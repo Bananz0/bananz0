@@ -1,17 +1,11 @@
-# v3
+Hi, I'm Glen! I'm an Electrical & Electronics Engineering student with a passion for cybersecurity, software, and hardware engineering.
 
-Third iteration of my personal website built with Jekyll.
+🚀 Check out my portfolio here: [My Website](https://bananz0.github.io)
 
-> 📢 **PSA for those who want to fork or copy this repo and use it for their own site:**
->
-> Please be a decent person and give me proper credit by linking back to my website! Refer to this handy [quora post](https://www.quora.com/Is-it-bad-to-copy-other-peoples-code) if you're not sure.
+### About Me
+- 🔭 I’m currently working on space tech and network security projects.
+- 🌱 Learning about red team operations and full-stack development.
 
-## Dependencies
-
-- [Gulp](https://gulpjs.com/)
-
-## Getting Started
-
-1.  `gem install jekyll sass bundler jekyll-minifier jekyll-sitemap`
-2.  `npm install`
-3.  `npm start`
+### Contact
+- 📧 Email: glenmuthokaq@gmail.com
+- 🌐 [LinkedIn](https://linkedin.com/in/glenmuthoka)
