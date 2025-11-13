@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{{ site.description }}">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-container">
+      <h1 class="site-title"><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
+      <nav class="site-nav">
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/about' | relative_url }}">About</a>
+        <a href="{{ '/projects' | relative_url }}">Projects</a>
+        <a href="{{ '/skills' | relative_url }}">Skills</a>
+        <a href="{{ '/contact' | relative_url }}">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  {% if page.url == '/' %}
+  <section class="hero">
+    <div class="container">
+      <h1>Hi, I'm Glen Muthoka Mutinda</h1>
+      <p>{{ site.description }}</p>
+    </div>
+  </section>
+  {% endif %}
+
+  <main class="page-content">
+    <div class="container">
+      {{ content }}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="social-links">
+        <a href="https://github.com/{{ site.github_username }}" class="social-link" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/{{ site.linkedin_username }}" class="social-link" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a href="mailto:{{ site.email }}" class="social-link">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </div>
+      <p class="copyright">&copy; {{ 'now' | date: "%Y" }} Glen Muthoka Mutinda. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,34 @@
+title: Glen Muthoka Mutinda - Portfolio
+email: glenmuthokaq@gmail.com
+description: >-
+  Electrical & Electronics Engineering student specializing in embedded systems, 
+  cybersecurity, and mixed-signal processing.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+
+github_username: Bananz0
+linkedin_username: glenmuthoka
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Education
+education:
+  - institution: University of Southampton
+    degree: Bachelor of Engineering (BEng), Electrical & Electronics Engineering
+    dates: 2023 - 2026
+  - institution: ONCAMPUS Global
+    degree: Undergraduate Foundation Programme, Engineering Pathway
+    dates: 2022 - 2023
+  - institution: Moi Forces Academy
+    degree: Kenya Certificate of Secondary Education
+    dates: 2018 - 2022
