@@ -1,0 +1,156 @@
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\renewcommand{\sfdefault}{lmss} 
+\usepackage[scale=0.85]{geometry}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\setlist{noitemsep, leftmargin=*}
+
+% Personal Information
+\name{Glen}{Muthoka Mutinda}
+\phone{+44 7341 625286}
+\email{theglenmuthoka@gmail.com}
+\social[linkedin]{glenmuthoka}
+\social[github]{Bananz0}
+
+\begin{document}
+
+\makecvtitle
+
+\section{Professional Summary}
+Electrical \& Electronics Engineering graduate from the University of Southampton with specialization in embedded systems, IC design, and cybersecurity. Proven track record in both hardware and software development, from TSMC 65nm IC fabrication to real-time FPGA systems and full-stack applications. Experience includes space-grade software development for lunar CubeSat missions, achieving measurable improvements in system performance and reliability. Seeking graduate opportunities in embedded systems engineering, digital design, or firmware development.
+
+\section{Education}
+\cventry{2023--2026}{BEng Electrical \& Electronics Engineering (Expected First Class Honours)}{University of Southampton}{Southampton, UK}{}{
+\textbf{Key Modules:} Digital Systems Design, Integrated Circuit Design, Control Systems, Embedded Systems, Network Security, Signal Processing\\
+\textbf{Final Year Project:} TSMC 65nm IC Design \& Fabrication (Team Lead)}
+
+\cventry{2022--2023}{Undergraduate Foundation Programme, Engineering Pathway (Distinction)}{ONCAMPUS Global}{Southampton, UK}{}{}
+
+\cventry{2018--2022}{Kenya Certificate of Secondary Education}{Moi Forces Academy}{Nairobi, Kenya}{}{}
+
+\section{Professional Experience}
+\cventry{Sep 2023--Jun 2025}{Junior Software Engineer}{ARTEMIS Small Sat-1 Lunar CubeSat Project}{University of Southampton}{}{
+\begin{itemize}
+    \item Developed and optimized flight software in C/C++ for lunar mission CubeSat, reducing system latency by 6\% through algorithm optimization and code refactoring
+    \item Enhanced system reliability by 20\% through implementation of comprehensive unit testing frameworks and automated debugging procedures
+    \item Collaborated with multidisciplinary team of 8 engineers to deliver space-grade software meeting strict timing and safety requirements
+    \item Conducted code reviews and documentation following NASA coding standards and MISRA C guidelines
+    \item Implemented real-time telemetry processing system for ground station communication
+\end{itemize}}
+
+\section{Technical Projects}
+
+\subsection{Hardware \& Digital Design}
+
+\cvitem{TSMC 65nm CPU Design: Complete IC Design \& Fabrication Flow}{Sep 2024--Jun 2025\\
+\textbf{Role:} Team Lead (6-member team) | \textbf{Tools:} S-Edit, T-Spice, L-Edit, Calibre DRC/LVS\\
+Led complete integrated circuit design from RTL to GDSII tape-out for TSMC 65nm process node. Designed CPU datapath and control logic, performed extensive SPICE simulations to verify timing constraints (setup/hold times), and conducted full physical verification including Design Rule Checking and Layout vs. Schematic validation. Successfully submitted GDSII files for fabrication with zero DRC violations. Achieved 15\% area reduction through custom cell optimization and strategic floorplanning.}
+
+\cvitem{16-Stage FIR Notch Filter for Real-Time Audio on FPGA}{Nov 2024--Dec 2024\\
+\textbf{Platform:} Altera Cyclone V (DE1-SoC) | \textbf{Language:} SystemVerilog | \textbf{Tools:} Quartus Prime, ModelSim\\
+Designed parametrized Finite Impulse Response digital filter with notch filtering capabilities for real-time stereo audio processing. Implemented 4-state FSM controller achieving 19-cycle latency (950ns at 50MHz) from ADC input to DAC output. Developed custom MATLAB scripts for optimal FIR coefficient generation and verification. Successfully processed dual-channel 48kHz audio with -40dB notch depth at configurable frequencies. Synthesized design utilized 2,847 logic elements (5\% FPGA utilization).\\
+\faGithub~\href{https://github.com/Bananz0/FIR-Filter-FPGA}{github.com/Bananz0/FIR-Filter-FPGA}}
+
+\cvitem{WattsApp: Embedded Smart Energy Management Platform}{Jan 2025--Mar 2025\\
+\textbf{MCU:} ESP32 | \textbf{Protocols:} MQTT, Modbus RTU | \textbf{Sensors:} INA219, ACS712\\
+Designed IoT-enabled smart meter system for real-time energy monitoring integrating solar generation, battery storage, and grid power. Implemented embedded C firmware for ESP32 managing power measurement (±0.5\% accuracy), load balancing decisions, and wireless data transmission. Developed React.js web dashboard for live visualization of energy flow and cost optimization recommendations. System achieved 12\% reduction in peak grid consumption during testing phase through intelligent load shifting algorithms.\\
+\faGithub~\href{https://github.com/Bananz0/WattsApp}{github.com/Bananz0/WattsApp}}
+
+\subsection{Software Development}
+
+\cvitem{Somnus: Sleep Optimization Mobile Application}{Jan 2025--Present\\
+\textbf{Platform:} Android (Kotlin) | \textbf{APIs:} Health Connect, Google Fit, Samsung Health\\
+Developing Android application that calculates optimal wake times using sleep cycle analysis and REM pattern detection algorithms. Integrated with Android Health Connect module for unified access to multiple health platforms. Implemented custom sleep stage classification model based on heart rate variability and movement data.\\
+\faGithub~\href{https://github.com/Bananz0/Somnus}{github.com/Bananz0/Somnus}}
+
+\cvitem{SmartSync Lighting: AI-Driven Smart Home Automation}{Dec 2024--Present\\
+\textbf{Language:} Python | \textbf{Libraries:} OpenCV, Spotify API, python-kasa\\
+Engineered automated lighting system that synchronizes TP-Link smart bulbs with Spotify playback for immersive audiovisual experiences. Implemented computer vision algorithms using OpenCV for real-time album artwork analysis and dominant color extraction. Developed adaptive lighting schemes that adjust brightness and color temperature based on music genre classification and tempo detection. System processes and updates lighting in <200ms for seamless synchronization.\\
+\faGithub~\href{https://github.com/Bananz0/SmartSync-Lighting}{github.com/Bananz0/SmartSync-Lighting}}
+
+\cvitem{WinStream: Windows to AirPlay Audio Bridge}{Jun 2024--Present\\
+\textbf{Language:} C\#/.NET | \textbf{Technologies:} Virtual Audio Drivers, AirPlay Protocol\\
+Creating Windows application enabling system-wide audio streaming to AirPlay devices (HomePod, Apple TV). Implemented virtual audio device driver for transparent audio capture and developed real-time audio encoding/transmission using AirPlay 2 protocol specifications. Achieved <50ms latency for lip-sync compatibility with video content. Overcame Windows audio subsystem limitations through kernel-mode driver development.\\
+\faGithub~\href{https://github.com/Bananz0/WinStream}{github.com/Bananz0/WinStream}}
+
+\cvitem{ControlCraft: Interactive Control Systems Analysis Toolbox}{Nov 2024--Dec 2024\\
+\textbf{Platform:} MATLAB GUI (App Designer) | \textbf{Features:} PID Tuning, Root Locus, Bode Plots\\
+Built comprehensive educational tool for control systems analysis and design. Implemented interactive PID controller tuning with real-time step response visualization, automated stability analysis (Routh-Hurwitz, Nyquist), and transfer function manipulation tools. Includes frequency domain analysis with customizable Bode/Nyquist plots and time domain simulations. Successfully deployed in undergraduate control systems labs serving 60+ students.\\
+\faGithub~\href{https://github.com/Bananz0/ControlCraft}{github.com/Bananz0/ControlCraft}}
+
+\cvitem{PiBoard: Real-Time Collaborative Whiteboard}{Apr 2024--May 2024\\
+\textbf{Framework:} Qt (C++) | \textbf{Platform:} Raspberry Pi | \textbf{Protocol:} Custom Serial\\
+Developed collaborative whiteboard application with custom serial communication protocol over GPIO. Implemented efficient data serialization for real-time drawing synchronization between multiple Raspberry Pi devices. Achieved <100ms update latency through optimized protocol design and threading architecture. System supports up to 4 concurrent users with automatic conflict resolution.\\
+\faGithub~\href{https://github.com/Bananz0/PiBoard}{github.com/Bananz0/PiBoard}}
+
+\subsection{Infrastructure \& Cybersecurity}
+
+\cvitem{Enterprise-Grade Home Network Infrastructure}{Ongoing\\
+\textbf{Technologies:} OPNsense, UniFi, Docker, Proxmox, HAProxy\\
+Architected and deployed production-grade home network infrastructure including:
+\begin{itemize}
+    \item \textbf{Network Security:} OPNsense firewall with Zenarmor IDS/IPS performing deep packet inspection; integrated Tailscale mesh VPN for zero-trust remote access; AdGuard DNS for network-wide ad/malware blocking
+    \item \textbf{Containerized Services:} Docker Compose orchestration hosting 15+ services (Plex, Jellyfin, Nextcloud, Home Assistant, Sonarr, Radarr, Overseerr); HAProxy reverse proxy with SSL/TLS termination and load balancing across multiple backend servers
+    \item \textbf{Virtualization:} Proxmox hypervisor managing 5 VMs for service isolation and resource optimization; implemented automated backup strategies with 3-2-1 rule compliance
+    \item \textbf{Monitoring:} Prometheus + Grafana stack for real-time infrastructure monitoring; Uptime Kuma for service availability tracking
+\end{itemize}
+Achieved 99.8\% uptime over 12-month period with zero security incidents. Infrastructure serves 8 concurrent users with average response times <50ms.}
+
+\cvitem{Hackintosh Systems Engineering}{2023--Present\\
+Successfully built and maintained 3 production Hackintosh systems (laptops and desktops) demonstrating deep understanding of UEFI/BIOS architecture, kernel extensions (kexts), and macOS bootloader configuration. Created custom OpenCore EFI configurations ensuring hardware compatibility (WiFi, Bluetooth, audio, GPU acceleration). Published detailed build guides and EFI packages for Lenovo ThinkPad G50-80 benefiting 200+ community members.}
+
+\section{Technical Skills}
+
+\subsection{Programming \& Hardware Description Languages}
+\cvitem{Proficient}{SystemVerilog, C/C++, Python, JavaScript/Node.js}
+\cvitem{Competent}{C\#, MATLAB, Kotlin, PowerShell}
+
+\subsection{Hardware Design \& Embedded Systems}
+\cvitem{IC Design}{TSMC 65nm Process, Cadence S-Edit/L-Edit/T-Spice, Mentor Calibre (DRC/LVS), GDSII Tape-out}
+\cvitem{FPGA/Digital}{Altera Quartus Prime, Xilinx Vivado, ModelSim, SystemVerilog, VHDL}
+\cvitem{PCB Design}{KiCad, Autodesk EAGLE, Altium Designer (basic)}
+\cvitem{Simulation}{LTSpice, NI Multisim, MATLAB Simulink/Simscape}
+\cvitem{Platforms}{Arduino (AVR/ARM), ESP32, Raspberry Pi, STM32 (basic)}
+
+\subsection{Software Development}
+\cvitem{Web Technologies}{React.js, Express.js, RESTful APIs, WebSocket}
+\cvitem{Mobile}{Android (Kotlin), Health Connect API}
+\cvitem{Databases}{PostgreSQL, MongoDB, SQLite}
+\cvitem{Version Control}{Git, GitHub, GitLab CI/CD}
+
+\subsection{Cybersecurity \& Networking}
+\cvitem{Network Security}{OPNsense/pfSense Firewall Configuration, IDS/IPS (Suricata, Zenarmor), VPN (Tailscale, WireGuard, OpenVPN)}
+\cvitem{Infrastructure}{UniFi Network Management, HAProxy (Load Balancing/Reverse Proxy), SSL/TLS Certificate Management, VLAN Segmentation}
+\cvitem{Protocols}{TCP/IP Stack, MQTT, Modbus RTU/TCP, SPI/I2C/UART, AirPlay}
+
+\subsection{DevOps \& Infrastructure}
+\cvitem{Containerization}{Docker, Docker Compose, Portainer}
+\cvitem{Virtualization}{Proxmox VE, VirtualBox, VMware}
+\cvitem{Linux Admin}{Ubuntu Server, Debian, Bash scripting, systemd, iptables}
+\cvitem{Monitoring}{Prometheus, Grafana, Uptime Kuma}
+
+\subsection{Tools \& Software}
+\cvitem{IDEs}{VS Code, CLion, Android Studio, Quartus, Vivado}
+\cvitem{CAD/Modeling}{Fusion 360, KiCad}
+\cvitem{Scientific}{MATLAB (Control Systems Toolbox, Signal Processing, Simulink), Jupyter Notebook, NumPy/SciPy}
+
+\section{Professional Memberships}
+\cvitem{2024--Present}{Member, Institute of Electrical and Electronics Engineers (IEEE)}
+\cvitem{2024--Present}{Member, Information Systems Audit and Control Association (ISACA)}
+\cvitem{2024--2026}{Associate Member, Royal Aeronautical Society (AMRAeS)}
+
+\section{Achievements \& Activities}
+\cvitem{2025}{Attended ISACA Winchester Chapter technical workshop on cybersecurity frameworks}
+\cvitem{2024--2025}{Active contributor to open-source projects: endlessh-go (Golang), Nearby-Sharing-Windows, AudioPlaybackConnector}
+\cvitem{2024}{Represented university at Engineering Society technical demonstrations}
+
+\section{Additional Information}
+\cvitem{Languages}{English (Native), Swahili (Native), Spanish (Beginner - A1)}
+\cvitem{Interests}{Amateur radio (studying for Foundation License), IoT security research, HomeKit/Matter protocol development}
+\cvitem{Right to Work}{UK Student Visa (valid until 2026), eligible for Graduate Route visa}
+
+\end{document}
