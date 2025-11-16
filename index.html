@@ -1,0 +1,465 @@
+---
+layout: default
+title: Home
+---
+
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="glitch" data-text="GLEN MUTHOKA">GLEN MUTHOKA</h1>
+        <p class="tagline">// EMBEDDED SYSTEMS // IC DESIGN // HOMELABBING //</p>
+        <div class="cta-buttons">
+            <a href="{{ '/projects' | relative_url }}" class="cta-btn">VIEW PROJECTS</a>
+            <a href="{{ '/contact' | relative_url }}" class="cta-btn">GET IN TOUCH</a>
+        </div>
+    </div>
+    
+    <!-- 3D IC Chip container -->
+    <div id="chip-container"></div>
+</section>
+
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card fade-in">
+                <div class="stat-number">6%</div>
+                <div class="stat-label">Latency Reduction<br>CubeSat Software</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">65nm</div>
+                <div class="stat-label">TSMC Process<br>IC Design</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">20%</div>
+                <div class="stat-label">Reliability Boost<br>Flight Software</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">99.8%</div>
+                <div class="stat-label">Infrastructure<br>Uptime</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="featured-projects">
+    <div class="container">
+        <h2 class="section-title fade-in">FEATURED_PROJECTS</h2>
+        
+        <!-- Personal Projects -->
+        <h3 class="project-category fade-in">Personal Projects</h3>
+        <div class="projects-grid">
+            <div class="project-card fade-in">
+                <span class="project-badge">WINDOWS</span>
+                <h3 class="project-title">Galaxy Book Enabler</h3>
+                <p class="project-desc">PowerShell tool that spoofs Windows PCs as Samsung Galaxy Books, unlocking ecosystem apps like Quick Share, Multi Control, and Samsung Notes. Features 21 authentic hardware profiles, auto-elevation, and intelligent package management.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">PowerShell</span>
+                    <span class="tech-tag">Registry</span>
+                    <span class="tech-tag">WinGet</span>
+                </div>
+                <a href="https://github.com/Bananz0/GalaxyBookEnabler" class="project-link" target="_blank">VIEW PROJECT →</a>
+            </div>
+
+            <div class="project-card fade-in">
+                <span class="project-badge">eGPU</span>
+                <h3 class="project-title">eGPU Auto-Enabler</h3>
+                <p class="project-desc">Background service that automatically re-enables external GPUs after hot-plugging on Windows. Includes intelligent power management, crash recovery, and Windows notifications. Runs silently with 99.9% reliability.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">PowerShell</span>
+                    <span class="tech-tag">PnP</span>
+                    <span class="tech-tag">Automation</span>
+                </div>
+                <a href="https://github.com/Bananz0/eGPUae" class="project-link" target="_blank">VIEW PROJECT →</a>
+            </div>
+        </div>
+
+        <!-- University Work -->
+        <h3 class="project-category fade-in" style="margin-top: 3rem;">University Work</h3>
+        <div class="projects-grid">
+            <div class="project-card fade-in">
+                <span class="project-badge">IC DESIGN</span>
+                <h3 class="project-title">TSMC 65nm CPU Design</h3>
+                <p class="project-desc">Complete IC design flow from RTL to GDSII tape-out for TSMC 65nm process. Led 6-person team through datapath design, SPICE simulations, and physical verification. Achieved 15% area reduction with zero DRC violations.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">Cadence</span>
+                    <span class="tech-tag">Calibre</span>
+                    <span class="tech-tag">GDSII</span>
+                </div>
+            </div>
+
+            <div class="project-card fade-in">
+                <span class="project-badge">EMBEDDED</span>
+                <h3 class="project-title">PiBoard</h3>
+                <p class="project-desc">Real-time collaborative whiteboard for Raspberry Pi with custom serial communication protocol over GPIO. Achieved <100ms update latency through optimized threading and data serialization. Supports 4 concurrent users.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">Qt/C++</span>
+                    <span class="tech-tag">GPIO</span>
+                    <span class="tech-tag">Serial</span>
+                </div>
+                <a href="https://github.com/Bananz0/PiBoard" class="project-link" target="_blank">VIEW PROJECT →</a>
+            </div>
+
+            <div class="project-card fade-in">
+                <span class="project-badge">IoT</span>
+                <h3 class="project-title">WattsApp Smart Meter</h3>
+                <p class="project-desc">ESP32-based energy management platform integrating solar, battery, and grid power. Implemented MQTT/Modbus protocols for real-time monitoring. Achieved 12% reduction in peak consumption through intelligent load balancing.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">ESP32</span>
+                    <span class="tech-tag">MQTT</span>
+                    <span class="tech-tag">InfluxDB</span>
+                </div>
+                <a href="https://github.com/Bananz0/WattsApp" class="project-link" target="_blank">VIEW PROJECT →</a>
+            </div>
+        </div>
+
+        <div class="view-all-projects fade-in">
+            <a href="{{ '/projects' | relative_url }}" class="cta-btn">VIEW ALL PROJECTS</a>
+        </div>
+    </div>
+</section>
+
+<section class="tech-overview">
+    <div class="container">
+        <h2 class="section-title fade-in">TECH_STACK</h2>
+        <div class="tech-grid">
+            <div class="tech-card fade-in">
+                <h3>🔧 Hardware & Digital Design</h3>
+                <p>IC Design (TSMC 65nm) • FPGA (SystemVerilog, Quartus, Vivado) • PCB Design (KiCad, EAGLE) • Embedded (ESP32, STM32, Arduino)</p>
+            </div>
+            
+            <div class="tech-card fade-in">
+                <h3>💾 Software Development</h3>
+                <p>C/C++ • Python • JavaScript/TypeScript • Kotlin • React.js • Node.js • PowerShell • Real-time Systems</p>
+            </div>
+            
+            <div class="tech-card fade-in">
+                <h3>🔒 Infrastructure & Homelabbing</h3>
+                <p>OPNsense • HAProxy • Docker • Proxmox • InfluxDB • Grafana • IDS/IPS (Suricata, Zenarmor) • 99.8% Uptime</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem 2rem;
+    position: relative;
+}
+
+.hero-content {
+    max-width: 1200px;
+    text-align: center;
+    z-index: 10;
+}
+
+.tagline {
+    font-size: 1.5rem;
+    color: var(--cyber-blue);
+    margin: 1rem 0 2rem;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#chip-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    opacity: 0.3;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.stats-section {
+    padding: 4rem 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--cyber-pink);
+    text-shadow: 0 0 20px var(--cyber-pink);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.featured-projects {
+    padding: 4rem 0;
+}
+
+.project-category {
+    color: var(--cyber-purple);
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.project-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 0, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 110, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.project-card:hover::after {
+    left: 100%;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--cyber-pink);
+    box-shadow: 0 10px 40px rgba(255, 0, 110, 0.3);
+}
+
+.project-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background: var(--cyber-purple);
+    color: var(--darker-bg);
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.project-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.project-desc {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.tech-tag {
+    padding: 0.3rem 0.8rem;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid var(--cyber-blue);
+    color: var(--cyber-blue);
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+.project-link {
+    color: var(--cyber-pink);
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.project-link:hover {
+    color: var(--cyber-blue);
+}
+
+.view-all-projects {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.tech-overview {
+    padding: 4rem 0;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.tech-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.tech-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 217, 255, 0.2);
+}
+
+.tech-card h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.tech-card p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+    #chip-container {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// 3D Rotating IC Chip using Three.js
+const chipContainer = document.getElementById('chip-container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+renderer.setSize(400, 400);
+chipContainer.appendChild(renderer.domElement);
+
+// Create IC chip geometry
+const geometry = new THREE.BoxGeometry(2, 0.2, 2);
+const material = new THREE.MeshPhongMaterial({
+    color: 0x00d9ff,
+    emissive: 0x00d9ff,
+    emissiveIntensity: 0.2,
+    shininess: 100,
+    wireframe: false
+});
+
+const chip = new THREE.Mesh(geometry, material);
+scene.add(chip);
+
+// Add circuit traces
+const traceGeometry = new THREE.BoxGeometry(0.05, 0.01, 1.5);
+const traceMaterial = new THREE.MeshPhongMaterial({
+    color: 0xff006e,
+    emissive: 0xff006e,
+    emissiveIntensity: 0.3
+});
+
+for (let i = 0; i < 8; i++) {
+    const trace = new THREE.Mesh(traceGeometry, traceMaterial);
+    trace.position.x = -0.75 + (i * 0.25);
+    trace.position.y = 0.11;
+    chip.add(trace);
+}
+
+// Add pins
+const pinGeometry = new THREE.BoxGeometry(0.1, 0.3, 0.1);
+const pinMaterial = new THREE.MeshPhongMaterial({
+    color: 0xb537f2,
+    emissive: 0xb537f2,
+    emissiveIntensity: 0.2
+});
+
+for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+        const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+        pin.position.x = -0.75 + (i * 0.5);
+        pin.position.z = -0.75 + (j * 0.5);
+        pin.position.y = -0.2;
+        chip.add(pin);
+    }
+}
+
+// Lighting
+const light1 = new THREE.PointLight(0x00d9ff, 1, 100);
+light1.position.set(5, 5, 5);
+scene.add(light1);
+
+const light2 = new THREE.PointLight(0xff006e, 0.5, 100);
+light2.position.set(-5, -5, 5);
+scene.add(light2);
+
+const ambientLight = new THREE.AmbientLight(0x404040);
+scene.add(ambientLight);
+
+camera.position.z = 5;
+
+// Animation
+function animateChip() {
+    requestAnimationFrame(animateChip);
+    
+    chip.rotation.x += 0.005;
+    chip.rotation.y += 0.01;
+    
+    renderer.render(scene, camera);
+}
+
+animateChip();
+
+// Responsive
+window.addEventListener('resize', () => {
+    const size = Math.min(400, window.innerWidth - 40);
+    renderer.setSize(size, size);
+    chipContainer.style.width = size + 'px';
+    chipContainer.style.height = size + 'px';
+});
+</script>

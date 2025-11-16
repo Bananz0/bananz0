@@ -1,18 +1,22 @@
-title: Glen Muthoka Mutinda - Portfolio
-email: glenmuthokaq@gmail.com
+title: Glen Muthoka | Embedded Systems Engineer
+email: theglenmuthoka@gmail.com
 description: >-
-  Electrical & Electronics Engineering student specializing in embedded systems, 
-  cybersecurity, and mixed-signal processing.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+  Electrical & Electronics Engineering student from Kenya, based in Southampton, UK.
+  Specializing in embedded systems, IC design, and homelabbing. 
+  Building at the intersection of hardware and software.
+baseurl: ""
+url: "https://glenmuthoka.com"
 
+# Social
 github_username: Bananz0
 linkedin_username: glenmuthoka
+twitter_username: bananz0
 
 # Build settings
 markdown: kramdown
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
 # Exclude from processing
 exclude:
@@ -20,15 +24,19 @@ exclude:
   - Gemfile.lock
   - node_modules
   - vendor
+  - README.md
+  - .gitignore
 
-# Education
-education:
-  - institution: University of Southampton
-    degree: Bachelor of Engineering (BEng), Electrical & Electronics Engineering
-    dates: 2023 - 2026
-  - institution: ONCAMPUS Global
-    degree: Undergraduate Foundation Programme, Engineering Pathway
-    dates: 2022 - 2023
-  - institution: Moi Forces Academy
-    degree: Kenya Certificate of Secondary Education
-    dates: 2018 - 2022
+# Collections (if you want blog posts later)
+# collections:
+#   projects:
+#     output: true
+#     permalink: /projects/:name
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"

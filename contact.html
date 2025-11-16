@@ -1,0 +1,431 @@
+---
+layout: default
+title: Contact
+---
+
+<section class="contact-hero">
+    <div class="container">
+        <h1 class="glitch fade-in" data-text="CONTACT">CONTACT</h1>
+        <p class="hero-subtitle fade-in">LET'S BUILD SOMETHING TOGETHER</p>
+    </div>
+</section>
+
+<section class="contact-main">
+    <div class="container">
+        <div class="contact-grid">
+            
+            <!-- Terminal-Style Contact Form -->
+            <div class="contact-form-section fade-in">
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                        <span class="terminal-title">contact_form.sh</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line-typing">
+                            <span class="terminal-prompt">user@glenmuthoka:~$</span> ./send_message.sh
+                        </div>
+                        
+                        <form id="contact-form" class="terminal-form" action="https://formspree.io/f/mldaokke" method="POST">
+                            <input type="hidden" name="_subject" value="New contact from glenmuthoka.com" />
+                            <div class="form-group">
+                                <label class="terminal-label">
+                                    <span class="terminal-prompt">&gt;</span> Enter your name:
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    class="terminal-input" 
+                                    placeholder="John Doe"
+                                    required
+                                />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="terminal-label">
+                                    <span class="terminal-prompt">&gt;</span> Enter your email:
+                                </label>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    class="terminal-input" 
+                                    placeholder="john@example.com"
+                                    required
+                                />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="terminal-label">
+                                    <span class="terminal-prompt">&gt;</span> Subject:
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="subject" 
+                                    class="terminal-input" 
+                                    placeholder="Project Inquiry"
+                                    required
+                                />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="terminal-label">
+                                    <span class="terminal-prompt">&gt;</span> Your message:
+                                </label>
+                                <textarea 
+                                    name="message" 
+                                    class="terminal-textarea" 
+                                    rows="6"
+                                    placeholder="Tell me about your project..."
+                                    required
+                                ></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="cta-btn">
+                                    SEND MESSAGE
+                                </button>
+                            </div>
+                            
+                            <div class="terminal-line-typing">
+                                <span class="terminal-prompt">$</span>
+                                <span class="cursor-blink">_</span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Info Cards -->
+            <div class="contact-info-section">
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">📧</div>
+                    <h3>EMAIL</h3>
+                    <p>For project inquiries and professional opportunities</p>
+                    <a href="mailto:theglenmuthoka@gmail.com" class="contact-link">
+                        theglenmuthoka@gmail.com
+                    </a>
+                </div>
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">💼</div>
+                    <h3>LINKEDIN</h3>
+                    <p>Let's connect professionally</p>
+                    <a href="https://linkedin.com/in/glenmuthoka" target="_blank" class="contact-link">
+                        /in/glen-muthoka
+                    </a>
+                </div>
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">🐙</div>
+                    <h3>GITHUB</h3>
+                    <p>Check out my open-source work</p>
+                    <a href="https://github.com/Bananz0" target="_blank" class="contact-link">
+                        github.com/Bananz0
+                    </a>
+                </div>
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">📍</div>
+                    <h3>LOCATION</h3>
+                    <p>Southampton, UK • From Kenya</p>
+                    <span class="contact-text">Remote • Hybrid • On-site</span>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <!-- Availability Status -->
+        <div class="availability-section fade-in">
+            <div class="availability-card">
+                <div class="status-indicator">
+                    <span class="status-dot active"></span>
+                    <span class="status-text">CURRENTLY AVAILABLE FOR PROJECTS</span>
+                </div>
+                <div class="availability-info">
+                    <div class="info-item">
+                        <span class="icon">⏱️</span>
+                        <span>Response Time: <strong>&lt; 24 hours</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🎯</span>
+                        <span>Project Types: <strong>Embedded Systems, IC Design, Full-Stack</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🌍</span>
+                        <span>Time Zone: <strong>GMT/BST (UTC+0/+1)</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<style>
+/* Contact Page Specific Styles */
+.contact-main {
+    padding: 4rem 2rem;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+/* Terminal Form Styles */
+.terminal-window {
+    background: #000;
+    border: 2px solid var(--cyber-blue);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 217, 255, 0.3);
+}
+
+.terminal-header {
+    background: var(--dark-bg);
+    padding: 0.8rem 1rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    border-bottom: 1px solid var(--cyber-blue);
+}
+
+.terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.terminal-btn.red { background: #ff5f56; }
+.terminal-btn.yellow { background: #ffbd2e; }
+.terminal-btn.green { background: #27c93f; }
+
+.terminal-title {
+    margin-left: auto;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.terminal-body {
+    padding: 2rem;
+    min-height: 400px;
+}
+
+.terminal-line-typing {
+    color: #00ff00;
+    margin-bottom: 1.5rem;
+    font-family: 'Courier New', monospace;
+}
+
+.terminal-prompt {
+    color: var(--cyber-pink);
+    margin-right: 0.5rem;
+}
+
+.terminal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.terminal-label {
+    color: #00ff00;
+    font-size: 0.95rem;
+}
+
+.terminal-input,
+.terminal-textarea {
+    background: rgba(0, 217, 255, 0.05);
+    border: 1px solid var(--cyber-blue);
+    color: var(--text-primary);
+    padding: 0.8rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.terminal-input:focus,
+.terminal-textarea:focus {
+    outline: none;
+    border-color: var(--cyber-pink);
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
+    background: rgba(255, 0, 110, 0.05);
+}
+
+.terminal-textarea {
+    resize: vertical;
+}
+
+.cursor-blink {
+    animation: blink 1s infinite;
+}
+
+/* Contact Info Cards */
+.contact-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contact-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.contact-card:hover {
+    border-color: var(--cyber-pink);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+}
+
+.contact-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.contact-card h3 {
+    color: var(--cyber-blue);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+}
+
+.contact-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.contact-link {
+    display: inline-block;
+    color: var(--cyber-pink);
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.contact-link:hover {
+    color: var(--cyber-blue);
+    text-shadow: 0 0 10px var(--cyber-blue);
+}
+
+.contact-text {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+/* Availability Section */
+.availability-section {
+    margin-top: 3rem;
+}
+
+.availability-card {
+    background: var(--card-bg);
+    border: 2px solid var(--cyber-purple);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(181, 55, 242, 0.2);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #666;
+}
+
+.status-dot.active {
+    background: #27c93f;
+    box-shadow: 0 0 15px #27c93f;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-text {
+    color: var(--text-primary);
+    font-weight: bold;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.availability-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.info-item .icon {
+    font-size: 1.5rem;
+}
+
+.info-item span {
+    color: var(--text-secondary);
+}
+
+.info-item strong {
+    color: var(--text-primary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-info-section {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-info-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .availability-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .terminal-body {
+        padding: 1rem;
+    }
+}
+</style>
