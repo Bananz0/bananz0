@@ -10,29 +10,6 @@ Specializing in embedded systems, digital design, and hardware-software integrat
 [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=flat&logo=twitter&logoColor=white)](https://twitter.com/bananz0)
 [![Email](https://img.shields.io/badge/Email-theglenmuthoka@gmail.com-ff006e?style=flat&logo=gmail&logoColor=white)](mailto:theglenmuthoka@gmail.com)
 
-🌐 **Live Site:** [glenmuthoka.com](https://glenmuthoka.com) | [bananz0.github.io](https://bananz0.github.io)
-
-</div>
-
----
-
-## 🚀 Portfolio Website
-
-Cyberpunk-themed portfolio built with Jekyll, featuring:
-- ⚡ Interactive particle system & animations
-- 🎨 Glitch effects & holographic UI panels
-- 🖱️ Custom cursor tracking
-- 📱 Fully responsive design
-- 🎯 3D rotating IC chip (Three.js)
-- 🔥 Terminal-style contact form
-
-### Local Development
-```bash
-bundle install
-bundle exec jekyll serve
-# Visit http://localhost:4000
-```
-
 ---
 
 ## Technical Expertise
