@@ -5,33 +5,10 @@
 **Electrical & Electronics Engineering @ University of Southampton**  
 Specializing in embedded systems, digital design, and hardware-software integration
 
-[![Website](https://img.shields.io/badge/Website-glenmuthoka.com-00d9ff?style=flat&logo=google-chrome&logoColor=white)](https://glenmuthoka.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/glenmuthoka) 
 [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=flat&logo=twitter&logoColor=white)](https://twitter.com/bananz0)
-[![Email](https://img.shields.io/badge/Email-theglenmuthoka@gmail.com-ff006e?style=flat&logo=gmail&logoColor=white)](mailto:theglenmuthoka@gmail.com)
-
-🌐 **Live Site:** [glenmuthoka.com](https://glenmuthoka.com) | [bananz0.github.io](https://bananz0.github.io)
 
 </div>
-
----
-
-## 🚀 Portfolio Website
-
-Cyberpunk-themed portfolio built with Jekyll, featuring:
-- ⚡ Interactive particle system & animations
-- 🎨 Glitch effects & holographic UI panels
-- 🖱️ Custom cursor tracking
-- 📱 Fully responsive design
-- 🎯 3D rotating IC chip (Three.js)
-- 🔥 Terminal-style contact form
-
-### Local Development
-```bash
-bundle install
-bundle exec jekyll serve
-# Visit http://localhost:4000
-```
 
 ---
 
