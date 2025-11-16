@@ -155,6 +155,26 @@ title: About
                 </div>
             </div>
         </div>
+
+        <!-- CV Download Panel -->
+        <div class="holo-panel cv-panel fade-in">
+            <div class="panel-header">
+                <span class="panel-icon">📄</span>
+                <h2>DOWNLOAD_CV</h2>
+            </div>
+            <div class="panel-content">
+                <p class="cv-description">Get the complete overview of my experience, education, and technical skills.</p>
+                <div class="cv-download-options">
+                    <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cv-download-btn" download="Glen_Muthoka_CV.pdf">
+                        <span class="cv-icon">📥</span>
+                        <span class="cv-text">
+                            <strong>DOWNLOAD CV</strong>
+                            <small>PDF Format • Updated Nov 2024</small>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -382,6 +402,63 @@ title: About
     border-left: 3px solid var(--cyber-purple);
     margin-bottom: 1rem;
     background: rgba(181, 55, 242, 0.05);
+}
+
+/* CV Download Panel */
+.cv-panel {
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.1), rgba(0, 217, 255, 0.1));
+}
+
+.cv-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.cv-download-options {
+    display: flex;
+    justify-content: center;
+}
+
+.cv-download-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2.5rem;
+    background: linear-gradient(135deg, var(--cyber-pink), var(--cyber-purple));
+    border: 2px solid var(--cyber-pink);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.3s;
+    box-shadow: 0 5px 20px rgba(255, 0, 110, 0.3);
+}
+
+.cv-download-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 0, 110, 0.5);
+    background: linear-gradient(135deg, var(--cyber-purple), var(--cyber-blue));
+    border-color: var(--cyber-blue);
+}
+
+.cv-icon {
+    font-size: 2rem;
+}
+
+.cv-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.cv-text strong {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.cv-text small {
+    color: rgba(224, 231, 255, 0.7);
+    font-size: 0.85rem;
 }
 
 .wide-panel {

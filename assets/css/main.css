@@ -167,6 +167,28 @@ nav {
     width: 100%;
 }
 
+/* CV Download Button */
+.cv-btn {
+    padding: 0.5rem 1.2rem !important;
+    background: linear-gradient(135deg, var(--cyber-pink), var(--cyber-purple)) !important;
+    border: 2px solid var(--cyber-pink);
+    border-radius: 4px;
+    color: var(--text-primary) !important;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
+}
+
+.cv-btn::after {
+    display: none !important;
+}
+
+.cv-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 0, 110, 0.5);
+    background: linear-gradient(135deg, var(--cyber-purple), var(--cyber-blue)) !important;
+}
+
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
     display: none;
