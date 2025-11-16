@@ -3,3 +3,107 @@ _site
 .jekyll-cache
 .jekyll-metadata
 vendor
+
+# LaTeX build artifacts (common)
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.lol
+*.glo
+*.gls
+*.ist
+*.acn
+*.acr
+*.alg
+*.glg
+*.glsdefs
+*.idx
+*.ilg
+*.ind
+*.inx
+*.maf
+*.mtc*
+*.nav
+*.snm
+*.synctex.gz
+*.synctex(busy)
+*.run.xml
+*.bcf
+*.xdv
+*.ps
+*.dvi
+*.4ct
+*.4tc
+
+# LaTeX temporary and auxiliary directories
+auto/
+build/
+latex_out/
+_generated/
+
+
+# Bibliography / indexing intermediate files
+*.blg
+*.bbl
+*.run.xml
+
+# Editors / OS files
+*~
+.#*
+*.swp
+*.swo
+*.lock
+*.kate-swp
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor/project config folders
+.vscode/
+.idea/
+*.iml
+
+# Emacs
+*~ 
+.#* 
+.emacs.desktop
+.emacs.desktop.lock
+
+# Vim
+.*.swp
+*.sw?
+
+# Windows thumbnail cache / Recycle bin
+ehthumbs.db
+Thumbs.db
+$RECYCLE.BIN/
+
+# TeXShop / TeXworks / TeXstudio specific
+*.synctex.gz
+*.tex.backup
+*.tex~ 
+texstudio.ini
+
+# latexmk / build tools
+.latexmkrc
+.fls
+latexmk/
+latexrun-cache/
+
+# Auxiliary output directories often created by scripts
+out/
+tmp/
+cache/
+
+# If you keep project-specific generated files in a folder, ignore it:
+# /out/

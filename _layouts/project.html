@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} | Glen Muthoka</title>
+    <meta name="description" content="{{ page.description }}">
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/project.css' | relative_url }}">
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <canvas id="particles"></canvas>
+    <div id="cursor-follower"></div>
+    
+    <nav>
+        <div class="logo">
+            <a href="{{ '/' | relative_url }}">GLENMUTHOKA.COM</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ '/' | relative_url }}">HOME</a></li>
+            <li><a href="{{ '/projects' | relative_url }}">PROJECTS</a></li>
+            <li><a href="{{ '/about' | relative_url }}">ABOUT</a></li>
+            <li><a href="{{ '/skills' | relative_url }}">SKILLS</a></li>
+            <li><a href="{{ '/contact' | relative_url }}">CONTACT</a></li>
+        </ul>
+    </nav>
+
+    <main class="project-detail">
+        <!-- Project Header -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="breadcrumb fade-in">
+                    <a href="{{ '/projects' | relative_url }}">PROJECTS</a>
+                    <span class="separator">/</span>
+                    <span class="current">{{ page.title }}</span>
+                </div>
+                
+                <div class="project-title-section fade-in">
+                    <span class="project-badge-large">{{ page.category }}</span>
+                    <h1 class="glitch" data-text="{{ page.title }}">{{ page.title }}</h1>
+                    <p class="project-tagline">{{ page.tagline }}</p>
+                </div>
+                
+                <div class="project-meta fade-in">
+                    <div class="meta-item">
+                        <span class="meta-label">TECH STACK</span>
+                        <div class="meta-tags">
+                            {% for tech in page.tech_stack %}
+                            <span class="tech-badge">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if page.github_url %}
+                    <div class="meta-item">
+                        <a href="{{ page.github_url }}" class="github-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span class="link-icon">→</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if page.stats %}
+                    <div class="meta-stats">
+                        {% for stat in page.stats %}
+                        <div class="stat-pill">
+                            <span class="stat-value">{{ stat.value }}</span>
+                            <span class="stat-label">{{ stat.label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Content -->
+        <section class="project-body">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="main-content">
+                        {{ content }}
+                    </div>
+                    
+                    <aside class="project-sidebar">
+                        {% if page.quick_facts %}
+                        <div class="sidebar-card fade-in">
+                            <h3>QUICK_FACTS</h3>
+                            <ul class="facts-list">
+                                {% for fact in page.quick_facts %}
+                                <li>
+                                    <span class="fact-icon">{{ fact.icon }}</span>
+                                    <span class="fact-text">{{ fact.text }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if page.links %}
+                        <div class="sidebar-card fade-in">
+                            <h3>LINKS</h3>
+                            <div class="links-list">
+                                {% for link in page.links %}
+                                <a href="{{ link.url }}" class="sidebar-link" target="_blank">
+                                    <span>{{ link.text }}</span>
+                                    <span class="link-arrow">→</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Projects -->
+        {% if page.related_projects %}
+        <section class="related-projects">
+            <div class="container">
+                <h2 class="section-title fade-in">RELATED_PROJECTS</h2>
+                <div class="related-grid">
+                    {% for project in page.related_projects %}
+                    <a href="{{ project.url | relative_url }}" class="related-card fade-in">
+                        <span class="related-badge">{{ project.category }}</span>
+                        <h4>{{ project.title }}</h4>
+                        <p>{{ project.description }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>GLEN MUTHOKA</h3>
+                <p>Embedded Systems // Digital Design // Homelabbing</p>
+            </div>
+            <div class="footer-section">
+                <h3>LINKS</h3>
+                <a href="https://github.com/{{ site.github_username }}" target="_blank">GitHub</a>
+                <a href="https://linkedin.com/in/{{ site.linkedin_username }}" target="_blank">LinkedIn</a>
+                <a href="https://twitter.com/{{ site.twitter_username }}" target="_blank">Twitter</a>
+            </div>
+            <div class="footer-section">
+                <h3>CONTACT</h3>
+                <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {{ 'now' | date: "%Y" }} Glen Muthoka. All systems operational.</p>
+        </div>
+    </footer>
+
+    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+</body>
+</html>
