@@ -54,7 +54,7 @@ Developing flight software for CubeSats
 
 <div align="center">
   <img src="https://github-readme-stats.vercel.app/api?username=bananz0&theme=aura&show_icons=true&hide_border=true" height="160px" />
-                      
+       
   <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=bananz0&theme=aura&layout=compact&hide_border=true&hide=html,css" height="160px" />
 </div>
 
