@@ -1,5 +1,141 @@
 // ==========================================
-// PARTICLE SYSTEM
+// 3D DOT GRID OVERLAY (OPTIMIZED WITH SPATIAL PARTITIONING)
+// ==========================================
+function create3DDotGrid() {
+    const dotGrid = document.createElement('div');
+    dotGrid.id = 'dot-grid';
+    document.body.appendChild(dotGrid);
+
+    const dots = [];
+    const spacing = 50; // Distance between dots
+    const cols = Math.ceil(window.innerWidth / spacing);
+    const rows = Math.ceil(window.innerHeight / spacing);
+    const checkRadius = 150; // Only check dots within this radius
+
+    // Create dot grid with spatial hash map
+    const spatialGrid = {};
+    const cellSize = 100;
+
+    function getSpatialKey(x, y) {
+        return `${Math.floor(x / cellSize)},${Math.floor(y / cellSize)}`;
+    }
+
+    // Create dot grid
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            const x = col * spacing + spacing / 2;
+            const y = row * spacing + spacing / 2;
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            dotGrid.appendChild(dot);
+            
+            const dotData = {
+                element: dot,
+                x: x,
+                y: y
+            };
+            
+            dots.push(dotData);
+
+            // Add to spatial grid
+            const key = getSpatialKey(x, y);
+            if (!spatialGrid[key]) {
+                spatialGrid[key] = [];
+            }
+            spatialGrid[key].push(dotData);
+        }
+    }
+
+    // Track mouse position accurately
+    let mouseX = -1000;
+    let mouseY = -1000;
+    let animationFrameId = null;
+
+    // Get nearby dots using spatial partitioning
+    function getNearbyDots(x, y) {
+        const nearbyDots = [];
+        const cellX = Math.floor(x / cellSize);
+        const cellY = Math.floor(y / cellSize);
+
+        // Check surrounding cells
+        for (let dx = -2; dx <= 2; dx++) {
+            for (let dy = -2; dy <= 2; dy++) {
+                const key = `${cellX + dx},${cellY + dy}`;
+                if (spatialGrid[key]) {
+                    nearbyDots.push(...spatialGrid[key]);
+                }
+            }
+        }
+        return nearbyDots;
+    }
+
+    function updateDots() {
+        // Get only nearby dots for performance
+        const nearbyDots = getNearbyDots(mouseX, mouseY);
+
+        // Reset previously active dots
+        dots.forEach(dot => {
+            if (dot.element.classList.contains('active') || dot.element.classList.contains('nearby')) {
+                dot.element.classList.remove('active', 'nearby');
+            }
+        });
+
+        // Update only nearby dots
+        nearbyDots.forEach(dot => {
+            const dx = dot.x - mouseX;
+            const dy = dot.y - mouseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 60) {
+                dot.element.classList.add('active');
+            } else if (distance < 120) {
+                dot.element.classList.add('nearby');
+            }
+        });
+    }
+
+    // Use mousemove for accurate tracking with requestAnimationFrame for smooth updates
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        if (!animationFrameId) {
+            animationFrameId = requestAnimationFrame(() => {
+                updateDots();
+                animationFrameId = null;
+            });
+        }
+    });
+
+    // Reset on mouse leave
+    document.addEventListener('mouseleave', () => {
+        dots.forEach(dot => {
+            dot.element.classList.remove('active', 'nearby');
+        });
+    });
+
+    // Recreate grid on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            location.reload(); // Simplest approach for resize
+        }, 500);
+    });
+
+    // Hide on mobile for performance
+    if ('ontouchstart' in window) {
+        dotGrid.style.display = 'none';
+    }
+}
+
+// Initialize dot grid
+create3DDotGrid();
+
+// ==========================================
+// INTERACTIVE PARTICLE SYSTEM
 // ==========================================
 const canvas = document.getElementById('particles');
 const ctx = canvas.getContext('2d');
@@ -13,6 +149,14 @@ resizeCanvas();
 
 const particles = [];
 const particleCount = 100;
+let mouseParticleX = -1000;
+let mouseParticleY = -1000;
+
+// Track mouse position for particle interaction
+document.addEventListener('mousemove', (e) => {
+    mouseParticleX = e.clientX;
+    mouseParticleY = e.clientY;
+});
 
 class Particle {
     constructor() {
@@ -21,18 +165,67 @@ class Particle {
         this.vx = (Math.random() - 0.5) * 0.5;
         this.vy = (Math.random() - 0.5) * 0.5;
         this.size = Math.random() * 2;
+        this.baseVx = this.vx;
+        this.baseVy = this.vy;
     }
 
     update() {
+        // Calculate distance from mouse
+        const dx = this.x - mouseParticleX;
+        const dy = this.y - mouseParticleY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const interactionRadius = 150;
+
+        // Apply repel force when mouse is near
+        if (distance < interactionRadius) {
+            const force = (interactionRadius - distance) / interactionRadius;
+            const angle = Math.atan2(dy, dx);
+            const repelStrength = 3;
+            
+            this.vx = this.baseVx + Math.cos(angle) * force * repelStrength;
+            this.vy = this.baseVy + Math.sin(angle) * force * repelStrength;
+        } else {
+            // Gradually return to base velocity
+            this.vx += (this.baseVx - this.vx) * 0.05;
+            this.vy += (this.baseVy - this.vy) * 0.05;
+        }
+
         this.x += this.vx;
         this.y += this.vy;
 
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        // Bounce off edges
+        if (this.x < 0 || this.x > canvas.width) {
+            this.vx *= -1;
+            this.baseVx *= -1;
+        }
+        if (this.y < 0 || this.y > canvas.height) {
+            this.vy *= -1;
+            this.baseVy *= -1;
+        }
     }
 
     draw() {
-        ctx.fillStyle = 'rgba(0, 217, 255, 0.5)';
+        // Calculate distance from mouse for color intensity
+        const dx = this.x - mouseParticleX;
+        const dy = this.y - mouseParticleY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = 150;
+        
+        let opacity = 0.5;
+        let color = '0, 217, 255'; // Cyan
+        
+        // Change color when near mouse
+        if (distance < maxDistance) {
+            const proximity = 1 - (distance / maxDistance);
+            opacity = 0.5 + proximity * 0.5;
+            // Blend from cyan to pink
+            const r = Math.floor(proximity * 255);
+            const g = Math.floor(217 * (1 - proximity));
+            const b = 255;
+            color = `${r}, ${g}, ${b}`;
+        }
+        
+        ctx.fillStyle = `rgba(${color}, ${opacity})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -161,7 +354,7 @@ let lastScroll = 0;
 
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-    
+
     if (currentScroll > 100) {
         nav.style.background = 'rgba(5, 8, 22, 0.95)';
         nav.style.boxShadow = '0 4px 20px rgba(0, 217, 255, 0.1)';
@@ -169,12 +362,12 @@ window.addEventListener('scroll', () => {
         nav.style.background = 'rgba(5, 8, 22, 0.9)';
         nav.style.boxShadow = 'none';
     }
-    
+
     lastScroll = currentScroll;
 });
 
 // ==========================================
-// CURSOR FOLLOWER (OPTIONAL)
+// ENHANCED CURSOR FOLLOWER WITH MAGNETIC EFFECT
 // ==========================================
 const cursorFollower = document.getElementById('cursor-follower');
 
@@ -183,6 +376,24 @@ if (cursorFollower) {
     let mouseY = 0;
     let followerX = 0;
     let followerY = 0;
+    let currentHoverElement = null;
+    let isMagnetic = false;
+
+    // Create ghost cursor trails
+    const ghostCursors = [];
+    const ghostCount = 5;
+    
+    for (let i = 0; i < ghostCount; i++) {
+        const ghost = document.createElement('div');
+        ghost.className = 'cursor-ghost';
+        ghost.style.opacity = (1 - i / ghostCount) * 0.3;
+        document.body.appendChild(ghost);
+        ghostCursors.push({
+            element: ghost,
+            x: 0,
+            y: 0
+        });
+    }
 
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
@@ -190,32 +401,143 @@ if (cursorFollower) {
     });
 
     function animateCursor() {
+        let targetX = mouseX;
+        let targetY = mouseY;
+
+        // Magnetic effect: snap to center of hovered element
+        if (currentHoverElement && isMagnetic) {
+            const rect = currentHoverElement.getBoundingClientRect();
+            const elementCenterX = rect.left + rect.width / 2;
+            const elementCenterY = rect.top + rect.height / 2;
+            
+            // Calculate distance to element center
+            const distX = elementCenterX - mouseX;
+            const distY = elementCenterY - mouseY;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+            
+            // Apply magnetic pull within 100px radius
+            if (distance < 100) {
+                const pullStrength = Math.min(1, (100 - distance) / 100) * 0.5;
+                targetX += distX * pullStrength;
+                targetY += distY * pullStrength;
+            }
+        }
+
         // Smooth follow with easing
-        followerX += (mouseX - followerX) * 0.1;
-        followerY += (mouseY - followerY) * 0.1;
-        
+        const easing = isMagnetic ? 0.15 : 0.1;
+        followerX += (targetX - followerX) * easing;
+        followerY += (targetY - followerY) * easing;
+
         cursorFollower.style.left = followerX + 'px';
         cursorFollower.style.top = followerY + 'px';
-        
+
+        // Animate ghost cursors with delay
+        ghostCursors.forEach((ghost, index) => {
+            const delay = (index + 1) * 0.05;
+            ghost.x += (followerX - ghost.x) * delay;
+            ghost.y += (followerY - ghost.y) * delay;
+            ghost.element.style.left = ghost.x + 'px';
+            ghost.element.style.top = ghost.y + 'px';
+        });
+
         requestAnimationFrame(animateCursor);
     }
 
     animateCursor();
 
-    // Add hover effect on interactive elements
-    const hoverElements = document.querySelectorAll('a, button, .project-card, .stat-card');
-    hoverElements.forEach(el => {
+    // Add magnetic hover effect on interactive elements
+    const magneticElements = document.querySelectorAll('a, button, .project-card, .stat-card, .skill-panel, .cv-btn');
+    
+    magneticElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
+            currentHoverElement = el;
+            isMagnetic = true;
+            cursorFollower.classList.add('cursor-active');
             cursorFollower.style.transform = 'translate(-50%, -50%) scale(1.5)';
             cursorFollower.style.borderColor = 'rgba(255, 0, 110, 0.8)';
+            ghostCursors.forEach(ghost => {
+                ghost.element.classList.add('ghost-active');
+            });
         });
-        
+
         el.addEventListener('mouseleave', () => {
+            currentHoverElement = null;
+            isMagnetic = false;
+            cursorFollower.classList.remove('cursor-active');
             cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
             cursorFollower.style.borderColor = 'rgba(0, 217, 255, 0.5)';
+            ghostCursors.forEach(ghost => {
+                ghost.element.classList.remove('ghost-active');
+            });
+        });
+    });
+
+    // Hide cursor on mobile
+    if ('ontouchstart' in window) {
+        cursorFollower.style.display = 'none';
+        ghostCursors.forEach(ghost => {
+            ghost.element.style.display = 'none';
+        });
+    }
+}
+
+// ==========================================
+// 3D TILT EFFECT FOR CARDS
+// ==========================================
+function init3DTilt() {
+    const tiltElements = document.querySelectorAll('.project-card, .stat-card, .skill-panel');
+    
+    tiltElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            this.style.transition = 'none';
+        });
+
+        element.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / centerY * -10; // Max 10deg tilt
+            const rotateY = (x - centerX) / centerX * 10;
+            
+            this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            
+            // Move the glow effect
+            const glowElement = this.querySelector('.panel-glow');
+            if (glowElement) {
+                glowElement.style.left = `${(x / rect.width) * 100 - 50}%`;
+                glowElement.style.top = `${(y / rect.height) * 100 - 50}%`;
+            }
+        });
+
+        element.addEventListener('mouseleave', function() {
+            this.style.transition = 'transform 0.5s ease';
+            this.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            
+            const glowElement = this.querySelector('.panel-glow');
+            if (glowElement) {
+                glowElement.style.left = '-50%';
+                glowElement.style.top = '-50%';
+            }
         });
     });
 }
+
+// Initialize 3D tilt on page load and after DOM changes
+init3DTilt();
+
+// Re-initialize after dynamic content loads
+const tiltObserver = new MutationObserver(() => {
+    init3DTilt();
+});
+
+tiltObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+});
 
 // ==========================================
 // TYPING EFFECT FOR TERMINAL (IF EXISTS)
@@ -238,13 +560,13 @@ if (terminalBody) {
 // ==========================================
 function animateValue(element, start, end, duration, suffix = '') {
     const startTime = performance.now();
-    
+
     function update(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         const current = start + (end - start) * easeOutQuart(progress);
-        
+
         // Handle different number formats
         if (suffix === '%' || suffix === 'nm') {
             element.textContent = Math.round(current) + suffix;
@@ -253,12 +575,12 @@ function animateValue(element, start, end, duration, suffix = '') {
         } else {
             element.textContent = Math.round(current) + suffix;
         }
-        
+
         if (progress < 1) {
             requestAnimationFrame(update);
         }
     }
-    
+
     requestAnimationFrame(update);
 }
 
@@ -276,7 +598,7 @@ const statObserver = new IntersectionObserver((entries) => {
                 const text = statNumber.textContent;
                 const value = parseFloat(text);
                 const suffix = text.replace(/[0-9.]/g, '');
-                
+
                 animateValue(statNumber, 0, value, 2000, suffix);
             }
         }
@@ -299,9 +621,9 @@ if (filterButtons.length > 0) {
             // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
+
             const filterValue = button.getAttribute('data-filter');
-            
+
             // Filter skill panels
             skillPanels.forEach(panel => {
                 if (filterValue === 'all') {
@@ -353,14 +675,14 @@ const contactForm = document.getElementById('contact-form');
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const submitBtn = contactForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
-        
+
         // Show loading state
         submitBtn.textContent = 'SENDING...';
         submitBtn.disabled = true;
-        
+
         try {
             const formData = new FormData(contactForm);
             const response = await fetch(contactForm.action, {
@@ -370,13 +692,13 @@ if (contactForm) {
                     'Accept': 'application/json'
                 }
             });
-            
+
             if (response.ok) {
                 // Success message
                 submitBtn.textContent = '✓ MESSAGE SENT!';
                 submitBtn.style.background = 'var(--cyber-blue)';
                 submitBtn.style.borderColor = 'var(--cyber-blue)';
-                
+
                 // Show success in terminal
                 const terminalBody = contactForm.closest('.terminal-body');
                 if (terminalBody) {
@@ -386,7 +708,7 @@ if (contactForm) {
                     successLine.innerHTML = '<span class="terminal-prompt">$</span> Message sent successfully! ✓';
                     terminalBody.appendChild(successLine);
                 }
-                
+
                 // Reset form after 2 seconds
                 setTimeout(() => {
                     contactForm.reset();
@@ -403,7 +725,7 @@ if (contactForm) {
             submitBtn.textContent = '✗ FAILED - TRY AGAIN';
             submitBtn.style.background = 'var(--cyber-pink)';
             submitBtn.style.borderColor = 'var(--cyber-pink)';
-            
+
             // Show error in terminal
             const terminalBody = contactForm.closest('.terminal-body');
             if (terminalBody) {
@@ -413,7 +735,7 @@ if (contactForm) {
                 errorLine.innerHTML = '<span class="terminal-prompt">$</span> Error: Message failed to send. Please try again.';
                 terminalBody.appendChild(errorLine);
             }
-            
+
             setTimeout(() => {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
