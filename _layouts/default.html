@@ -11,8 +11,13 @@
     <link rel="alternate icon" href="{{ '/favicon.ico' | relative_url }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}">
     
-    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Preload main CSS and load non-blocking -->
+    <link rel="preload" href="{{ '/assets/css/main.css' | relative_url }}" as="style">
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}"></noscript>
+
+    <!-- Defer third-party script to avoid render-blocking -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 </head>
 <body>
     <div class="grid-bg"></div>
@@ -64,6 +69,7 @@
         </div>
     </footer>
 
-    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+    <!-- Defer main JS to after first paint -->
+    <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
 </body>
 </html>
