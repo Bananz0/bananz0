@@ -53,7 +53,7 @@ Led complete integrated circuit design from RTL to GDSII tape-out for TSMC 65nm 
 \cvitem{16-Stage FIR Notch Filter for Real-Time Audio on FPGA}{Nov 2024--Dec 2024\\
 \textbf{Platform:} Altera Cyclone V (DE1-SoC) | \textbf{Language:} SystemVerilog | \textbf{Tools:} Quartus Prime, ModelSim\\
 Designed parametrized Finite Impulse Response digital filter with notch filtering capabilities for real-time stereo audio processing. Implemented 4-state FSM controller achieving 19-cycle latency (950ns at 50MHz) from ADC input to DAC output. Developed custom MATLAB scripts for optimal FIR coefficient generation and verification. Successfully processed dual-channel 48kHz audio with -40dB notch depth at configurable frequencies. Synthesized design utilized 2,847 logic elements (5\% FPGA utilization).\\
-\faGithub~\href{https://github.com/Bananz0/FIR-Filter-FPGA}{github.com/Bananz0/FIR-Filter-FPGA}}
+\faGithub~\href{https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA}{github.com/Bananz0/16-Stage-FIR-Notch-Filter}}
 
 \cvitem{WattsApp: Embedded Smart Energy Management Platform}{Jan 2025--Mar 2025\\
 \textbf{MCU:} ESP32 | \textbf{Protocols:} MQTT, Modbus RTU | \textbf{Sensors:} INA219, ACS712\\
@@ -87,6 +87,28 @@ Built comprehensive educational tool for control systems analysis and design. Im
 Developed collaborative whiteboard application with custom serial communication protocol over GPIO. Implemented efficient data serialization for real-time drawing synchronization between multiple Raspberry Pi devices. Achieved <100ms update latency through optimized protocol design and threading architecture. System supports up to 4 concurrent users with automatic conflict resolution.\\
 \faGithub~\href{https://github.com/Bananz0/PiBoard}{github.com/Bananz0/PiBoard}}
 
+\subsection{Open Source \& Personal Tools}
+
+\cvitem{Galaxy Book Enabler}{2024--Present\\
+\textbf{Language:} PowerShell | \textbf{Downloads:} 8,300+ | \textbf{Stars:} 350+\\
+Developed professional-grade Windows tool that spoofs PCs as Samsung Galaxy Books, unlocking the Samsung ecosystem including Quick Share, Multi Control, Samsung Notes, and 20+ exclusive applications. Implemented 21 authentic Galaxy Book hardware profiles with registry manipulation, automatic elevation via gsudo, and smart package management through WinGet. Features auto-update checker, System Support Engine integration, and seamless migration between versions.\\
+\faGithub~\href{https://github.com/Bananz0/GalaxyBookEnabler}{github.com/Bananz0/GalaxyBookEnabler}}
+
+\cvitem{eGPU Auto-Enabler}{2024--Present\\
+\textbf{Language:} PowerShell | \textbf{Technologies:} PnP Utilities, Power Management APIs\\
+Created background service that automatically re-enables external GPUs after hot-plugging on Windows, eliminating manual Device Manager intervention. Implemented automatic PnP device monitoring with 2-second polling, custom power plan switching for optimal eGPU performance, and crash recovery with runtime state preservation. Features Windows toast notifications for all events, 500KB rotating logs, and daily auto-update verification. Achieved 99.9\% reliability with <50ms detection latency.\\
+\faGithub~\href{https://github.com/Bananz0/eGPUae}{github.com/Bananz0/eGPUae}}
+
+\cvitem{MIPSquare: MIPS Assembly Simulator}{2024\\
+\textbf{Language:} C++ | \textbf{Platform:} Cross-platform CLI\\
+Built MIPS processor simulator for computer architecture coursework, implementing instruction decoding, register file management, and memory operations. Supports core MIPS instruction set including arithmetic, logical, branch, and memory access operations.\\
+\faGithub~\href{https://github.com/Bananz0/MIPSquare}{github.com/Bananz0/MIPSquare}}
+
+\cvitem{Sudoku Solver: Qt GUI Application}{Mar 2024\\
+\textbf{Framework:} Qt (C++) | \textbf{Algorithm:} Backtracking with constraint propagation\\
+Developed interactive Sudoku puzzle solver with graphical user interface using Qt framework. Implemented efficient backtracking algorithm with constraint propagation for solving puzzles of varying difficulty. Features step-by-step visualization of solving process and puzzle generation capabilities.\\
+\faGithub~\href{https://github.com/Bananz0/Sudoku-Solver}{github.com/Bananz0/Sudoku-Solver}}
+
 \subsection{Infrastructure \& Cybersecurity}
 
 \cvitem{Enterprise-Grade Home Network Infrastructure}{Ongoing\\
@@ -101,7 +123,8 @@ Architected and deployed production-grade home network infrastructure including:
 Achieved 99.8\% uptime over 12-month period with zero security incidents. Infrastructure serves 8 concurrent users with average response times <50ms.}
 
 \cvitem{Hackintosh Systems Engineering}{2023--Present\\
-Successfully built and maintained 3 production Hackintosh systems (laptops and desktops) demonstrating deep understanding of UEFI/BIOS architecture, kernel extensions (kexts), and macOS bootloader configuration. Created custom OpenCore EFI configurations ensuring hardware compatibility (WiFi, Bluetooth, audio, GPU acceleration). Published detailed build guides and EFI packages for Lenovo ThinkPad G50-80 benefiting 200+ community members.}
+Successfully built and maintained 3 production Hackintosh systems (laptops and desktops) demonstrating deep understanding of UEFI/BIOS architecture, kernel extensions (kexts), and macOS bootloader configuration. Created custom OpenCore EFI configurations ensuring hardware compatibility (WiFi, Bluetooth, audio, GPU acceleration). Published detailed build guides and EFI packages for HP EliteBook 440 x360 G1 benefiting community members.\\
+\faGithub~\href{https://github.com/Bananz0/440-x360-G1-Hackintosh}{github.com/Bananz0/440-x360-G1-Hackintosh}}
 
 \section{Technical Skills}
 
