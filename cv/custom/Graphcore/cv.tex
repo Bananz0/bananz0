@@ -1,0 +1,62 @@
+% Tailored CV for Graphcore - Graduate Firmware Engineer
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\renewcommand{\sfdefault}{lmss}
+\usepackage[scale=0.85]{geometry}
+\usepackage{enumitem}
+\setlist{noitemsep, leftmargin=*}
+
+% Personal Information (kept consistent with master CV)
+\name{Glen}{Muthoka Mutinda}
+\phone{+44 7341 625286}
+\email{theglenmuthoka@gmail.com}
+\social[linkedin]{glenmuthoka}
+\social[github]{Bananz0}
+\address{Bristol, UK}{}
+
+\begin{document}
+\makecvtitle
+
+\section{Profile}
+\cvitem{}{Final-year Electrical \& Electronics Engineering student with hands-on embedded systems, digital design and low-level software experience. Strong foundation in C/C++, SystemVerilog and real-time systems developed through space-grade CubeSat firmware, FPGA designs and IC tape-out projects. Currently researching AI-driven optical authentication using GPU-accelerated Python. Comfortable working across hardware and software boundaries to deliver reliable, testable firmware for complex platforms.}
+
+\section{Education}
+\cventry{2023--2026}{BEng Electrical \& Electronics Engineering (Expected First Class)}{University of Southampton}{Southampton, UK}{}{Key modules: Embedded Systems, Integrated Circuit Design, Digital Systems, Control Systems.\\
+\textbf{Second Year Project:} TSMC 65nm IC Design \& Fabrication (Team Lead).\\
+\textbf{Final Year Project:} AI-Driven Optical Authentication Framework using Optical PUFs (Lead Researcher).}
+
+\section{Selected Experience}
+\cventry{Sep 2023--Jun 2025}{Junior Software Engineer}{ARTEMIS Small Sat-1 Lunar CubeSat Project}{University of Southampton}{}{
+\begin{itemize}
+  \item Developed flight firmware in C/C++ for a lunar CubeSat; reduced system latency by 6\% via algorithmic optimisation and refactoring.
+  \item Implemented unit testing frameworks and automated debugging procedures, increasing system reliability by 20\%.
+  \item Designed and validated real-time telemetry processing and ground-station interfaces; practiced disciplined code reviews using MISRA-like guidelines.
+\end{itemize}}
+
+\cvitem{TSMC 65nm CPU Design}{Led a 6-member IC design project from RTL through physical verification to GDSII submission for fabrication. Verified timing and power constraints using SPICE simulations and performed DRC/LVS checks. Demonstrated cross-disciplinary hardware/software integration awareness.}
+
+\cvitem{WattsApp (ESP32) --- Embedded Firmware}{Implemented embedded C firmware for an ESP32-based energy management system. Managed sensor integration (I2C/SPI/ADC), MQTT/Modbus communications, and reliable power measurement routines.}
+
+\cvitem{WinStream --- Kernel / Driver Development}{Developed a Windows virtual audio device and low-level components for system-wide audio capture; experience navigating kernel-mode development challenges and low-latency requirements.}
+
+\cvitem{FPGA Real-Time DSP}{Designed SystemVerilog FIR notch filter on Altera Cyclone platform with deterministic latency (real-time audio processing). Familiar with timing closure, synthesis and simulation flows.}
+
+\section{Relevant Projects}
+\cvitem{Galaxy Book Enabler}{System-level tooling (PowerShell) that manipulates hardware profile and OS configuration; demonstrates deep OS/firmware interaction knowledge and careful packaging/auto-update behaviour.}
+\cvitem{eGPU Auto-Enabler}{Background Windows service for PnP device monitoring and power management; highlights reliability engineering and device lifecycle handling.}
+
+\section{Technical Skills}
+\cvitem{Languages}{C (embedded), C++, SystemVerilog, Python, PowerShell}
+\cvitem{Embedded / Firmware}{RTOS concepts, real-time telemetry, MCU (ESP32/STM32 basics), low-level peripherals (I2C, SPI, UART, ADC), unit testing for firmware}
+\cvitem{Hardware / Tools}{FPGA flows (Quartus/Vivado), IC design flow concepts (Cadence/Calibre familiarity), LTSpice/ModelSim}
+\cvitem{Software Practices}{Continuous Integration, Git, automated testing, build systems (Make/CMake), code reviews, MISRA-aware C practices}
+\cvitem{OS / Drivers}{Experience with kernel-mode concepts and device driver interactions; system-level troubleshooting on Windows and Linux}
+
+\section{Awards \& Memberships}
+\cvitem{}{Member, IEEE; Active open-source contributor with multiple projects demonstrating system-level and embedded expertise.}
+
+\section{Other}
+\cvitem{Right to Work}{UK student visa (valid until 2026) — eligible for Graduate Route visa.}
+
+\end{document}

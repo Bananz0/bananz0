@@ -1,0 +1,107 @@
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\renewcommand{\sfdefault}{lmss} 
+\usepackage[scale=0.85]{geometry}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\setlist{noitemsep, leftmargin=*}
+
+% Personal Information
+\name{Glen}{Muthoka Mutinda}
+\phone{+44 7341 625286}
+\email{theglenmuthoka@gmail.com}
+\social[linkedin]{glenmuthoka}
+\social[github]{Bananz0}
+
+\begin{document}
+
+\makecvtitle
+
+\section{Professional Summary}
+Hands-on final-year Electrical \& Electronics Engineering student (Expected First Class Honours, June 2026) with proven ability to move fast and deliver results. Strong foundation in embedded C/C++ development, Python automation, and ARM/STM32 microcontrollers. Track record of building real-world prototypes from concept to working hardware—from space-grade CubeSat software to IoT energy systems. Thrives in fast-paced environments where experimentation and problem-solving drive innovation. Ready to shape products from the ground up in a startup setting.
+
+\section{Education}
+\cventry{2023--2026}{BEng Electrical \& Electronics Engineering (Expected First Class Honours)}{University of Southampton}{Southampton, UK}{}{
+\textbf{Specialization:} Embedded Systems, IoT Architecture, PCB Design, Real-Time Systems\\
+\textbf{Second Year Project:} TSMC 65nm IC Design \& Fabrication (Team Lead - managing 6 engineers)\\
+\textbf{Final Year Project:} AI-Driven Optical Authentication Framework using Optical PUFs (Lead Researcher)}
+
+\cventry{2022--2023}{Undergraduate Foundation Programme, Engineering Pathway (Distinction)}{ONCAMPUS Global}{Southampton, UK}{}{}
+
+\section{Professional Experience}
+\cventry{Sep 2023--Jun 2025}{Junior Software Engineer - Embedded Systems}{ARTEMIS Small Sat-1 Lunar CubeSat Project}{University of Southampton}{}{
+\begin{itemize}
+    \item Developed flight software in C/C++ for ARM Cortex-M microcontroller in resource-constrained, mission-critical environment—similar pressure to startup product development
+    \item Reduced system latency by 6\% through iterative optimization and experimentation with different approaches
+    \item Built custom device drivers for SPI, I2C, and UART peripherals, debugging hardware-software integration issues
+    \item Created Python automation scripts for testing, data analysis, and build processes, accelerating development cycle
+    \item Collaborated directly with small multidisciplinary team (8 engineers) to rapidly iterate on prototypes and meet tight deadlines
+    \item Enhanced system reliability by 20\% through test-driven development and continuous improvement mindset
+\end{itemize}}
+
+\section{Technical Projects - Building Real Products}
+
+\cvitem{WattsApp - IoT Smart Energy Management Platform}{Jan 2025--Mar 2025\\
+\textbf{Full-Stack IoT Prototype} | ESP32 | C | Python | React.js | MQTT | Modbus\\
+Built complete end-to-end IoT system from scratch—embedded firmware, backend infrastructure, and web dashboard. Developed bare metal C firmware for ESP32 managing power measurement sensors (INA219, ACS712), load balancing algorithms, and wireless communication. Implemented Python backend for data processing and MQTT broker management. Created React.js dashboard for real-time visualization. Achieved 12\% reduction in peak grid consumption through intelligent automation. \textbf{This is exactly the kind of hardware-software integration, prototyping, and problem-solving I thrive on.}\\
+\faGithub~\href{https://github.com/Bananz0/WattsApp}{github.com/Bananz0/WattsApp}}
+
+\cvitem{eGPU Auto-Enabler - 8,300+ Downloads, Production Tool}{2024--Present\\
+\textbf{PowerShell} | Windows API | Device Management\\
+Shipped production-ready Windows automation tool solving real user problems—exactly the "make things happen" mentality. Implemented automatic device detection, custom power management, crash recovery, and auto-update system. Achieved 99.9\% reliability across diverse hardware configurations. Built user base of 8,300+ through iterative improvements based on feedback. Demonstrates ability to identify problems, build solutions, and ship products people actually use.\\
+\faGithub~\href{https://github.com/Bananz0/eGPUae}{github.com/Bananz0/eGPUae}}
+
+\cvitem{Galaxy Book Enabler - 350+ GitHub Stars}{2024--Present\\
+\textbf{PowerShell} | Registry Manipulation | Package Management\\
+Another shipped product with large user base. Developed sophisticated Windows tool with hardware spoofing, automatic elevation, and smart package management through WinGet. Shows ability to understand complex systems, reverse-engineer solutions, and deliver polished end-user experiences.\\
+\faGithub~\href{https://github.com/Bananz0/GalaxyBookEnabler}{github.com/Bananz0/GalaxyBookEnabler}}
+
+\cvitem{16-Stage FIR Filter - Real-Time DSP on FPGA}{Nov 2024--Dec 2024\\
+\textbf{SystemVerilog} | Altera Cyclone V | MATLAB\\
+Designed and implemented complete real-time audio processing system from algorithm design through hardware testing. Created MATLAB scripts for coefficient generation, wrote SystemVerilog for FPGA implementation, and debugged hardware interfaces (SPI ADC/DAC). Achieved 19-cycle latency for 48kHz stereo audio. Demonstrates full-stack hardware development capability.\\
+\faGithub~\href{https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA}{github.com/Bananz0/16-Stage-FIR-Notch-Filter}}
+
+\cvitem{PiBoard - Real-Time Collaborative Whiteboard}{Apr 2024--May 2024\\
+\textbf{C++/Qt} | Raspberry Pi | Custom Serial Protocol\\
+Built collaborative application with custom binary protocol over GPIO UART. Implemented multi-threaded architecture for <100ms latency. Directly configured hardware registers for UART control. Shows comfort working at multiple abstraction levels—from low-level hardware to application logic.\\
+\faGithub~\href{https://github.com/Bananz0/PiBoard}{github.com/Bananz0/PiBoard}}
+
+\cvitem{TSMC 65nm CPU - Complete IC Design \& Fabrication}{Sep 2023--Jun 2024\\
+\textbf{Team Lead} | S-Edit, T-Spice, L-Edit, Calibre\\
+Led 6-person team through complete IC design flow from concept to GDSII tape-out. Managed tight schedules, coordinated between team members, and successfully submitted for fabrication with zero violations. Achieved 15\% area reduction through iterative optimization. Demonstrates leadership and ability to deliver complex projects on deadline.}
+
+\section{Hands-On Technical Skills}
+
+\cvitem{Embedded Software}{C (bare metal \& RTOS), C++, ARM Cortex-M, STM32 (experience through projects), ESP32}
+\cvitem{Scripting \& Automation}{Python (expert level), PowerShell (production tools), Bash scripting}
+\cvitem{Linux \& Tools}{Ubuntu/Debian, systemd, Git, Docker, build systems, command-line workflows}
+\cvitem{Hardware Interfaces}{SPI, I2C, UART, GPIO, ADC/DAC, PWM, interrupt handling}
+\cvitem{IoT \& Protocols}{MQTT, Modbus RTU/TCP, WiFi, Bluetooth, RESTful APIs, WebSocket}
+\cvitem{PCB Design}{KiCad (designed multiple boards), EAGLE, component selection, DFM principles}
+\cvitem{FPGA/Digital}{SystemVerilog, Quartus Prime, Vivado, ModelSim}
+\cvitem{Web/Full-Stack}{React.js, Node.js, Express.js, PostgreSQL, MongoDB (full-stack prototyping)}
+\cvitem{Dev Tools}{VS Code, CLion, GDB, JTAG/SWD, oscilloscopes, logic analyzers, multimeters}
+
+\section{Why I'm Perfect for This Startup Role}
+
+\cvitem{I Move Fast}{\textbf{Proven track record:} Built WattsApp (full IoT system) in 3 months while managing coursework. Shipped multiple production tools used by 8,300+ people. Comfortable with rapid iteration and "good enough to ship" mentality.}
+
+\cvitem{I Experiment \& Problem-Solve}{\textbf{Natural curiosity:} 15+ GitHub repos spanning embedded systems, automation, IoT, and infrastructure. Always building, breaking, and fixing things. Comfortable diving into unfamiliar territory and figuring it out.}
+
+\cvitem{Full-Stack Capability}{\textbf{Versatile:} Can work across the entire stack—embedded firmware (C/C++), backend services (Python), web dashboards (React), hardware interfaces, PCB design, and DevOps. Whatever needs doing, I can learn it or build it.}
+
+\cvitem{Team Player}{\textbf{Great communicator:} Led teams, collaborated with multidisciplinary groups, and explained technical concepts to non-technical stakeholders. Comfortable working directly with founders in tight-knit environment.}
+
+\cvitem{Startup Mindset}{\textbf{Can-do attitude:} Don't wait for perfect specs—jump in, prototype, test, iterate. Built infrastructure serving 8+ users with 99.8\% uptime. Comfortable wearing multiple hats and doing what needs to be done.}
+
+\section{Additional Information}
+\cvitem{Location}{Based in Southampton, highly flexible for London hybrid role (2-3 days/week in office)}
+\cvitem{Availability}{Graduating June 2026, available for immediate start or part-time during final semester}
+\cvitem{Languages}{English (Native), Swahili (Native)}
+\cvitem{Right to Work}{UK Student Visa (valid until 2026), eligible for Graduate Route visa (2-3 years work authorization)}
+\cvitem{Memberships}{IEEE Member, ISACA Member}
+
+\end{document}

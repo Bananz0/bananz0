@@ -1,0 +1,102 @@
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\renewcommand{\sfdefault}{lmss} 
+\usepackage[scale=0.85]{geometry}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\setlist{noitemsep, leftmargin=*}
+
+% Personal Information
+\name{Glen}{Muthoka Mutinda}
+\phone{+44 7341 625286}
+\email{theglenmuthoka@gmail.com}
+\social[linkedin]{glenmuthoka}
+\social[github]{Bananz0}
+
+\begin{document}
+
+\makecvtitle
+
+\section{Professional Summary}
+Final-year Electrical \& Electronics Engineering student (Expected First Class Honours) with extensive hands-on experience in embedded C/C++ programming, bare metal firmware development, and low-level hardware interfaces. Proven track record developing space-grade software for lunar CubeSat missions and real-time FPGA-based DSP systems. Strong electronics foundation spanning IC design through PCB-level implementation. Seeking graduate embedded software engineer position in Bristol.
+
+\section{Education}
+\cventry{2023--2026}{BEng Electrical \& Electronics Engineering (Expected First Class Honours)}{University of Southampton}{Southampton, UK}{}{
+\textbf{Key Modules:} Embedded Systems, Digital Systems Design, IC Design, Signal Processing (DSP), Control Systems, Real-Time Systems\\
+\textbf{Second Year Project:} TSMC 65nm IC Design \& Fabrication - Complete RTL to silicon flow (Team Lead)\\
+\textbf{Final Year Project:} AI-Driven Optical Authentication Framework using Optical PUFs (Lead Researcher)}
+
+\cventry{2022--2023}{Undergraduate Foundation Programme, Engineering Pathway (Distinction)}{ONCAMPUS Global}{Southampton, UK}{}{}
+
+\section{Professional Experience}
+\cventry{Sep 2023--Jun 2025}{Junior Software Engineer - Embedded Systems}{ARTEMIS Small Sat-1 Lunar CubeSat Project}{University of Southampton}{}{
+\begin{itemize}
+    \item Developed bare metal flight software in C/C++ for ARM Cortex-M microcontroller, directly managing interrupts, DMA, and peripheral registers without OS abstraction
+    \item Reduced system latency by 6\% through low-level optimization: eliminated context switches, minimized interrupt overhead, and optimized critical path timing
+    \item Implemented custom device drivers for SPI-based IMU sensors, I2C temperature monitors, and UART telemetry, achieving <10μs jitter
+    \item Enhanced system reliability by 20\% through comprehensive unit testing and hardware-in-the-loop validation
+    \item Conducted code reviews following NASA coding standards and MISRA C guidelines for safety-critical systems
+\end{itemize}}
+
+\section{Technical Projects}
+
+\cvitem{16-Stage FIR Notch Filter - Real-Time DSP on FPGA}{Nov 2024--Dec 2024\\
+\textbf{Platform:} Altera Cyclone V | \textbf{Language:} SystemVerilog\\
+Designed real-time digital filter for stereo audio with -40dB notch depth. Achieved 19-cycle latency (950ns at 50MHz) from ADC to DAC. Created MATLAB scripts for FIR coefficient generation using Parks-McClellan algorithm. Directly interfaced with ADC/DAC via SPI, managing chip select timing and 48kHz sample synchronization.\\
+\faGithub~\href{https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA}{github.com/Bananz0/16-Stage-FIR-Notch-Filter}}
+
+\cvitem{WattsApp - Bare Metal Smart Energy System}{Jan 2025--Mar 2025\\
+\textbf{MCU:} ESP32 | \textbf{Protocols:} I2C, SPI, MQTT, Modbus RTU | \textbf{Language:} C\\
+Developed bare metal firmware for IoT smart meter monitoring solar, battery, and grid power. Implemented low-level drivers for INA219 (I2C) and ACS712 (ADC) sensors achieving ±0.5\% accuracy. Managed dual-core architecture with FreeRTOS task scheduling. Achieved 12\% reduction in peak consumption through intelligent load shifting algorithms.\\
+\faGithub~\href{https://github.com/Bananz0/WattsApp}{github.com/Bananz0/WattsApp}}
+
+\cvitem{TSMC 65nm CPU Design - Complete IC Fabrication Flow}{Sep 2023--Jun 2024\\
+\textbf{Role:} Team Lead | \textbf{Tools:} S-Edit, T-Spice, L-Edit, Calibre DRC/LVS\\
+Led IC design from RTL to GDSII tape-out for TSMC 65nm process. Designed CPU datapath at transistor level, performed SPICE simulations for timing verification, and conducted full physical verification. Successfully submitted for fabrication with zero DRC violations and 15\% area reduction.}
+
+\cvitem{PiBoard - Real-Time Collaborative Whiteboard}{Apr 2024--May 2024\\
+\textbf{Platform:} Raspberry Pi | \textbf{Language:} C++/Qt\\
+Developed custom binary serial protocol over GPIO UART for real-time drawing synchronization. Directly configured BCM2835 GPIO registers for hardware UART control. Achieved <100ms update latency with support for 4 concurrent users.\\
+\faGithub~\href{https://github.com/Bananz0/PiBoard}{github.com/Bananz0/PiBoard}}
+
+\cvitem{ControlCraft - Control Systems Analysis Toolbox}{Nov 2024--Dec 2024\\
+\textbf{Platform:} MATLAB | \textbf{Focus:} DSP \& Control Theory\\
+Built educational tool for control systems analysis with interactive PID tuning, Bode/Nyquist plots, and automated stability analysis. Demonstrates strong DSP fundamentals. Deployed in undergraduate labs serving 60+ students.\\
+\faGithub~\href{https://github.com/Bananz0/ControlCraft}{github.com/Bananz0/ControlCraft}}
+
+\cvitem{MIPSquare - MIPS Processor Simulator}{2024\\
+\textbf{Language:} C++\\
+Built cycle-accurate MIPS simulator implementing instruction decoding, register file management, and pipeline hazard detection. Demonstrates understanding of processor architecture and low-level instruction execution.\\
+\faGithub~\href{https://github.com/Bananz0/MIPSquare}{github.com/Bananz0/MIPSquare}}
+
+\section{Open Source Contributions}
+\cvitem{Galaxy Book Enabler}{PowerShell tool with 8,300+ downloads, 350+ GitHub stars - Windows system automation}
+\cvitem{eGPU Auto-Enabler}{Background service achieving 99.9\% reliability with <50ms detection latency}
+
+\section{Technical Skills}
+
+\cvitem{Programming}{C (bare metal firmware), C++, Python, SystemVerilog, Assembly (ARM/MIPS), MATLAB}
+\cvitem{Hardware Interfaces}{SPI, I2C, UART, GPIO, ADC/DAC, PWM, DMA, Interrupt handling}
+\cvitem{Protocols}{Modbus RTU/TCP, MQTT, CAN bus}
+\cvitem{Microcontrollers}{ESP32 (Xtensa LX6), ARM Cortex-M, Arduino (AVR/ARM), STM32, Raspberry Pi}
+\cvitem{FPGA/Digital}{Quartus Prime, Vivado, ModelSim, SystemVerilog, VHDL, FSM design}
+\cvitem{IC Design}{TSMC 65nm, Cadence S-Edit/L-Edit/T-Spice, Calibre (DRC/LVS), GDSII tape-out}
+\cvitem{PCB Design}{KiCad, EAGLE, Altium (basic)}
+\cvitem{DSP \& Control}{FIR/IIR filters, FFT, PID tuning, Bode/Nyquist analysis, MATLAB toolboxes}
+\cvitem{Embedded OS}{FreeRTOS, bare metal (no OS), embedded Linux (basic)}
+\cvitem{Tools}{Git, GDB, JTAG/SWD, oscilloscopes, logic analyzers, VS Code, CLion}
+\cvitem{Standards}{MISRA C, NASA coding standards}
+
+\section{Professional Memberships \& Activities}
+\cvitem{2024--Present}{Member, Institute of Electrical and Electronics Engineers (IEEE)}
+\cvitem{2024--Present}{Member, Information Systems Audit and Control Association (ISACA)}
+\cvitem{2024--2025}{Active open-source contributor and Engineering Society representative}
+
+\section{Additional Information}
+\cvitem{Languages}{English (Native), Swahili (Native)}
+\cvitem{Right to Work}{UK Student Visa (valid until 2026), eligible for Graduate Route visa}
+
+\end{document}
