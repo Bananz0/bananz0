@@ -596,6 +596,8 @@ nav.scrolled {
     cursor: pointer;
     z-index: 1001;
     padding: 8px;
+    background: transparent;
+    border: none;
 }
 
 .mobile-menu-toggle span {
