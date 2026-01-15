@@ -486,12 +486,18 @@ function initLiquidTilt() {
     const tiltElements = document.querySelectorAll('.project-card, .stat-card, .skill-panel, .holo-panel, .tech-card');
     
     tiltElements.forEach(element => {
+        let rectCache;
+
         element.addEventListener('mouseenter', function() {
             this.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+            rectCache = this.getBoundingClientRect();
         });
 
         element.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
+            if (!rectCache) {
+                rectCache = this.getBoundingClientRect();
+            }
+            const rect = rectCache;
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
@@ -521,6 +527,7 @@ function initLiquidTilt() {
         element.addEventListener('mouseleave', function() {
             this.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
             this.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            rectCache = null;
             
             const glowElement = this.querySelector('.panel-glow');
             if (glowElement) {
