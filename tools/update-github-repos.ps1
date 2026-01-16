@@ -2,7 +2,9 @@ param(
   [string]$User = "Bananz0",
   [string]$OutFile = "$PSScriptRoot\..\_data\github_repos.json",
   [int]$PerPage = 100,
-  [string]$Token = $env:GITHUB_TOKEN
+  [string]$Token = $env:GITHUB_TOKEN,
+  [switch]$IncludeForks,
+  [switch]$IncludeArchived
 )
 
 $ErrorActionPreference = "Stop"
@@ -102,13 +104,23 @@ while ($true) {
 # - Keep non-forks (owned work)
 # - For forks, keep only if they look actively pushed after creation (suggesting local contributions)
 $filtered = $all | Where-Object {
-  $_.private -eq $false -and $_.archived -eq $false -and (
-    $_.fork -eq $false -or (
-      $_.fork -eq $true -and $_.pushed_at -and $_.created_at -and
-      ([DateTime]$_.pushed_at - [DateTime]$_.created_at).TotalHours -ge 6
+  # Exclude private by default
+  ($_.private -eq $false) -and
+  # Archived repos are excluded unless user asks to include them
+  (($_.archived -eq $false) -or ($IncludeArchived.IsPresent)) -and
+  # Forks: include only owned or (if requested) include forks with activity
+  (
+    ($_.fork -eq $false) -or (
+      ($IncludeForks.IsPresent -and $_.pushed_at -and $_.created_at -and
+        ([DateTime]$_.pushed_at - [DateTime]$_.created_at).TotalHours -ge 6)
     )
   )
 }
+
+# Diagnostics: counts
+$totalFetched = $all.Count
+$totalFiltered = $filtered.Count
+Write-Host "Fetched $totalFetched repos from GitHub; $totalFiltered passed filtering." -ForegroundColor Cyan
 
 # Weights for combined score: tune as needed
 $weightDownloads = 1
