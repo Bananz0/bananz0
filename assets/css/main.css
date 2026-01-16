@@ -3983,6 +3983,22 @@ html, body {
     text-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
 }
 
+/* Ensure visibility on mobile */
+@media (max-width: 768px) {
+    .category-label {
+        font-size: 1rem;
+        letter-spacing: 2px;
+        margin-bottom: var(--space-lg);
+        padding: 0 var(--space-md);
+    }
+    
+    .section-subtitle.centered-override {
+        font-size: 0.9rem;
+        padding: 0 var(--space-md);
+        max-width: 95%;
+    }
+}
+
 .projects-grid {
     display: flex;
     flex-wrap: wrap;
