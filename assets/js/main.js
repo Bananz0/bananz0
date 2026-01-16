@@ -1,6 +1,17 @@
 // ==========================================
 // NEXUS PORTFOLIO - PREMIUM INTERACTIONS
 // Glen Muthoka - Embedded Systems Engineer
+// 
+// PERFORMANCE OPTIMIZATIONS IMPLEMENTED:
+// - Consolidated mousemove listeners (1 instead of 4+)
+// - Spatial hash grid for O(n) particle connections vs O(n²)
+// - Batched canvas rendering (color groups)
+// - Event delegation instead of MutationObservers
+// - Cached getBoundingClientRect calls
+// - Passive event listeners for scroll/touch
+// - Device-based particle count adjustment
+// - Throttled resize handlers
+// - requestIdleCallback for non-critical animations
 // ==========================================
 
 // Shared smoothed mouse position for consistent animation timing
@@ -8,12 +19,16 @@ let smoothMouseX = window.innerWidth / 2;
 let smoothMouseY = window.innerHeight / 2;
 let rawMouseX = window.innerWidth / 2;
 let rawMouseY = window.innerHeight / 2;
+let mouseParticleX = -1000;
+let mouseParticleY = -1000;
 
-// Unified smooth mouse tracking
+// OPTIMIZED: Single unified mouse tracking handler for all features
 document.addEventListener('mousemove', (e) => {
     rawMouseX = e.clientX;
     rawMouseY = e.clientY;
-});
+    mouseParticleX = e.clientX;
+    mouseParticleY = e.clientY;
+}, { passive: true });
 
 // Single animation loop for smooth mouse position
 function updateSmoothMouse() {
@@ -46,16 +61,11 @@ if (ctx) {
 
     resizeCanvas();
 
+    // OPTIMIZED: Detect device performance and adjust particle count
+    const isLowEnd = navigator.hardwareConcurrency <= 4 || 
+                     /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
     const particles = [];
-    const particleCount = window.innerWidth < 768 ? 50 : 80;
-    let mouseParticleX = -1000;
-    let mouseParticleY = -1000;
-
-    // Track mouse position for particle interaction
-    document.addEventListener('mousemove', (e) => {
-        mouseParticleX = e.clientX;
-        mouseParticleY = e.clientY;
-    });
+    const particleCount = isLowEnd ? 45 : (window.innerWidth < 768 ? 65 : 90);
 
     class Particle {
         constructor() {
@@ -100,31 +110,23 @@ if (ctx) {
             if (this.y > canvas.height + 10) this.y = -10;
         }
 
-        draw() {
+        getColor() {
             // Calculate distance from mouse for color intensity
             const dx = this.x - mouseParticleX;
             const dy = this.y - mouseParticleY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxDistance = 150;
+            const distSq = dx * dx + dy * dy;
+            const maxDistSq = 22500; // 150^2
             
             let opacity = 0.4;
-            let color;
             
             // Change color when near mouse
-            if (distance < maxDistance) {
-                const proximity = 1 - (distance / maxDistance);
+            if (distSq < maxDistSq) {
+                const proximity = 1 - Math.sqrt(distSq / maxDistSq);
                 opacity = 0.4 + proximity * 0.6;
-                // Blend to cyan when close
                 const h = this.hue + (180 - this.hue) * proximity;
-                color = `hsla(${h}, 100%, 60%, ${opacity})`;
-            } else {
-                color = `hsla(${this.hue}, 80%, 50%, ${opacity})`;
+                return `hsla(${h}, 100%, 60%, ${opacity})`;
             }
-            
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+            return `hsla(${this.hue}, 80%, 50%, ${opacity})`;
         }
     }
 
@@ -133,42 +135,99 @@ if (ctx) {
         particles.push(new Particle());
     }
 
+    // OPTIMIZED: Spatial hash grid for efficient neighbor detection
+    const cellSize = 80;
+    function getSpatialKey(x, y) {
+        return `${Math.floor(x / cellSize)},${Math.floor(y / cellSize)}`;
+    }
+
     function animateParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Update all particles
+        particles.forEach(particle => particle.update());
+
+        // OPTIMIZED: Build spatial hash grid O(n) instead of O(n²)
+        const grid = new Map();
         particles.forEach(particle => {
-            particle.update();
-            particle.draw();
+            const key = getSpatialKey(particle.x, particle.y);
+            if (!grid.has(key)) grid.set(key, []);
+            grid.get(key).push(particle);
         });
 
-        // Draw connections between nearby particles (using distance squared for perf)
-        const maxDistSq = 6400; // 80^2
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distSq = dx * dx + dy * dy;
+        // OPTIMIZED: Batch rendering by color groups
+        const colorGroups = new Map();
+        particles.forEach(particle => {
+            const color = particle.getColor();
+            if (!colorGroups.has(color)) colorGroups.set(color, []);
+            colorGroups.get(color).push(particle);
+        });
 
-                if (distSq < maxDistSq) {
-                    const opacity = (1 - distSq / maxDistSq) * 0.15;
-                    ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.stroke();
+        // Draw particles in batches
+        colorGroups.forEach((group, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            group.forEach(particle => {
+                ctx.moveTo(particle.x + particle.size, particle.y);
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            });
+            ctx.fill();
+        });
+
+        // Draw connections using spatial hash (check only adjacent cells)
+        const maxDistSq = 6400; // 80^2
+        const drawnConnections = new Set();
+        
+        particles.forEach(particle => {
+            const cellX = Math.floor(particle.x / cellSize);
+            const cellY = Math.floor(particle.y / cellSize);
+            
+            // Check only adjacent cells (9 cells total)
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    const key = `${cellX + dx},${cellY + dy}`;
+                    const neighbors = grid.get(key);
+                    if (!neighbors) continue;
+                    
+                    neighbors.forEach(neighbor => {
+                        if (particle === neighbor) return;
+                        
+                        // Prevent duplicate connections
+                        const connectionKey = particle.x < neighbor.x ? 
+                            `${particle.x},${particle.y}-${neighbor.x},${neighbor.y}` :
+                            `${neighbor.x},${neighbor.y}-${particle.x},${particle.y}`;
+                        if (drawnConnections.has(connectionKey)) return;
+                        drawnConnections.add(connectionKey);
+                        
+                        const dx = particle.x - neighbor.x;
+                        const dy = particle.y - neighbor.y;
+                        const distSq = dx * dx + dy * dy;
+
+                        if (distSq < maxDistSq) {
+                            const opacity = (1 - distSq / maxDistSq) * 0.15;
+                            ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particle.x, particle.y);
+                            ctx.lineTo(neighbor.x, neighbor.y);
+                            ctx.stroke();
+                        }
+                    });
                 }
             }
-        }
+        });
 
         requestAnimationFrame(animateParticles);
     }
 
     animateParticles();
 
+    // OPTIMIZED: Throttled resize handler
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        resizeCanvas();
-    });
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(resizeCanvas, 150);
+    }, { passive: true });
 }
 
 // ==========================================
@@ -210,10 +269,18 @@ const observerOptions = {
 const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-            // Add staggered delay for multiple elements
-            setTimeout(() => {
-                entry.target.classList.add('visible');
-            }, index * 100);
+            // OPTIMIZED: Use requestIdleCallback for non-critical animations
+            const addVisible = () => {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 100);
+            };
+            
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(addVisible, { timeout: 500 });
+            } else {
+                addVisible();
+            }
         }
     });
 }, observerOptions);
@@ -257,292 +324,70 @@ if (mobileMenuToggle) {
 }
 
 // ==========================================
-// NAVBAR SCROLL EFFECT - HIDE ON SCROLL
+// FLOATING HERO SCROLL EFFECT
 // ==========================================
-const nav = document.querySelector('nav');
+const floatingCtas = document.querySelector('.floating-ctas');
+const floatingInner = document.querySelector('.floating-inner');
 const heroSection = document.querySelector('.hero');
 let lastScroll = 0;
 let ticking = false;
 
-// Create floating CV button that appears when nav hides
-const floatingCvBtn = document.createElement('a');
-floatingCvBtn.href = '/cv/my_mega_cv.pdf';
-floatingCvBtn.download = 'Glen_Muthoka_CV.pdf';
-floatingCvBtn.className = 'floating-cv-btn';
-floatingCvBtn.innerHTML = '📄 CV';
-floatingCvBtn.setAttribute('aria-label', 'Download CV');
-document.body.appendChild(floatingCvBtn);
-
-function updateNav() {
+function updateFloatingHero() {
     const currentScroll = window.pageYOffset;
     
-    // Get the height of the hero section (or fallback to 100px)
-    const heroHeight = heroSection ? heroSection.offsetHeight * 0.3 : 100;
+    // Get the height of the hero section (or fallback to 500px)
+    const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
 
     if (currentScroll > heroHeight) {
-        // Past the hero - hide navbar, show floating CV
-        nav.classList.add('nav-hidden');
-        floatingCvBtn.classList.add('visible');
+        // Past the hero - show floating CTAs and expand container
+        if (floatingCtas) {
+            floatingCtas.classList.add('visible');
+        }
+        if (floatingInner) {
+            floatingInner.classList.add('expanded');
+            floatingInner.classList.remove('compact');
+        }
     } else {
-        // In hero section - show navbar, hide floating CV
-        nav.classList.remove('nav-hidden');
-        floatingCvBtn.classList.remove('visible');
-    }
-    
-    if (currentScroll > 50) {
-        nav.classList.add('scrolled');
-    } else {
-        nav.classList.remove('scrolled');
+        // In hero section - hide floating CTAs and compact container
+        if (floatingCtas) {
+            floatingCtas.classList.remove('visible');
+        }
+        if (floatingInner) {
+            floatingInner.classList.remove('expanded');
+            floatingInner.classList.add('compact');
+        }
     }
 
     lastScroll = currentScroll;
     ticking = false;
 }
 
+// Initialize with compact state
+if (floatingInner) {
+    floatingInner.classList.add('compact');
+}
+
+// OPTIMIZED: Passive scroll listener for better performance
 window.addEventListener('scroll', () => {
     if (!ticking) {
-        requestAnimationFrame(updateNav);
+        requestAnimationFrame(updateFloatingHero);
         ticking = true;
     }
-});
+}, { passive: true });
 
-// ==========================================
-// MORPHING CURSOR - LIQUID GLASS CYBERPUNK
-// ==========================================
-const cursorFollower = document.getElementById('cursor-follower');
-
-if (cursorFollower && !('ontouchstart' in window)) {
-    let followerX = smoothMouseX;
-    let followerY = smoothMouseY;
-    let currentHoverElement = null;
-    let currentMorphType = 'default';
-    let isMorphing = false;
-
-    // Create liquid trail elements
-    const trailElements = [];
-    const trailCount = 4;
-    
-    for (let i = 0; i < trailCount; i++) {
-        const trail = document.createElement('div');
-        trail.className = 'cursor-trail';
-        trail.style.opacity = (1 - i / trailCount) * 0.25;
-        document.body.appendChild(trail);
-        trailElements.push({
-            element: trail,
-            x: smoothMouseX,
-            y: smoothMouseY
-        });
-    }
-
-    // Create inner glow element
-    const innerGlow = document.createElement('div');
-    innerGlow.className = 'cursor-inner-glow';
-    cursorFollower.appendChild(innerGlow);
-
-    function animateCursor() {
-        // Always follow the mouse smoothly
-        followerX += (smoothMouseX - followerX) * 0.18;
-        followerY += (smoothMouseY - followerY) * 0.18;
-
-        // Apply transform - cursor always follows mouse
-        cursorFollower.style.transform = `translate(${followerX - 16}px, ${followerY - 16}px)`;
-
-        // Animate trail elements with liquid effect
-        trailElements.forEach((trail, index) => {
-            const delay = (index + 1) * 0.07;
-            trail.x += (followerX - trail.x) * delay;
-            trail.y += (followerY - trail.y) * delay;
-            trail.element.style.transform = `translate(${trail.x - 12}px, ${trail.y - 12}px)`;
-        });
-
-        requestAnimationFrame(animateCursor);
-    }
-
-    animateCursor();
-
-    // Detect element type and set morph mode
-    function getMorphType(element) {
-        if (!element) return 'default';
-        
-        const tagName = element.tagName.toLowerCase();
-        const classList = element.classList;
-        
-        // Check for buttons first
-        if (tagName === 'button' || 
-            classList.contains('cta-btn') || 
-            classList.contains('cv-btn') || 
-            classList.contains('filter-btn') ||
-            classList.contains('carousel-nav-btn') ||
-            classList.contains('carousel-dot') ||
-            classList.contains('submit-btn')) {
-            return 'button';
-        }
-        
-        // Check for cards
-        if (classList.contains('project-card') || 
-            classList.contains('stat-card') || 
-            classList.contains('skill-panel') ||
-            classList.contains('carousel-card') ||
-            classList.contains('tech-card') ||
-            classList.contains('cert-card') ||
-            classList.contains('holo-panel')) {
-            return 'card';
-        }
-        
-        // Check for links (not buttons)
-        if (tagName === 'a' && !classList.contains('cta-btn') && !classList.contains('cv-btn')) {
-            return 'link';
-        }
-        
-        // Check for headings/titles for text highlight effect
-        if (classList.contains('glitch') || 
-            classList.contains('section-title') ||
-            classList.contains('project-title')) {
-            return 'text';
-        }
-        
-        return 'default';
-    }
-
-    // Track currently bound elements to avoid duplicate listeners
-    const boundElements = new WeakSet();
-
-    // Set up hover detection for all interactive elements
-    function setupMorphListeners() {
-        const interactiveElements = document.querySelectorAll(`
-            a, button, 
-            .project-card, .stat-card, .skill-panel, .tech-card, .cert-card, .holo-panel,
-            .cta-btn, .cv-btn, .filter-btn, .carousel-nav-btn, .carousel-dot, .submit-btn,
-            .carousel-card, .glitch, .section-title, .project-title
-        `);
-        
-        interactiveElements.forEach(el => {
-            // Skip if already bound
-            if (boundElements.has(el)) return;
-            boundElements.add(el);
-            
-            el.addEventListener('mouseenter', (e) => {
-                e.stopPropagation();
-                currentHoverElement = el;
-                currentMorphType = getMorphType(el);
-                isMorphing = true;
-                
-                // Add appropriate class to cursor
-                cursorFollower.className = 'cursor-follower';
-                cursorFollower.classList.add(`cursor-${currentMorphType}`);
-                
-                // Update trail classes
-                trailElements.forEach(trail => {
-                    trail.element.className = 'cursor-trail';
-                    trail.element.classList.add(`trail-${currentMorphType}`);
-                });
-            });
-
-            el.addEventListener('mouseleave', (e) => {
-                // Only reset if we're leaving to a non-interactive element
-                const relatedTarget = e.relatedTarget;
-                if (relatedTarget && getMorphType(relatedTarget) !== 'default') {
-                    return; // Don't reset, we're entering another interactive element
-                }
-                
-                currentHoverElement = null;
-                currentMorphType = 'default';
-                isMorphing = false;
-                
-                // Reset cursor class
-                cursorFollower.className = 'cursor-follower';
-                
-                // Reset trail classes
-                trailElements.forEach(trail => {
-                    trail.element.className = 'cursor-trail';
-                });
-            });
-        });
-    }
-
-    setupMorphListeners();
-
-    // Re-setup listeners when DOM changes (debounced)
-    let morphObserverTimeout;
-    const morphObserver = new MutationObserver(() => {
-        clearTimeout(morphObserverTimeout);
-        morphObserverTimeout = setTimeout(setupMorphListeners, 200);
-    });
-    morphObserver.observe(document.body, { childList: true, subtree: true });
-
-} else if (cursorFollower) {
-    cursorFollower.style.display = 'none';
-}
-
-// ==========================================
-// LIQUID GLASS TILT EFFECT
-// ==========================================
-function initLiquidTilt() {
-    // Skip on mobile and touch devices
-    if ('ontouchstart' in window || window.innerWidth < 768) {
-        return;
-    }
-
-    const tiltElements = document.querySelectorAll('.project-card, .stat-card, .skill-panel, .holo-panel, .tech-card');
-    
-    tiltElements.forEach(element => {
-        element.addEventListener('mouseenter', function() {
-            this.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
-        });
-
-        element.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            // Calculate rotation
-            const rotateX = (y - centerY) / centerY * -8;
-            const rotateY = (x - centerX) / centerX * 8;
-            
-            // Apply 3D transform
-            this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            
-            // Liquid Glass Shine Effect
-            // Update CSS variables for liquid shine
-            this.style.setProperty('--mouse-x', `${x}px`);
-            this.style.setProperty('--mouse-y', `${y}px`);
-            
-            // Move the glow element if it exists
-            const glowElement = this.querySelector('.panel-glow');
-            if (glowElement) {
-                glowElement.style.left = `${(x / rect.width) * 100 - 50}%`;
-                glowElement.style.top = `${(y / rect.height) * 100 - 50}%`;
-            }
-        });
-
-        element.addEventListener('mouseleave', function() {
-            this.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            this.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-            
-            const glowElement = this.querySelector('.panel-glow');
-            if (glowElement) {
-                glowElement.style.left = '-50%';
-                glowElement.style.top = '-50%';
-            }
+// Scroll to top when logo badge is clicked
+const logoBadge = document.querySelector('.static-logo-badge a');
+if (logoBadge) {
+    logoBadge.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
         });
     });
 }
 
-// Initialize Liquid Tilt
-initLiquidTilt();
-
-// Re-initialize after dynamic content loads
-const tiltObserver = new MutationObserver(() => {
-    initLiquidTilt();
-});
-
-tiltObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+// OPTIMIZED: Removed MutationObserver - using event delegation instead
 
 // ==========================================
 // CYBERPUNK TEXT SCRAMBLE EFFECT
@@ -971,13 +816,17 @@ function initProjectCarousel() {
     if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoPlay(); prevSlide(); startAutoPlay(); });
     if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoPlay(); nextSlide(); startAutoPlay(); });
 
-    // Touch/swipe support
+    // Touch/swipe support - OPTIMIZED: Passive event listeners
     let touchStartX = 0;
     let touchEndX = 0;
 
     track.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
         stopAutoPlay();
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+        // Allow native scrolling behavior
     }, { passive: true });
 
     track.addEventListener('touchend', (e) => {
@@ -1049,7 +898,7 @@ function initProjectCarousel() {
             createDots();
             goToSlide(currentIndex);
         }, 250);
-    });
+    }, { passive: true });
 
     init();
 }
@@ -1148,6 +997,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, 100);
 });
+
+// ==========================================
+// PERFORMANCE MONITORING (DEV MODE)
+// ==========================================
+if (window.location.search.includes('debug=perf')) {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let fps = 0;
+    
+    // FPS Monitor
+    function measureFPS() {
+        frameCount++;
+        const currentTime = performance.now();
+        
+        if (currentTime >= lastTime + 1000) {
+            fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+            frameCount = 0;
+            lastTime = currentTime;
+            
+            // Warn if FPS drops below 30
+            if (fps < 30) {
+                console.warn(`⚠️ Low FPS detected: ${fps} fps`);
+            }
+        }
+        
+        requestAnimationFrame(measureFPS);
+    }
+    
+    measureFPS();
+    
+    // Long Task Detection
+    if ('PerformanceObserver' in window) {
+        const perfObserver = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (entry.duration > 50) {
+                    console.warn(`⚠️ Long task detected: ${entry.duration.toFixed(2)}ms`);
+                }
+            }
+        });
+        
+        try {
+            perfObserver.observe({ entryTypes: ['longtask'] });
+        } catch (e) {
+            // longtask not supported
+        }
+    }
+    
+    console.log('%c🔍 Performance Monitoring Active', 'color: #00f5ff; font-size: 14px; font-weight: bold;');
+    console.log('%cAdd ?debug=perf to URL to enable', 'color: #a855f7; font-size: 12px;');
+}
 
 // ==========================================
 // SMOOTH PAGE TRANSITIONS

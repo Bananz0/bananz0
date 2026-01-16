@@ -21,12 +21,12 @@
 \makecvtitle
 
 \section{Professional Summary}
-Final-year Electrical \& Electronics Engineering student at the University of Southampton with specialization in embedded systems, IC design, and cybersecurity. Proven track record in both hardware and software development, from TSMC 65nm IC fabrication to real-time FPGA systems and full-stack applications. Experience includes space-grade software development for lunar CubeSat missions and AI-driven optical authentication research, achieving measurable improvements in system performance and reliability. Seeking graduate opportunities in embedded systems engineering, digital design, or firmware development.
+Final-year Electrical \& Electronics Engineering student at the University of Southampton with specialization in embedded systems, IC design, and cybersecurity. Maintain 69 GitHub repositories spanning public open source, private work, and forks (not all contributions are mirrored publicly). Proven track record in both hardware and software development, from Ring Oscillator design for real-time clock chips at TSMC 65nm to real-time FPGA systems and full-stack applications. Experience includes space-grade software development for lunar CubeSat missions and AI-driven optical authentication research, achieving measurable improvements in system performance and reliability. Seeking graduate opportunities in embedded systems engineering, digital design, or firmware development.
 
 \section{Education}
 \cventry{2023--2026}{BEng Electrical \& Electronics Engineering (Expected First Class Honours)}{University of Southampton}{Southampton, UK}{}{
 \textbf{Key Modules:} Digital Systems Design, Integrated Circuit Design, Control Systems, Embedded Systems, Network Security, Signal Processing\\
-\textbf{Second Year Project:} TSMC 65nm IC Design \& Fabrication (Team Lead)\\
+\textbf{Second Year Project:} TSMC 65nm Ring Oscillator for Real-Time Clock IC (Team Lead)\\
 \textbf{Final Year Project:} AI-Driven Optical Authentication Framework using Optical PUFs (Lead Researcher \& Developer)}
 
 \cventry{2022--2023}{Undergraduate Foundation Programme, Engineering Pathway (Distinction)}{ONCAMPUS Global}{Southampton, UK}{}{}
@@ -51,18 +51,23 @@ Final-year Electrical \& Electronics Engineering student at the University of So
 \textbf{Role:} Lead Researcher \& Developer | \textbf{Tools:} Python, NumPy, CuPy (CUDA), Scipy, Matplotlib\\
 Developing novel anti-counterfeiting security framework leveraging Optical Physical Unclonable Functions (OPUFs). Designed machine learning pipelines for spectral data analysis with statistical feature extraction (peak analysis, SNR, spectral entropy). Engineered GPU-accelerated data processing using CUDA/CuPy for high-dimensional emission spectra. Developed robust quantization algorithm to convert analog spectral features into cryptographic-strength bitstreams. Conducting security analysis and benchmarking against simulation and cloning attacks.}
 
-\cvitem{TSMC 65nm CPU Design: Complete IC Design \& Fabrication Flow}{Sep 2023--Jun 2024\\
+\cvitem{TSMC 65nm Real-Time Clock Design: Ring Oscillator IC Fabrication Flow}{Sep 2023--Jun 2024\\
 \textbf{Role:} Team Lead (6-member team) | \textbf{Tools:} S-Edit, T-Spice, L-Edit, Calibre DRC/LVS\\
-Led complete integrated circuit design from RTL to GDSII tape-out for TSMC 65nm process node. Designed CPU datapath and control logic, performed extensive SPICE simulations to verify timing constraints (setup/hold times), and conducted full physical verification including Design Rule Checking and Layout vs. Schematic validation. Successfully submitted GDSII files for fabrication with zero DRC violations. Achieved 15\% area reduction through custom cell optimization and strategic floorplanning.}
+Led complete integrated circuit design from RTL to GDSII tape-out for TSMC 65nm process node. Designed and implemented Ring Oscillator circuit for real-time clock chip. Performed extensive SPICE simulations to verify oscillation frequency stability and timing constraints. Conducted full physical verification including Design Rule Checking and Layout vs. Schematic validation. Successfully submitted GDSII files for fabrication with zero DRC violations. Achieved 15\% area reduction through custom cell optimization and strategic floorplanning.}
+
+\cvitem{MIPSquare++: 5-Stage Pipelined MIPS Processor Simulator}{Apr 2025--Jun 2025\\
+\textbf{Language:} C++ (C++23) | \textbf{Tools:} CMake, CLion, Git\\
+Developed comprehensive MIPS CPU simulator implementing realistic 5-stage pipeline architecture (Fetch, Decode, Execute, Memory, Write-Back) with full hazard detection and mitigation. Implemented custom MIPS assembly parser with label resolution supporting R-type (add, sub, and, or, slt, sll, srl, sra, jr), I-type (addi, lw, sw, beq, bne), and J-type (j, jal) instructions. Engineered intelligent data forwarding between EX/MEM and MEM/WB stages to minimize pipeline stalls. Developed load-use hazard detection with automatic pipeline stalling and branch hazard handling with pipeline flushing. Created comprehensive test suite including RAW hazard tests, control hazard tests, and showcase program (calculating squares 0-200 using odd number summation) optimized for minimal stalls. Achieved near 1 CPI with proper forwarding implementation. System featured separate instruction/data memory, 32-register MIPS register file, and configurable debug output for all pipeline stages.\\
+\faGithub~\href{https://github.com/Bananz0/MIPSquare}{github.com/Bananz0/MIPSquare}}
 
 \cvitem{16-Stage FIR Notch Filter for Real-Time Audio on FPGA}{Nov 2024--Dec 2024\\
 \textbf{Platform:} Altera Cyclone V (DE1-SoC) | \textbf{Language:} SystemVerilog | \textbf{Tools:} Quartus Prime, ModelSim\\
 Designed parametrized Finite Impulse Response digital filter with notch filtering capabilities for real-time stereo audio processing. Implemented 4-state FSM controller achieving 19-cycle latency (950ns at 50MHz) from ADC input to DAC output. Developed custom MATLAB scripts for optimal FIR coefficient generation and verification. Successfully processed dual-channel 48kHz audio with -40dB notch depth at configurable frequencies. Synthesized design utilized 2,847 logic elements (5\% FPGA utilization).\\
 \faGithub~\href{https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA}{github.com/Bananz0/16-Stage-FIR-Notch-Filter}}
 
-\cvitem{WattsApp: Embedded Smart Energy Management Platform}{Jan 2025--Mar 2025\\
-\textbf{MCU:} ESP32 | \textbf{Protocols:} MQTT, Modbus RTU | \textbf{Sensors:} INA219, ACS712\\
-Designed IoT-enabled smart meter system for real-time energy monitoring integrating solar generation, battery storage, and grid power. Implemented embedded C firmware for ESP32 managing power measurement (±0.5\% accuracy), load balancing decisions, and wireless data transmission. Developed React.js web dashboard for live visualization of energy flow and cost optimization recommendations. System achieved 12\% reduction in peak grid consumption during testing phase through intelligent load shifting algorithms.\\
+\cvitem{WattsApp: Embedded Smart System Management Platform}{Jan 2025--Mar 2025\\
+\textbf{MCU:} AVR ATMega644p | \textbf{Stack:} Embedded C, InfluxDB, Grafana | \textbf{Protocols:} UART, I2C\\
+Designed comprehensive embedded system management platform for real-time monitoring and control on AVR ATMega644p microcontroller. Developed bare-metal C firmware implementing sensor polling, data acquisition, and serial communication for telemetry streaming. Integrated InfluxDB time-series database for efficient historical data storage and Grafana dashboards for live system visualization and analytics. Implemented sensor interfaces for temperature (I2C), voltage/current monitoring (ADC), and GPIO control. Achieved sub-millisecond response times with interrupt-driven architecture and optimized data structures. System demonstrated in D2 IC Design coursework with successful chip testing and system integration demonstration.\\
 \faGithub~\href{https://github.com/Bananz0/WattsApp}{github.com/Bananz0/WattsApp}}
 
 \subsection{Software Development}
@@ -127,6 +132,11 @@ Architected and deployed production-grade home network infrastructure including:
 \end{itemize}
 Achieved 99.8\% uptime over 12-month period with zero security incidents. Infrastructure serves 8 concurrent users with average response times <50ms.}
 
+\cvitem{GramSMC: macOS Hardware Control via Kernel Extension}{2026\\
+\textbf{Platform:} macOS (Hackintosh) | \textbf{Tools:} DriverKit, macOS Kernel SDK, ACPI/ASL, C++\\
+Developed VirtualSMC plugin enabling native hardware control for LG Gram 13Z990-R running macOS. Engineered custom ACPI tables (SSDT) defining hardware device interfaces and embedded controller (EC) field mappings. Implemented DriverKit-based kernel extension using macOS Kernel SDK for user-space driver architecture, replacing deprecated kext model. Reverse-engineered LG embedded controller protocol through ACPI disassembly, I/O port monitoring, and register mapping to enable keyboard backlight control, battery management, thermal sensors, and fan control. Achieved native macOS integration with System Management Controller (SMC) framework, providing temperature/voltage/fan data to monitoring tools. Zero kernel panics in 1000+ hours of testing.\\
+\faGithub~\href{https://github.com/Bananz0/GramSMC}{github.com/Bananz0/GramSMC}}
+
 \cvitem{Hackintosh Systems Engineering}{2023--Present\\
 Successfully built and maintained 3 production Hackintosh systems (laptops and desktops) demonstrating deep understanding of UEFI/BIOS architecture, kernel extensions (kexts), and macOS bootloader configuration. Created custom OpenCore EFI configurations ensuring hardware compatibility (WiFi, Bluetooth, audio, GPU acceleration). Published detailed build guides and EFI packages for HP EliteBook 440 x360 G1 benefiting community members.\\
 \faGithub~\href{https://github.com/Bananz0/440-x360-G1-Hackintosh}{github.com/Bananz0/440-x360-G1-Hackintosh}}
@@ -173,7 +183,7 @@ Successfully built and maintained 3 production Hackintosh systems (laptops and d
 
 \section{Achievements \& Activities}
 \cvitem{2025}{Attended ISACA Winchester Chapter technical workshop on cybersecurity frameworks}
-\cvitem{2024--2025}{Active contributor to open-source projects: endlessh-go (Golang), Nearby-Sharing-Windows, AudioPlaybackConnector}
+\cvitem{2024--2026}{Active open-source contributor and maintainer (public + private repositories; selected public contributions include endlessh-go, Nearby-Sharing-Windows, and AudioPlaybackConnector)}
 \cvitem{2024}{Represented university at Engineering Society technical demonstrations}
 
 \section{Additional Information}

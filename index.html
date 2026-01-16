@@ -8,38 +8,14 @@ title: Home
     <div class="hero-content">
         <h1 class="glitch" data-text="GLEN MUTHOKA">GLEN MUTHOKA</h1>
         <p class="tagline">// EMBEDDED SYSTEMS // IC DESIGN // HOMELABBING //</p>
-        <div class="cta-buttons">
-            <a href="#projects" class="cta-btn primary">VIEW PROJECTS</a>
-            <a href="#contact" class="cta-btn">GET IN TOUCH</a>
+        <div class="cta-buttons" data-spring="snappy" data-bounce="1">
+            <a href="#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">VIEW PROJECTS</a>
+            <a href="#contact" class="cta-btn" data-spring="snappy" data-bounce="1">GET IN TOUCH</a>
         </div>
     </div>
     
     <!-- 3D IC Chip container -->
     <div id="chip-container"></div>
-</section>
-
-<!-- STATS SECTION -->
-<section class="stats-section">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-card fade-in">
-                <div class="stat-number">6%</div>
-                <div class="stat-label">Latency Reduction<br>CubeSat Software</div>
-            </div>
-            <div class="stat-card fade-in">
-                <div class="stat-number">65nm</div>
-                <div class="stat-label">TSMC Process<br>IC Design</div>
-            </div>
-            <div class="stat-card fade-in">
-                <div class="stat-number">20%</div>
-                <div class="stat-label">Reliability Boost<br>Flight Software</div>
-            </div>
-            <div class="stat-card fade-in">
-                <div class="stat-number">99.8%</div>
-                <div class="stat-label">Infrastructure<br>Uptime</div>
-            </div>
-        </div>
-    </div>
 </section>
 
 <!-- ABOUT SECTION -->
@@ -57,25 +33,37 @@ title: Home
                 <div class="panel-content">
                     <p class="lead">Final-year <strong>Electrical & Electronics Engineering</strong> student at the <strong>University of Southampton</strong>, with focus on embedded systems, IC design, and cybersecurity.</p>
                     
-                    <p>My journey spans the entire technology stack; developing <strong>AI-driven optical authentication frameworks</strong> using GPU-accelerated Python, to designing circuits at the <strong>TSMC 65nm process node</strong>, to developing space-grade software for <strong>lunar CubeSat missions</strong>. I thrive where hardware meets software.</p>
+                    <p>My journey spans the entire technology stack; developing <strong>AI-driven optical authentication frameworks</strong> using GPU-accelerated Python, to designing <strong>Ring Oscillator circuits for real-time clock chips at TSMC 65nm</strong>, to developing space-grade software for <strong>lunar CubeSat missions</strong>. I thrive where hardware meets software.</p>
                 </div>
             </div>
 
             <!-- Experience Panel -->
             <div class="holo-panel fade-in">
                 <div class="panel-header">
-                    <span class="panel-icon"></span>
+                    <span class="panel-icon">💼</span>
                     <h2>CURRENT_WORK</h2>
                 </div>
                 <div class="panel-content">
                     <div class="work-item">
                         <h3>Junior Software Engineer</h3>
-                        <h4>ARTEMIS Small Sat-1 Lunar CubeSat</h4>
-                        <p class="work-period">Sep 2023  Present</p>
+                        <h4>ARTEMIS Small Sat-1 Lunar CubeSat Mission</h4>
+                        <p class="work-period">Sep 2023 → Present</p>
                         <ul>
-                            <li>Developing flight software in C/C++ following NASA cFS architecture</li>
-                            <li>Optimized system latency by <strong>6%</strong> through algorithm refinement</li>
-                            <li>Enhanced reliability by <strong>20%</strong> with comprehensive testing</li>
+                            <li>Developing <strong>space-grade flight software</strong> in C/C++ following NASA cFS (Core Flight System) architecture for lunar orbit operations</li>
+                            <li>Implemented <strong>real-time telemetry processing</strong> modules with embedded systems constraints (limited memory/power)</li>
+                            <li>Optimized system latency by <strong>6%</strong> through algorithm refinement and buffer management improvements</li>
+                            <li>Enhanced mission reliability by <strong>20%</strong> with comprehensive unit testing, integration testing, and fault injection scenarios</li>
+                            <li>Collaborated with cross-functional team on <strong>CubeSat subsystem integration</strong> (ADCS, comms, power)</li>
+                        </ul>
+                    </div>
+                    <div class="work-item">
+                        <h3>Open Source Contributor</h3>
+                        <h4>Various Projects</h4>
+                        <p class="work-period">2023 → Present</p>
+                        <ul>
+                            <li>Maintained <strong>GalaxyBookEnabler</strong> (430+ stars): PowerShell automation for Samsung ecosystem interoperability on Windows</li>
+                            <li>Developed <strong>eGPU Auto-Enabler</strong>: Hot-plug solution for external GPU management with sub-50ms latency</li>
+                            <li>Built <strong>GramSMC</strong>: macOS kernel extensions using DriverKit for LG Gram hardware control via reverse-engineered EC protocols</li>
                         </ul>
                     </div>
                 </div>
@@ -84,15 +72,29 @@ title: Home
             <!-- Education Panel -->
             <div class="holo-panel fade-in">
                 <div class="panel-header">
-                    <span class="panel-icon"></span>
+                    <span class="panel-icon">🎓</span>
                     <h2>EDUCATION</h2>
                 </div>
                 <div class="panel-content">
                     <div class="edu-item">
                         <h3>BEng Electrical & Electronics Engineering</h3>
                         <h4>University of Southampton</h4>
-                        <p class="edu-period">2023  2026</p>
-
+                        <p class="edu-period">2023 → 2026 (Final Year)</p>
+                        <p><strong>Final Year Project:</strong> AI-Driven Optical Physical Unclonable Function (OPUF) Authentication Framework</p>
+                        <ul>
+                            <li>GPU-accelerated spectral analysis using <strong>CUDA/CuPy</strong> for real-time device authentication</li>
+                            <li>Machine learning pipelines for pattern recognition in optical fingerprints</li>
+                            <li>Novel anti-counterfeiting security framework for hardware authentication</li>
+                        </ul>
+                        <p style="margin-top: var(--space-md);"><strong>Key Modules:</strong></p>
+                        <ul>
+                            <li><strong>D2 IC Design & Test (ELEC2210):</strong> Complete IC design flow from RTL to silicon validation, DRC/LVS verification, and chip testing</li>
+                            <li><strong>Computer Engineering (ELEC2204):</strong> CPU architecture, pipelining, and processor simulation</li>
+                            <li><strong>Embedded Systems:</strong> Real-time operating systems, ARM Cortex-M programming, bare-metal development</li>
+                            <li><strong>Digital Signal Processing:</strong> FFT/DFT, filter design, spectral analysis in Python/MATLAB</li>
+                            <li><strong>Computer Architecture:</strong> CPU microarchitecture, pipelining, cache optimization, SystemVerilog HDL</li>
+                            <li><strong>Cybersecurity:</strong> Cryptography, network security, hardware security modules</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -100,28 +102,31 @@ title: Home
             <!-- Interests Panel -->
             <div class="holo-panel fade-in">
                 <div class="panel-header">
-                    <span class="panel-icon"></span>
-                    <h2>INTERESTS</h2>
+                    <span class="panel-icon">🏠</span>
+                    <h2>INTERESTS & HOME LAB</h2>
                 </div>
                 <div class="panel-content">
                     <div class="interests-grid">
                         <div class="interest-item">
-                            <span class="interest-icon"></span>
+                            <span class="interest-icon">📻</span>
                             <h4>Amateur Radio</h4>
                         </div>
                         <div class="interest-item">
-                            <span class="interest-icon"></span>
+                            <span class="interest-icon">🔒</span>
                             <h4>IoT Security</h4>
                         </div>
                         <div class="interest-item">
-                            <span class="interest-icon"></span>
+                            <span class="interest-icon">💻</span>
                             <h4>Open Source</h4>
                         </div>
                         <div class="interest-item">
-                            <span class="interest-icon"></span>
+                            <span class="interest-icon">🖥️</span>
                             <h4>Homelabbing</h4>
                         </div>
                     </div>
+                    <p style="margin-top: var(--space-lg); color: var(--text-secondary);">
+                        <strong>Home Lab Stack:</strong> OPNsense, HomeNet, UniFi Network, AdGuard, CCTV, Plex, Sonarr, Radarr, Lidarr, Readarr, homarr, Overseerr, Uptime Kuma, Portainer, Tautulli, Bazarr, Prowlarr, CasaOS, Grafana, Prometheus, balena dashboard, OpenObserve, Cockpit, qBittorrent. Expert in SSH tunneling and Ubuntu Server LTS management.
+                    </p>
                 </div>
             </div>
         </div>
@@ -140,21 +145,23 @@ title: Home
             <h3 class="category-label"> FEATURED</h3>
             <div class="projects-grid">
                 
+                {% assign gbe_repo = site.data.github_repos | where: "name", "GalaxyBookEnabler" | first %}
+                {% if gbe_repo %}
                 <!-- Galaxy Book Enabler -->
-                <div class="project-card-full fade-in">
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
                     <div class="project-header">
                         <span class="project-badge">WINDOWS</span>
                         <div class="project-meta">
-                            <span>PowerShell</span>
+                            <span>{{ gbe_repo.language }}</span>
                             <span></span>
                             <span>2024-2025</span>
                         </div>
                     </div>
-                    <h3>Galaxy Book Enabler</h3>
-                    <p>Professional-grade PowerShell tool that spoofs Windows PCs as Samsung Galaxy Books, unlocking the Samsung ecosystem including Quick Share, Multi Control, Samsung Notes, and 20+ apps.</p>
+                    <h3>{{ gbe_repo.name }}</h3>
+                    <p>{{ gbe_repo.description }}</p>
                     <div class="project-stats">
                         <span class="stat"><strong>8.3K+</strong> Downloads</span>
-                        <span class="stat"><strong>350+</strong> Stars</span>
+                        <span class="stat"><strong>{{ gbe_repo.stargazers_count }}+</strong> Stars</span>
                         <span class="stat"><strong>21</strong> Device Profiles</span>
                     </div>
                     <div class="tech-tags">
@@ -164,15 +171,82 @@ title: Home
                         <span class="tech-tag">Task Scheduler</span>
                     </div>
                     <div class="project-links">
-                        <a href="https://github.com/Bananz0/GalaxyBookEnabler" class="project-link" target="_blank">
+                        <a href="{{ gbe_repo.html_url }}" class="project-link" target="_blank">
                             <span>VIEW ON GITHUB</span>
                             <span></span>
                         </a>
                     </div>
                 </div>
+                {% endif %}
 
-                <!-- TSMC 65nm CPU -->
-                <div class="project-card-full fade-in">
+                {% assign egpu_repo = site.data.github_repos | where: "name", "eGPUae" | first %}
+                {% if egpu_repo %}
+                <!-- eGPU Auto-Enabler -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">eGPU</span>
+                        <div class="project-meta">
+                            <span>{{ egpu_repo.language }}</span>
+                            <span></span>
+                            <span>2024-2025</span>
+                        </div>
+                    </div>
+                    <h3>eGPU Auto-Enabler</h3>
+                    <p>{{ egpu_repo.description }}</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>99.9%</strong> Reliability</span>
+                        <span class="stat"><strong>&lt;50ms</strong> Latency</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">PowerShell 7</span>
+                        <span class="tech-tag">PnP Utilities</span>
+                        <span class="tech-tag">Power Management</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ egpu_repo.html_url }}" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span></span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% assign gramsmc_repo = site.data.github_repos | where: "name", "GramSMC" | first %}
+                {% if gramsmc_repo %}
+                <!-- GramSMC + GramControlCenter -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">HACKINTOSH</span>
+                        <div class="project-meta">
+                            <span>{{ gramsmc_repo.language }}</span>
+                            <span></span>
+                            <span>2026</span>
+                        </div>
+                    </div>
+                    <h3>GramSMC + GramControlCenter</h3>
+                    <p>VirtualSMC plugin providing native macOS support for LG Gram 13Z990-R. Custom ACPI tables and DriverKit-based kext using macOS Kernel SDK for hardware control via reverse-engineered embedded controller.</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>DriverKit</strong> Based</span>
+                        <span class="stat"><strong>ACPI</strong> Custom Tables</span>
+                        <span class="stat"><strong>EC</strong> Reverse Eng.</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">DriverKit</span>
+                        <span class="tech-tag">macOS Kernel SDK</span>
+                        <span class="tech-tag">ACPI</span>
+                        <span class="tech-tag">EC Reverse Engineering</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ gramsmc_repo.html_url }}" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span></span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- AI-Driven OPUF -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
                     <div class="project-header">
                         <span class="project-badge">FINAL YEAR PROJECT</span>
                         <div class="project-meta">
@@ -196,332 +270,102 @@ title: Home
                         <span class="tech-tag">Spectral Analysis</span>
                     </div>
                     <div class="project-links">
-                        <span class="project-link" style="opacity: 0.5;">University Research Project</span>
+                        <a href="{{ '/projects/' | relative_url }}" class="project-link" style="opacity: 0.7;" title="View project details">University Research Project</a>
                     </div>
                 </div>
 
-                <!-- TSMC 65nm CPU (Second Year) -->
-                <div class="project-card-full fade-in">
+                <!-- TSMC 65nm RTC IC Design & Testing -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
                     <div class="project-header">
                         <span class="project-badge">IC DESIGN</span>
                         <div class="project-meta">
-                            <span>Hardware</span>
+                            <span>Hardware/Verilog</span>
                             <span></span>
-                            <span>2023-2024</span>
+                            <span>2023-2025</span>
                         </div>
                     </div>
-                    <h3>TSMC 65nm CPU Design & Fabrication</h3>
-                    <p>Complete integrated circuit design flow from RTL to GDSII tape-out for TSMC 65nm process node. Led 6-person team through full physical implementation and verification. Second-year group project.</p>
+                    <h3>TSMC 65nm Real-Time Clock: Complete IC Design & Test Flow</h3>
+                    <p>Led complete IC design from RTL to silicon validation for TSMC 65nm Ring Oscillator-based RTC chip. <strong>Design Phase:</strong> Schematic capture (S-Edit), SPICE simulation (T-Spice), physical layout (L-Edit), and full DRC/LVS verification (Calibre) achieving 15% area reduction and zero violations. <strong>Test Phase:</strong> Extracted Verilog golden model from hierarchical schematics, developed comprehensive test vectors for functional/timing validation, and successfully applied vectors to physical silicon via IC tester achieving 100% test pass rate. System validated through rigorous functional testing and timing characterization.</p>
                     <div class="project-stats">
                         <span class="stat"><strong>65nm</strong> Process</span>
                         <span class="stat"><strong>0</strong> DRC Errors</span>
                         <span class="stat"><strong>-15%</strong> Area</span>
+                        <span class="stat"><strong>100%</strong> Test Pass</span>
                     </div>
                     <div class="tech-tags">
                         <span class="tech-tag">Cadence S-Edit</span>
                         <span class="tech-tag">T-Spice</span>
                         <span class="tech-tag">L-Edit</span>
                         <span class="tech-tag">Calibre DRC/LVS</span>
+                        <span class="tech-tag">Verilog</span>
+                        <span class="tech-tag">IC Testing</span>
                     </div>
                     <div class="project-links">
-                        <span class="project-link" style="opacity: 0.5;">University Project</span>
+                        <a href="{{ '/projects/' | relative_url }}" class="project-link" style="opacity: 0.7;" title="View project details">University Group Project (Team Lead)</a>
                     </div>
                 </div>
 
-            </div>
-        </div>
-
-        <!-- Hardware & Embedded Projects -->
-        <div class="project-category fade-in">
-            <h3 class="category-label">HARDWARE & EMBEDDED</h3>
-            <div class="projects-grid">
-
-                <!-- eGPU Auto-Enabler -->
-                <div class="project-card-full fade-in">
+                <!-- WattsApp: Embedded System Management Platform -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
                     <div class="project-header">
-                        <span class="project-badge">eGPU</span>
+                        <span class="project-badge">EMBEDDED SYSTEMS</span>
                         <div class="project-meta">
-                            <span>PowerShell</span>
-                            <span></span>
-                            <span>2024-2025</span>
-                        </div>
-                    </div>
-                    <h3>eGPU Auto-Enabler</h3>
-                    <p>Background service that automatically re-enables external GPUs after hot-plugging on Windows. Eliminates manual Device Manager intervention with intelligent power management.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>99.9%</strong> Reliability</span>
-                        <span class="stat"><strong>&lt;50ms</strong> Latency</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">PowerShell 7</span>
-                        <span class="tech-tag">PnP Utilities</span>
-                        <span class="tech-tag">Power Management</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/eGPUae" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- 16-Stage FIR Filter -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">FPGA</span>
-                        <div class="project-meta">
-                            <span>SystemVerilog</span>
-                            <span></span>
-                            <span>2024</span>
-                        </div>
-                    </div>
-                    <h3>16-Stage FIR Notch Filter</h3>
-                    <p>Real-time audio processing on Altera Cyclone V FPGA. Parametrized FIR filter with 19-cycle latency @ 50MHz for 60Hz hum elimination in stereo audio.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>19</strong> Cycles</span>
-                        <span class="stat"><strong>48kHz</strong> Audio</span>
-                        <span class="stat"><strong>-40dB</strong> Notch</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">SystemVerilog</span>
-                        <span class="tech-tag">Quartus Prime</span>
-                        <span class="tech-tag">ModelSim</span>
-                        <span class="tech-tag">MATLAB</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- WattsApp -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">IoT</span>
-                        <div class="project-meta">
-                            <span>Embedded C</span>
+                            <span>AVR C</span>
                             <span></span>
                             <span>2025</span>
                         </div>
                     </div>
-                    <h3>WattsApp Smart Energy Management</h3>
-                    <p>ESP32-based IoT platform for real-time energy monitoring, integrating solar generation, battery storage, and grid power with intelligent load balancing.</p>
+                    <h3>WattsApp: Smart System Management Platform</h3>
+                    <p>Designed comprehensive embedded system management platform for real-time monitoring and control on AVR ATMega644p microcontroller. Developed bare-metal C firmware implementing sensor polling, data acquisition, and serial communication for telemetry streaming. Integrated InfluxDB time-series database for efficient historical data storage and Grafana dashboards for live system visualization and analytics. Implemented sensor interfaces for temperature (I2C), voltage/current monitoring (ADC), and GPIO control. Achieved sub-millisecond response times with interrupt-driven architecture and optimized data structures. Successfully demonstrated in IC testing coursework for chip validation and system integration.</p>
                     <div class="project-stats">
-                        <span class="stat"><strong>12%</strong> Savings</span>
-                        <span class="stat"><strong>0.5%</strong> Accuracy</span>
+                        <span class="stat"><strong><1ms</strong> Response</span>
+                        <span class="stat"><strong>Real-time</strong> Telemetry</span>
+                        <span class="stat"><strong>I2C/ADC</strong> Sensors</span>
                     </div>
                     <div class="tech-tags">
-                        <span class="tech-tag">ESP32</span>
-                        <span class="tech-tag">MQTT</span>
-                        <span class="tech-tag">Modbus RTU</span>
+                        <span class="tech-tag">AVR C</span>
+                        <span class="tech-tag">ATMega644p</span>
                         <span class="tech-tag">InfluxDB</span>
                         <span class="tech-tag">Grafana</span>
+                        <span class="tech-tag">UART</span>
+                        <span class="tech-tag">I2C</span>
                     </div>
                     <div class="project-links">
                         <a href="https://github.com/Bananz0/WattsApp" class="project-link" target="_blank">
                             <span>VIEW ON GITHUB</span>
-                            <span></span>
+                            <span>→</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- PiBoard -->
+                <!-- MIPSquare++ MIPS Simulator -->
                 <div class="project-card-full fade-in">
                     <div class="project-header">
-                        <span class="project-badge">EMBEDDED</span>
+                        <span class="project-badge">COMPUTER ARCH</span>
                         <div class="project-meta">
-                            <span>Qt/C++</span>
-                            <span></span>
-                            <span>2024</span>
-                        </div>
-                    </div>
-                    <h3>PiBoard - Collaborative Whiteboard</h3>
-                    <p>Real-time collaborative whiteboard for Raspberry Pi with custom serial communication protocol over GPIO. Multi-threaded architecture with mutex-based thread safety.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>&lt;100ms</strong> Latency</span>
-                        <span class="stat"><strong>4</strong> Users</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Qt Framework</span>
-                        <span class="tech-tag">C++</span>
-                        <span class="tech-tag">WiringPi</span>
-                        <span class="tech-tag">GPIO</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/PiBoard" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Software Projects -->
-        <div class="project-category fade-in">
-            <h3 class="category-label">SOFTWARE & MOBILE</h3>
-            <div class="projects-grid">
-
-                <!-- SmartSync Lighting -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">PYTHON</span>
-                        <div class="project-meta">
-                            <span>IoT/AI</span>
-                            <span></span>
-                            <span>2024-2025</span>
-                        </div>
-                    </div>
-                    <h3>SmartSync Lighting</h3>
-                    <p>AI-driven smart home automation syncing TP-Link bulbs with Spotify playback. OpenCV extracts dominant colors from album art for immersive audiovisual experiences.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>&lt;200ms</strong> Sync</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">OpenCV</span>
-                        <span class="tech-tag">Spotify API</span>
-                        <span class="tech-tag">python-kasa</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/SmartSync-Lighting" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Somnus -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">ANDROID</span>
-                        <div class="project-meta">
-                            <span>Kotlin</span>
+                            <span>C++</span>
                             <span></span>
                             <span>2025</span>
                         </div>
                     </div>
-                    <h3>Somnus - Sleep Optimizer</h3>
-                    <p>Android app that calculates optimal wake times using sleep cycle analysis and REM pattern detection. Integrates with Health Connect for unified health platform access.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Kotlin</span>
-                        <span class="tech-tag">Health Connect</span>
-                        <span class="tech-tag">Samsung Health</span>
-                        <span class="tech-tag">ML</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/Somnus" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- WinStream -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">WINDOWS</span>
-                        <div class="project-meta">
-                            <span>C#/.NET</span>
-                            <span></span>
-                            <span>2024</span>
-                        </div>
-                    </div>
-                    <h3>WinStream - AirPlay Bridge</h3>
-                    <p>Windows application enabling system-wide audio streaming to AirPlay devices (HomePod, Apple TV). Virtual audio driver with real-time AirPlay 2 protocol encoding.</p>
+                    <h3>MIPSquare++: 5-Stage Pipelined MIPS Simulator</h3>
+                    <p>Comprehensive MIPS CPU simulator implementing realistic 5-stage pipeline (IF/ID/EX/MEM/WB) with intelligent hazard mitigation. Built custom assembly parser with label resolution supporting R-type, I-type, and J-type instructions. Engineered EX/MEM and MEM/WB data forwarding paths to minimize pipeline stalls. Implemented load-use hazard detection with automatic stalling and branch hazard handling with pipeline flushing. Developed showcase program calculating squares 0-200 using odd-number summation optimized for minimal stalls. Achieved near 1 CPI with comprehensive test suite validating RAW hazards, control hazards, and memory operations.</p>
                     <div class="project-stats">
-                        <span class="stat"><strong>&lt;50ms</strong> Latency</span>
+                        <span class="stat"><strong>5</strong> Pipeline Stages</span>
+                        <span class="stat"><strong>~1.0</strong> CPI</span>
+                        <span class="stat"><strong>17</strong> Instructions</span>
                     </div>
                     <div class="tech-tags">
-                        <span class="tech-tag">C#/.NET</span>
-                        <span class="tech-tag">AirPlay 2</span>
-                        <span class="tech-tag">Virtual Audio</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/WinStream" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- ControlCraft -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">MATLAB</span>
-                        <div class="project-meta">
-                            <span>GUI</span>
-                            <span></span>
-                            <span>2024</span>
-                        </div>
-                    </div>
-                    <h3>ControlCraft Toolbox</h3>
-                    <p>Interactive control systems analysis tool with PID tuning, root locus, and Bode plots. Successfully deployed in undergraduate labs serving 60+ students.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>60+</strong> Students</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">MATLAB</span>
-                        <span class="tech-tag">App Designer</span>
-                        <span class="tech-tag">Control Systems</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/ControlCraft" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- MIPSquare -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">C++</span>
-                        <div class="project-meta">
-                            <span>Systems</span>
-                            <span></span>
-                            <span>2024</span>
-                        </div>
-                    </div>
-                    <h3>MIPSquare - MIPS Simulator</h3>
-                    <p>MIPS processor simulator implementing instruction decoding, register file management, and memory operations. Supports core MIPS instruction set for computer architecture study.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">C++</span>
+                        <span class="tech-tag">C++23</span>
+                        <span class="tech-tag">CMake</span>
+                        <span class="tech-tag">Data Forwarding</span>
+                        <span class="tech-tag">Hazard Detection</span>
                         <span class="tech-tag">MIPS ISA</span>
-                        <span class="tech-tag">CPU Architecture</span>
                     </div>
                     <div class="project-links">
                         <a href="https://github.com/Bananz0/MIPSquare" class="project-link" target="_blank">
                             <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Sudoku Solver -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">C++</span>
-                        <div class="project-meta">
-                            <span>Qt GUI</span>
-                            <span></span>
-                            <span>2024</span>
-                        </div>
-                    </div>
-                    <h3>Sudoku Solver</h3>
-                    <p>Interactive Sudoku puzzle solver with Qt GUI. Implements backtracking algorithm with constraint propagation and step-by-step visualization.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Qt</span>
-                        <span class="tech-tag">C++</span>
-                        <span class="tech-tag">Backtracking</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/Sudoku-Solver" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
+                            <span>→</span>
                         </a>
                     </div>
                 </div>
@@ -529,66 +373,60 @@ title: Home
             </div>
         </div>
 
-        <!-- Infrastructure Projects -->
-        <div class="project-category fade-in">
-            <h3 class="category-label">INFRASTRUCTURE & SYSTEMS</h3>
-            <div class="projects-grid">
+        <!-- Open Source (Public) - Auto-generated -->
+        <div class="project-category fade-in open-source-preview">
+            <h3 class="category-label">OPEN SOURCE (PUBLIC)</h3>
+            <p class="section-subtitle" style="text-align:center; margin: 0 auto var(--space-xl); max-width: 70ch;">
+                I maintain <strong>69</strong> repositories across public, private, and forked work.
+                The list below is pulled from public repos only.
+            </p>
 
-                <!-- Homelab -->
-                <div class="project-card-full fade-in">
+            {% assign repos = site.data.github_repos | where_exp: "r", "r.hidden != true" %}
+            {% if repos and repos.size > 0 %}
+            {% assign repos_sorted = repos | sort: 'stargazers_count' | reverse %}
+            <div class="repo-grid repo-grid-compact">
+                {% for repo in repos_sorted limit: 12 %}
+                <a class="project-card-full repo-card-full repo-card-full-compact" data-spring="default" data-bounce="1" href="{{ repo.html_url }}" target="_blank" rel="noopener">
                     <div class="project-header">
-                        <span class="project-badge">DEVOPS</span>
+                        <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif %}</span>
                         <div class="project-meta">
-                            <span>Infrastructure</span>
+                            <span>★ {{ repo.stargazers_count | default: 0 }}</span>
                             <span></span>
-                            <span>Ongoing</span>
+                            <span>⑂ {{ repo.forks_count | default: 0 }}</span>
                         </div>
                     </div>
-                    <h3>Enterprise-Grade Home Network</h3>
-                    <p>Production-grade home infrastructure with OPNsense firewall, Zenarmor IDS/IPS, Docker orchestration hosting 15+ services, Proxmox hypervisor, and full monitoring stack.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>99.8%</strong> Uptime</span>
-                        <span class="stat"><strong>15+</strong> Services</span>
-                        <span class="stat"><strong>5</strong> VMs</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">OPNsense</span>
-                        <span class="tech-tag">Docker</span>
-                        <span class="tech-tag">Proxmox</span>
-                        <span class="tech-tag">HAProxy</span>
-                        <span class="tech-tag">Grafana</span>
-                    </div>
-                </div>
 
-                <!-- Hackintosh -->
-                <div class="project-card-full fade-in">
-                    <div class="project-header">
-                        <span class="project-badge">HACKINTOSH</span>
-                        <div class="project-meta">
-                            <span>macOS</span>
-                            <span></span>
-                            <span>2023-2025</span>
-                        </div>
-                    </div>
-                    <h3>HP 440 x360 G1 Hackintosh</h3>
-                    <p>Custom OpenCore EFI configuration for macOS on HP EliteBook. Deep understanding of UEFI/BIOS architecture, kernel extensions, and bootloader configuration.</p>
+                    <h3>{{ repo.name }}</h3>
+                    {% if repo.description %}
+                    <p>{{ repo.description }}</p>
+                    {% else %}
+                    <p class="repo-desc-muted">No description provided.</p>
+                    {% endif %}
+
                     <div class="project-stats">
-                        <span class="stat"><strong>3</strong> Systems Built</span>
+                        <span class="stat"><strong>★ {{ repo.stargazers_count | default: 0 }}</strong> Stars</span>
+                        {% if repo.forks_count and repo.forks_count > 0 %}<span class="stat"><strong>⑂ {{ repo.forks_count }}</strong> Forks</span>{% endif %}
                     </div>
+
+                    {% assign topics = repo.topics | default: empty %}
                     <div class="tech-tags">
-                        <span class="tech-tag">OpenCore</span>
-                        <span class="tech-tag">UEFI</span>
-                        <span class="tech-tag">Kexts</span>
-                        <span class="tech-tag">ACPI</span>
+                        {% if topics and topics.size > 0 %}
+                        {% for topic in topics limit: 6 %}
+                        <span class="tech-tag">{{ topic }}</span>
+                        {% endfor %}
+                        {% endif %}
                     </div>
+
                     <div class="project-links">
-                        <a href="https://github.com/Bananz0/440-x360-G1-Hackintosh" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
+                        <span class="project-link">VIEW ON GITHUB</span>
                     </div>
-                </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
 
+            <div class="view-all-projects">
+                <a href="{{ '/projects/' | relative_url }}" class="cta-btn primary">FULL PROJECT ARCHIVE</a>
             </div>
         </div>
 
@@ -834,512 +672,7 @@ title: Home
 </section>
 
 <!-- INLINE STYLES FOR SINGLE PAGE SECTIONS -->
-<style>
-/* Single Page Layout Overrides */
-.page-section {
-    min-height: auto;
-    padding: var(--space-3xl) var(--space-xl);
-}
-
-/* About Grid */
-.about-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--space-xl);
-}
-
-.about-section .main-panel {
-    grid-column: 1 / -1;
-}
-
-/* Skills Section */
-.skills-section .skills-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    margin-bottom: var(--space-2xl);
-}
-
-.skills-section .cert-grid {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--space-lg);
-    margin-top: var(--space-2xl);
-}
-
-.skills-section .cert-card {
-    flex: 0 0 auto;
-    min-width: 150px;
-    padding: var(--space-lg);
-}
-
-/* Contact Section */
-.contact-section .contact-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: var(--space-2xl);
-    margin-bottom: var(--space-2xl);
-}
-
-.contact-info-section {
-    display: grid;
-    gap: var(--space-md);
-}
-
-.contact-card {
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(168, 85, 247, 0.15);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    text-align: center;
-    transition: var(--transition-normal);
-}
-
-.contact-card:hover {
-    border-color: var(--neon-magenta);
-    transform: translateY(-5px);
-}
-
-.contact-icon {
-    font-size: 2rem;
-    margin-bottom: var(--space-sm);
-}
-
-.contact-card h3 {
-    color: var(--neon-cyan);
-    font-size: 0.9rem;
-    margin-bottom: var(--space-sm);
-    letter-spacing: 2px;
-}
-
-.contact-link {
-    color: var(--neon-magenta);
-    text-decoration: none;
-    font-weight: 600;
-    transition: var(--transition-fast);
-}
-
-.contact-link:hover {
-    color: var(--neon-cyan);
-}
-
-.contact-text {
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-/* Terminal Form */
-.terminal-window {
-    background: #000;
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-}
-
-.terminal-header {
-    background: var(--bg-secondary);
-    padding: 0.75rem 1rem;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-}
-
-.terminal-btn {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-}
-
-.terminal-btn.red { background: #ff5f56; }
-.terminal-btn.yellow { background: #ffbd2e; }
-.terminal-btn.green { background: #27c93f; }
-
-.terminal-title {
-    margin-left: auto;
-    color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-}
-
-.terminal-body {
-    padding: var(--space-xl);
-}
-
-.terminal-line-typing {
-    color: #22d3ee;
-    margin-bottom: var(--space-lg);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-}
-
-.terminal-prompt {
-    color: var(--neon-magenta);
-    margin-right: 0.5rem;
-}
-
-.terminal-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-}
-
-.terminal-label {
-    display: block;
-    color: #22d3ee;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    margin-bottom: var(--space-sm);
-}
-
-.terminal-input,
-.terminal-textarea {
-    width: 100%;
-    background: rgba(168, 85, 247, 0.05);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    color: var(--text-primary);
-    padding: var(--space-md);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    border-radius: var(--radius-md);
-    transition: var(--transition-normal);
-}
-
-.terminal-input:focus,
-.terminal-textarea:focus {
-    outline: none;
-    border-color: var(--neon-magenta);
-    box-shadow: 0 0 20px rgba(255, 45, 146, 0.2);
-}
-
-.terminal-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* Availability Section */
-.availability-section {
-    margin-top: var(--space-2xl);
-}
-
-.availability-card {
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(168, 85, 247, 0.2);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-}
-
-.status-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-lg);
-    border-bottom: 1px solid rgba(168, 85, 247, 0.1);
-}
-
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #666;
-}
-
-.status-dot.active {
-    background: #22d3ee;
-    box-shadow: 0 0 15px #22d3ee;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.status-text {
-    color: var(--text-primary);
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: 2px;
-}
-
-.availability-info {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--space-xl);
-}
-
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    color: var(--text-secondary);
-}
-
-.info-item strong {
-    color: var(--neon-cyan);
-}
-
-/* CV Section */
-.cv-section {
-    display: flex;
-    justify-content: center;
-    margin-top: var(--space-2xl);
-}
-
-.cv-download-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-lg) var(--space-2xl);
-    background: var(--gradient-primary);
-    border: none;
-    border-radius: var(--radius-lg);
-    color: white;
-    text-decoration: none;
-    transition: var(--transition-normal);
-    box-shadow: 0 10px 30px rgba(255, 45, 146, 0.3);
-}
-
-.cv-download-btn:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(255, 45, 146, 0.4);
-}
-
-.cv-icon {
-    font-size: 1.5rem;
-}
-
-.cv-text {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.cv-text strong {
-    font-size: 1rem;
-    letter-spacing: 1.5px;
-}
-
-.cv-text small {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.8rem;
-}
-
-/* View All Projects Link */
-.view-all-projects {
-    display: flex;
-    justify-content: center;
-    margin-top: var(--space-2xl);
-}
-
-/* Projects Grid Styles */
-.project-category {
-    margin-bottom: var(--space-3xl);
-}
-
-.category-label {
-    font-size: 1.2rem;
-    color: var(--neon-purple);
-    text-align: center;
-    margin-bottom: var(--space-xl);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
-}
-
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: var(--space-xl);
-}
-
-.project-card-full {
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 245, 255, 0.2);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.project-card-full::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, var(--neon-magenta), var(--neon-cyan), var(--neon-purple));
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s;
-    border-radius: var(--radius-xl);
-}
-
-.project-card-full:hover::before {
-    opacity: 0.3;
-}
-
-.project-card-full:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 60px rgba(0, 245, 255, 0.2);
-    border-color: rgba(0, 245, 255, 0.4);
-}
-
-.project-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-md);
-}
-
-.project-badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    background: var(--neon-magenta);
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-radius: var(--radius-sm);
-    letter-spacing: 1px;
-}
-
-.project-meta {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-.project-meta span {
-    margin: 0 0.3rem;
-}
-
-.project-card-full h3 {
-    font-size: 1.4rem;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm);
-    line-height: 1.3;
-}
-
-.project-card-full > p {
-    color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: var(--space-md);
-}
-
-.project-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-    margin-bottom: var(--space-md);
-}
-
-.project-stats .stat {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.project-stats strong {
-    color: var(--neon-cyan);
-    font-size: 1.1rem;
-}
-
-.tech-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: var(--space-md);
-}
-
-.tech-tag {
-    padding: 0.25rem 0.6rem;
-    background: rgba(168, 85, 247, 0.1);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    color: var(--neon-purple);
-    font-size: 0.75rem;
-    border-radius: var(--radius-sm);
-    transition: all 0.2s ease;
-}
-
-.tech-tag:hover {
-    background: rgba(168, 85, 247, 0.2);
-    border-color: var(--neon-purple);
-}
-
-.project-links {
-    padding-top: var(--space-md);
-    border-top: 1px solid rgba(168, 85, 247, 0.1);
-}
-
-.project-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--neon-cyan);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-}
-
-.project-link:hover {
-    color: var(--neon-magenta);
-    transform: translateX(5px);
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .contact-section .contact-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .contact-info-section {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .about-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .contact-info-section {
-        grid-template-columns: 1fr;
-    }
-    
-    .availability-info {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .skills-section .cert-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .projects-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .project-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-sm);
-    }
-    
-    .project-stats {
-        flex-direction: column;
-        gap: var(--space-sm);
-    }
-}
-</style>
+<!-- Styles moved to assets/css/main.css -->
 
 <script>
 // 3D Rotating IC Chip using Three.js
