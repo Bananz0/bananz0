@@ -262,8 +262,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // INTERSECTION OBSERVER FOR ANIMATIONS
 // ==========================================
 const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -80px 0px'
+    threshold: 0.05,  // Reduced threshold for better mobile visibility
+    rootMargin: '0px 0px -20px 0px'  // Reduced bottom margin for mobile
 };
 
 const observer = new IntersectionObserver((entries) => {
