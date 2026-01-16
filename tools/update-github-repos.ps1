@@ -65,12 +65,16 @@ function Invoke-GitHubApi {
 function Get-ReleaseDownloadCount {
   param([string]$Owner, [string]$RepoName)
 
-  # Reduce requests by fetching only latest few releases (per_page=3)
-  $releasesUrl = "https://api.github.com/repos/$Owner/$RepoName/releases?per_page=3"
+  # Paginate through all releases, using the maximum per_page=100
+  $perPage = 100
+  $page = 1
+  $totalDownloads = 0
   try {
-    $releases = Invoke-GitHubApi -Url $releasesUrl
-    if ($releases -and $releases.Count -gt 0) {
-      $totalDownloads = 0
+    while ($true) {
+      $releasesUrl = "https://api.github.com/repos/$Owner/$RepoName/releases?per_page=$perPage&page=$page"
+      $releases = Invoke-GitHubApi -Url $releasesUrl
+      if (-not $releases -or $releases.Count -eq 0) { break }
+
       foreach ($release in $releases) {
         if ($release.assets) {
           foreach ($asset in $release.assets) {
@@ -78,13 +82,16 @@ function Get-ReleaseDownloadCount {
           }
         }
       }
-      return $totalDownloads
+
+      if ($releases.Count -lt $perPage) { break }
+      $page++
     }
-    return 0
+
+    return $totalDownloads
   }
   catch {
     Write-Host "  Warning: Could not fetch release stats for $RepoName" -ForegroundColor Yellow
-    return 0
+    return $totalDownloads
   }
 }
 
