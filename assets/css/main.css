@@ -4,11 +4,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: max-width var(--spring-default),
-        width var(--spring-default),
-        padding var(--spring-snappy),
-        margin var(--spring-snappy),
-        grid-template-columns var(--spring-default);
 }
 
 :root {
@@ -133,6 +128,24 @@
     --z-overlay: 10100;
 
     /* ============================================= */
+
+    /* Unified Badge Sizing - Consistent across GM logo and social badges */
+    --badge-size-lg: 48px;
+    /* Desktop (>870px) */
+    --badge-size-md: 44px;
+    /* Tablet (720-870px) */
+    --badge-size-sm: 36px;
+    /* Mobile (<500px) */
+    --badge-icon-lg: 20px;
+    /* Icon size at desktop */
+    --badge-icon-md: 18px;
+    /* Icon size at tablet */
+    --badge-icon-sm: 16px;
+    /* Icon size at mobile */
+    --badge-gap: var(--space-sm);
+    /* 8px gap between badges */
+    --header-element-gap: var(--space-md);
+    /* 16px gap to center box */
 
     --cyber-gold: var(--neon-gold);
     --cyber-amber: var(--neon-amber);
@@ -563,28 +576,31 @@ nav.scrolled {
    Static Logo Badge
    ========================================== */
 .static-logo-badge {
-    position: fixed;
-    top: var(--space-lg);
-    left: var(--space-lg);
-    z-index: 10002;
-    opacity: 1;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    flex-shrink: 0;
+    order: 1;
+    align-self: flex-start;
+    /* Prevent moving down when header expands */
+    transition: all var(--spring-smooth);
 }
 
 .static-logo-badge a {
+    /* Match header center box glassmorphism effect */
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    background: rgba(18, 18, 18, 0.6);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(245, 158, 11, 0.2);
+    width: var(--badge-size-lg);
+    height: var(--badge-size-lg);
+    background: rgba(18, 18, 18, 0.48);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+    border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-md);
     text-decoration: none;
     transition: all var(--transition-normal);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
 }
 
 .static-logo-badge a:hover {
@@ -605,48 +621,89 @@ nav.scrolled {
     letter-spacing: -0.5px;
 }
 
-@media (max-width: 720px) {
-    .static-logo-badge {
-        top: var(--space-md);
-        left: var(--space-md);
+
+/* ==========================================
+   Social Media Badges - Inline (Desktop)
+   ========================================== */
+.social-badges-inline {
+    display: flex;
+    gap: var(--badge-gap);
+    flex-shrink: 0;
+    order: 3;
+    align-self: flex-start;
+    /* Prevent moving down when header expands */
+    transition: opacity var(--spring-smooth), transform var(--spring-smooth);
+}
+
+/* Social Media Badges - Mobile Bottom */
+.social-badges-mobile {
+    display: none;
+    position: fixed;
+    bottom: var(--space-md);
+    right: var(--space-md);
+    z-index: 10002;
+    flex-direction: column;
+    gap: var(--badge-gap);
+    transition: opacity var(--spring-smooth), transform var(--spring-smooth);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Switch social badges to bottom corner only on phones (below 500px) */
+@media (max-width: 500px),
+(max-height: 660px) {
+
+    /* Fade out inline badges smoothly */
+    .social-badges-inline {
+        opacity: 0;
+        transform: translateY(-20px);
+        pointer-events: none;
     }
 
+    /* Fade in mobile badges smoothly */
+    .social-badges-mobile {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Consistent mobile sizing for both badge types */
+    .social-badge,
     .static-logo-badge a {
-        width: 40px;
-        height: 40px;
+        width: var(--badge-size-sm);
+        height: var(--badge-size-sm);
+    }
+
+    .social-badge svg {
+        width: var(--badge-icon-sm);
+        height: var(--badge-icon-sm);
+    }
+
+    .social-badge img {
+        width: var(--badge-icon-sm);
+        height: var(--badge-icon-sm);
     }
 
     .logo-text {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 }
 
-/* ==========================================
-   Social Media Badges
-   ========================================== */
-.social-badges {
-    position: fixed;
-    top: var(--space-lg);
-    right: var(--space-lg);
-    z-index: 10002;
-    display: flex;
-    gap: var(--space-sm);
-}
-
 .social-badge {
+    /* Match header center box glassmorphism effect */
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    background: rgba(18, 18, 18, 0.6);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(245, 158, 11, 0.2);
+    width: var(--badge-size-lg);
+    height: var(--badge-size-lg);
+    background: rgba(18, 18, 18, 0.48);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+    border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-md);
     text-decoration: none;
     transition: all var(--transition-normal);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);
     color: var(--text-secondary);
     font-size: 1.25rem;
 }
@@ -660,15 +717,16 @@ nav.scrolled {
 }
 
 .social-badge svg {
-    width: 20px;
-    height: 20px;
+    width: var(--badge-icon-lg);
+    height: var(--badge-icon-lg);
     fill: currentColor;
+    transition: all var(--spring-snappy);
 }
 
 /* Ensure raster icons (ORCID img) scale like SVG icons */
 .social-badge img[aria-label="ORCID"] {
-    width: 20px;
-    height: 20px;
+    width: var(--badge-icon-lg);
+    height: var(--badge-icon-lg);
     object-fit: contain;
     display: block;
 }
@@ -677,22 +735,28 @@ nav.scrolled {
     .social-badges {
         top: var(--space-md);
         right: var(--space-md);
-        gap: var(--space-xs);
+        gap: var(--badge-gap);
     }
 
-    .social-badge {
-        width: 40px;
-        height: 40px;
+    /* Unified sizing for both GM badge and social badges */
+    .social-badge,
+    .static-logo-badge a {
+        width: var(--badge-size-md);
+        height: var(--badge-size-md);
     }
 
     .social-badge svg {
-        width: 18px;
-        height: 18px;
+        width: var(--badge-icon-md);
+        height: var(--badge-icon-md);
     }
 
     .social-badge img {
-        width: 18px;
-        height: 18px;
+        width: var(--badge-icon-md);
+        height: var(--badge-icon-md);
+    }
+
+    .logo-text {
+        font-size: 1rem;
     }
 }
 
@@ -726,44 +790,73 @@ nav.scrolled {
 .floating-hero {
     position: fixed;
     top: var(--space-xl);
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     z-index: 10000;
-    width: min(92%, 980px);
+    width: 100%;
     display: flex;
     justify-content: center;
-    pointer-events: auto;
+    pointer-events: none;
+    /* Allow clicks through empty space */
+    /* Smooth transition for top position changes at breakpoints */
+    transition: top var(--spring-smooth);
 }
 
 .floating-inner {
     display: flex;
-    align-items: center;
-    gap: 0;
-    /* Handled by margins for animation support */
-    padding: var(--space-sm) var(--space-lg);
-    box-sizing: border-box;
-    display: flex;
     flex-direction: row;
+    align-items: center;
+    /* Ensure vertical centering */
+    justify-content: center;
+    /* Keep items grouped together in center */
+    width: min(95%, 1400px);
+    gap: var(--header-element-gap);
+    /* Remove glass styling - it's now on .header-center-box */
+    background: none;
+    border: none;
+    box-shadow: none;
+    pointer-events: auto;
+    /* Re-enable for children */
+    /* Smooth transitions for layout changes */
+    transition: gap var(--spring-smooth), padding var(--spring-smooth), top var(--spring-smooth);
+}
+
+/* Center Box - Has Glass Styling */
+.header-center-box {
+    order: 2;
+    flex: 0 1 auto;
+    min-width: 0;
+    min-height: 48px;
+    /* Match GM logo height for alignment */
+
+    /* Glass box styling - ONLY on center section */
     background: rgba(18, 18, 18, 0.48);
     -webkit-backdrop-filter: blur(10px) saturate(120%);
     backdrop-filter: blur(10px) saturate(120%);
     border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-lg);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);
+    padding: var(--space-sm) var(--space-lg);
+
+    display: flex;
+    align-items: center;
+    /* Vertical centering within pill */
+    gap: var(--space-md);
     transition: all var(--transition-normal);
-    width: auto;
-    max-width: max-content;
-    height: auto;
-    box-sizing: border-box;
 }
 
 /* Header Reveal Container */
 .header-reveal {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
+    /* Center title and toggle vertically */
+    justify-content: center;
     width: auto;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
+    /* Match the parent pill height so children truly center vertically */
+    height: 100%;
 }
 
 /* Title Group Container */
@@ -771,9 +864,12 @@ nav.scrolled {
     display: flex;
     flex-direction: row;
     align-items: center;
+    /* Center title and chevron */
     gap: var(--space-lg);
     flex-shrink: 0;
     width: auto;
+    /* Ensure title group occupies full header height for perfect centering */
+    height: 100%;
 }
 
 .floating-inner .site-title {
@@ -787,6 +883,15 @@ nav.scrolled {
     /* Balanced line-height to fix vertical shift */
 }
 
+/* Ensure the title text is centered inside its container
+   so font metrics don't visually shift the pill's center. */
+.floating-inner .site-title {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
 .floating-inner .site-sub {
     color: var(--text-muted);
     font-size: 0.85rem;
@@ -795,18 +900,32 @@ nav.scrolled {
     white-space: nowrap;
     line-height: 1.2;
     /* Balanced line-height to fix vertical shift */
+    /* Default expanded state values */
+    max-width: 300px;
+    max-height: 30px;
+    overflow: hidden;
+    visibility: visible;
+    /* Smooth transitions for show/hide at 1266px breakpoint */
+    transition:
+        opacity var(--spring-smooth),
+        max-width var(--spring-smooth),
+        max-height var(--spring-smooth),
+        visibility var(--spring-smooth);
 }
 
 /* Mini-mode Toggle Button (Mobile/Mini only) */
 .mini-toggle {
-    display: none;
+    display: flex;
+    /* Always display but control visibility with opacity for smooth animation */
+    opacity: 0;
+    pointer-events: none;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(245, 158, 11, 0.08);
     border-radius: var(--radius-full);
     color: var(--text-secondary);
     padding: 4px;
     cursor: pointer;
-    transition: all var(--spring-snappy);
+    transition: all var(--spring-snappy), opacity var(--spring-smooth);
     align-items: center;
     justify-content: center;
     width: 28px;
@@ -836,6 +955,12 @@ nav.scrolled {
     transform: rotate(0deg);
 }
 
+/* Make the chevron behave like a block-level item so it centers
+   reliably inside the toggle button across browsers. */
+.mini-toggle svg {
+    display: block;
+}
+
 /* Rotate when expanded (either via scroll or manual toggle) */
 .floating-inner.mini-expanded .mini-toggle svg,
 .floating-inner.expanded .mini-toggle svg {
@@ -855,90 +980,11 @@ nav.scrolled {
     justify-content: center;
 }
 
-/* Small screens: center the floating header title/sub for compact view */
-@media (max-width: 500px),
-(max-height: 660px) {
-    .floating-hero {
-        width: max-content;
-    }
-
-    .floating-inner {
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        width: auto;
-        padding: calc(var(--space-md) + 2px) var(--space-lg) var(--space-md);
-        /* Optical centering adjustment: text needs slightly more top room to look centered */
-    }
-
-    .header-reveal {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        width: 100%;
-        justify-content: center;
-        gap: var(--space-sm);
-    }
-
-    .title-group {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: var(--space-xs);
-    }
-
-    .floating-inner .site-title,
-    .floating-inner .site-sub {
-        text-align: center;
-        width: auto;
-        margin: 0;
-    }
-
-    /* Force site-sub to show in mini mode if we are using the horizontal layout */
-    .title-group .site-sub {
-        display: block;
-        font-size: 0.75rem;
-        opacity: 0.8;
-    }
-
-    /* Ensure CTAs stack below and remain centered */
-    .floating-ctas {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-sm);
-    }
-
-    .floating-ctas.visible {
-        margin-left: 0 !important;
-        margin-top: var(--space-md);
-        /* Vertical gap for mobile */
-    }
-
-    .mini-toggle {
-        display: flex;
-        margin: 0 0 0 var(--space-xs);
-    }
-
-    /* Visual nudge: when collapsed in mini (compact) mode, shift slightly down
-       so the title/subtitle appear optically centered within the rounded bar */
-    .floating-inner.compact {
-        transform: translateY(6px);
-    }
-
-    /* When expanded, reset any compact transform so expansion aligns correctly */
-    .floating-inner.mini-expanded,
-    .floating-inner.expanded {
-        transform: none;
-    }
-}
-
 .floating-ctas {
     display: flex;
     gap: var(--space-sm);
     align-items: center;
+    order: 4;
 
     /* Collapsed State (Default) */
     max-width: 0;
@@ -999,25 +1045,224 @@ nav.scrolled {
 
 @media (max-width: 900px) {
 
-    /* Scale social badges uniformly on smaller screens */
-    .social-badge {
-        width: 44px;
-        height: 44px;
+    /* Scale both GM badge and social badges uniformly on smaller screens */
+    .social-badge,
+    .static-logo-badge a {
+        width: var(--badge-size-md);
+        height: var(--badge-size-md);
+    }
+
+    .social-badge svg {
+        width: var(--badge-icon-md);
+        height: var(--badge-icon-md);
+    }
+}
+
+/* MINI MODE (< 870px) - Horizontal layout with flanking badges */
+@media (max-width: 870px) {
+    .floating-hero {
+        top: var(--space-md);
+        width: 100%;
+        padding: 0 var(--space-md);
+    }
+
+    .floating-inner {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        /* Center elements vertically */
+        justify-content: center;
+        /* Center the layout - icons stay close to center box */
+        width: 100%;
+        max-width: 100%;
+        gap: var(--header-element-gap);
+        /* Keep consistent gap - no jarring jump */
+    }
+
+    /* GM badge stays at left in row */
+    .static-logo-badge {
+        position: relative;
+        order: 1;
+        flex-shrink: 0;
+        top: auto;
+        bottom: auto;
+        left: auto;
+    }
+
+    /* Center box takes available space, has max-width constraint */
+    .header-center-box {
+        order: 2;
+        flex: 0 1 auto;
+        max-width: 600px;
+        width: auto;
+        flex-direction: column;
+        align-items: center;
+        /* Remove vertical padding so children sit on the visual center
+           of the pill. Keep horizontal padding for the pill shape. */
+        padding: 0 var(--space-lg);
+        /* Equal padding all around */
+    }
+
+    .header-reveal {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        /* Center title and toggle vertically */
+        justify-content: center;
+        width: 100%;
+        gap: var(--space-sm);
+        height: auto;
+    }
+
+    .title-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        /* Center title and chevron */
+        gap: var(--space-xs);
+    }
+
+    .floating-inner .site-title {
+        font-size: 0.95rem;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    /* Compact-specific: reduce the header pill vertical padding so the
+       center box aligns with the icon sizes and doesn't add extra height */
+    .floating-inner.compact .header-center-box {
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: inherit;
+    }
+
+    /* When expanded give the center box its normal padding */
+    .floating-inner.expanded .header-center-box,
+    .floating-inner.mini-expanded .header-center-box {
+        justify-content: flex-start;
+        padding: 18px var(--space-lg) var(--space-sm) var(--space-lg);
+    }
+
+    /* Ensure title/sub don't add vertical margins */
+    .header-center-box .site-title,
+    .header-center-box .site-sub {
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    /* Add horizontal padding to the title inside the compact mini pill so
+       "GLEN MUTHOKA" doesn't touch the pill edges when unexpanded. */
+    .floating-inner.compact .header-center-box .site-title {
+        padding: 0 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Ensure compact mini bar height matches icon sizes so icons and
+       header pill align perfectly when unexpanded */
+    .floating-inner.compact {
+        align-items: center;
+        min-height: 48px;
+        padding: 6px var(--space-sm);
+        justify-content: center;
+    }
+
+    @media (max-width: 720px) {
+        .floating-inner.compact {
+            min-height: 40px;
+            padding: 4px var(--space-xs);
+        }
+    }
+
+    @media (max-width: 500px) {
+        .floating-inner.compact {
+            min-height: 36px;
+            padding: 4px var(--space-xs);
+        }
+    }
+
+    .mini-toggle {
+        opacity: 1;
+        pointer-events: auto;
+        margin: 0 0 0 var(--space-xs);
+        align-self: center;
+        /* Center toggle vertically - fades in smoothly */
+    }
+
+    /* Nudge down 8px only when compact AND not expanded (collapsed state).
+       This avoids affecting the expanded/header-reveal state where items
+       should align to the pill center naturally. */
+    .floating-inner.compact:not(.expanded) .site-title,
+    .floating-inner.compact:not(.expanded) .mini-toggle {
+        transform: translateY(8px);
+    }
+
+    /* Remove compact-mode nudges — let flexbox center elements naturally.
+       Previous translateY nudges pushed the title/chevron outside the pill. */
+    .floating-inner.compact .site-title {
+        transform: none;
+    }
+
+    .floating-inner.compact .mini-toggle {
+        transform: none;
+    }
+
+    /* CTAs expand downward below title when visible */
+    .floating-ctas {
+        width: 100%;
+        max-width: 100%;
+        flex-direction: column;
+        align-items: center;
+        /* Ensure CTA group centers vertically in the header pill */
+        align-self: center;
+        gap: var(--space-xs);
+        margin-left: 0 !important;
+        max-height: 0;
+        margin-top: 0;
+        opacity: 0;
+        overflow: hidden;
+        visibility: hidden;
+        transform: translateY(-10px);
+    }
+
+    .floating-ctas.visible {
+        max-height: 150px;
+        margin-top: var(--space-sm);
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .floating-ctas .cta-btn {
+        width: 100%;
+        padding: 0.65em 0.9em;
+        font-size: 0.85rem;
+    }
+
+    /* Override expanded state padding to prevent jumps */
+    .floating-inner.expanded,
+    .floating-inner.mini-expanded {
+        padding: 0;
+        min-height: 0;
     }
 }
 
 /* TABLET & MOBILE OPTIMIZATIONS (< 1024px) */
 /* Switch to compact layout earlier to prevent tablet overflow */
+/* Reduced top offset jump - make it smoother */
 @media (max-width: 1024px) {
     .floating-hero {
         top: var(--space-md);
         width: min(96%, 100%);
+        max-width: 100%;
     }
 
     .floating-inner {
         padding: var(--space-xs) var(--space-md);
-        gap: var(--space-xs);
-        justify-content: space-between;
+        gap: var(--header-element-gap);
+        /* Keep icons close to center box - no space-between jump */
         width: 100%;
     }
 
@@ -1027,12 +1272,10 @@ nav.scrolled {
         text-overflow: ellipsis;
         white-space: nowrap;
         margin: 0;
-    }
-
-    .floating-inner .site-sub {
-        display: none;
-        /* Hide subtitle on tablets/mobile */
-        margin: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 100%;
+        text-align: left;
     }
 
     .floating-ctas {
@@ -1045,12 +1288,12 @@ nav.scrolled {
     .floating-ctas.visible {
         max-width: 350px;
         margin-left: auto;
+        flex-shrink: 0;
         /* Push to right */
     }
 
     .floating-ctas .cta-btn {
         padding: 8px 12px;
-        /* Comfortable padding */
         font-size: 0.8rem;
         gap: 0;
         min-width: unset;
@@ -1066,19 +1309,103 @@ nav.scrolled {
     }
 }
 
+/* Hide tagline below 1266px with spring animation */
+@media (max-width: 1266px) {
+    .floating-inner .site-sub {
+        max-width: 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        visibility: hidden;
+    }
+}
+
+/* Show compact button text only when tagline is hidden (below 1024px) */
+@media (max-width: 1024px) {
+    .desktop-text {
+        display: none;
+    }
+
+    .mobile-text {
+        display: inline;
+    }
+}
+
 /* PHONE OPTIMIZATIONS (< 500px) */
-/* Stacked layout for very small screens to avoid cramping */
+/* Move GM badge to bottom-left corner on phones */
 @media (max-width: 500px),
 (max-height: 660px) {
+
+    /* Move GM badge to bottom corner on phones */
+    .static-logo-badge {
+        position: fixed;
+        z-index: 10003;
+        top: auto;
+        bottom: var(--space-md);
+        left: var(--space-md);
+        order: -999;
+    }
+
     .floating-inner {
         flex-direction: column;
         /* Remove gap here so it collapses fully when CTAs are hidden */
-        gap: 0;
-        padding: 10px 12px;
+        background: rgba(18, 18, 18, 0.48);
+        /* Reduced from 10px for tighter mobile layout */
         align-items: stretch;
         /* allow header to resize with stacked buttons */
         cursor: pointer;
-        /* make entire bar clickable in mini mode */
+        /* Remove vertical padding so children sit on the visual center
+             of the pill; keep horizontal padding for the pill shape. */
+        padding: 0 var(--space-lg);
+    }
+
+    .header-center-box {
+        padding: var(--space-sm);
+        /* Equal padding all around */
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .header-reveal {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        /* Center title and toggle vertically */
+        width: 100%;
+        justify-content: center;
+        gap: var(--space-sm);
+    }
+
+    .title-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        /* Center title and chevron */
+        gap: var(--space-xs);
+    }
+
+    .floating-inner .site-title,
+    .floating-inner .site-sub {
+        text-align: center;
+        width: auto;
+        margin: 0;
+    }
+
+    .mini-toggle {
+        display: flex;
+        margin: 0 0 0 var(--space-xs);
+        align-self: center;
+    }
+
+    /* Override desktop expanded padding on mobile to prevent layout jumps/overlap */
+    .floating-inner.expanded,
+    .floating-inner.mini-expanded {
+        padding: 8px 12px;
+        min-height: 0;
     }
 
     /* Force visibility in mini mode if expanded */
@@ -1128,6 +1455,7 @@ nav.scrolled {
         justify-content: center;
         gap: 6px;
         /* Space between stacked buttons */
+        visibility: visible;
     }
 
     /* Button entry morph: slide each button down from the top with stagger */
@@ -1171,23 +1499,15 @@ nav.scrolled {
     }
 
     .social-badge {
-        width: 36px;
-        height: 36px;
+        width: var(--badge-size-sm);
+        height: var(--badge-size-sm);
         background: rgba(18, 18, 18, 0.8);
         border-color: rgba(245, 158, 11, 0.3);
     }
 
     .social-badge svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .static-logo-badge {
-        z-index: 10002;
-        /* Match social badges */
-        top: auto;
-        bottom: var(--space-md);
-        left: var(--space-md);
+        width: var(--badge-icon-sm);
+        height: var(--badge-icon-sm);
     }
 
     /* Stacked CTA buttons on mobile */
@@ -1199,8 +1519,8 @@ nav.scrolled {
     }
 
     .static-logo-badge a {
-        width: 36px;
-        height: 36px;
+        width: var(--badge-size-sm);
+        height: var(--badge-size-sm);
     }
 
     .logo-text {
@@ -1213,8 +1533,6 @@ nav.scrolled {
     .floating-inner.compact {
         align-items: center;
         justify-content: center;
-        padding-top: 12px; /* small top padding to optically center */
-        transform: translateY(6px);
     }
 
     .floating-inner.mini-expanded,
@@ -1229,6 +1547,8 @@ nav.scrolled {
     text-align: center;
     position: relative;
     z-index: 2;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Modern Glitch Effect */
@@ -1709,8 +2029,8 @@ nav.scrolled {
     /* match typical panel width used in about section */
     margin-left: auto;
     margin-right: auto;
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
 }
 
 @media (min-width: 1100px) {
@@ -4107,9 +4427,10 @@ body {
     }
 
     .floating-hero {
-        width: calc(100% - 24px);
-        left: 50%;
-        transform: translateX(-50%);
+        width: 100%;
+        left: 0;
+        right: 0;
+        transform: none;
     }
 }
 
@@ -4126,12 +4447,17 @@ body {
         gap: var(--space-xs);
     }
 
+    /* Keep GM badge inside the floating header for 501-600px so it remains
+       vertically centered with the title. Move to bottom-corner only on
+       narrower phone sizes (<=500px). */
     .static-logo-badge {
+        position: relative;
         z-index: 10002;
-        /* Match social badges */
         top: auto;
-        bottom: var(--space-md);
-        left: var(--space-md);
+        bottom: auto;
+        left: auto;
+        margin-left: 0;
+        order: 1;
     }
 
     /* Slightly reduce floating header footprint */

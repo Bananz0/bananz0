@@ -193,8 +193,24 @@ class SpringAnimation {
                     anim = config ? this.custom(config) : this.calculate();
                 }
                 const t = `${anim.duration}ms ${anim.timingFunction}`;
-                // Apply to common properties used in this site, include size properties so expansions (max-width/max-height) animate
-                el.style.transition = `opacity ${t}, transform ${t}, box-shadow ${t}, max-width ${t}, max-height ${t}, width ${t}, height ${t}, margin ${t}, padding ${t}`;
+                // Apply to common properties used in this site.
+                // Allow opt-out of size property animation via `data-spring-size="false"`
+                const includeSize = el.getAttribute('data-spring-size') !== 'false';
+                // By default include max-width/max-height but avoid animating explicit width/height
+                // for elements that manage layout (e.g., .floating-ctas) to prevent layout shifts.
+                const props = [
+                    `opacity ${t}`,
+                    `transform ${t}`,
+                    `box-shadow ${t}`,
+                    `max-width ${t}`,
+                    `max-height ${t}`,
+                    `margin ${t}`,
+                    `padding ${t}`
+                ];
+                if (includeSize) {
+                    props.push(`width ${t}`, `height ${t}`);
+                }
+                el.style.transition = props.join(', ');
                 // Hint the compositor for smoother animations
                 try { el.style.willChange = 'transform, opacity, max-height, max-width'; } catch (e) {}
             });

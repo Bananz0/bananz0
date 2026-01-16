@@ -338,7 +338,7 @@ let autoCollapseTimer = null;
 if (floatingInner && miniToggle) {
     const toggleExpansion = (e) => {
         e.stopPropagation();
-        if (window.innerWidth <= 500 || window.innerHeight <= 660) {
+        if (window.innerWidth <= 870 || window.innerHeight <= 660) {
             // Check for BOTH expanded states to determine if currently expanded
             const isExpanded = floatingInner.classList.contains('mini-expanded') ||
                 floatingInner.classList.contains('expanded');
@@ -368,8 +368,8 @@ if (floatingInner && miniToggle) {
 function startAutoCollapseTimer() {
     clearAutoCollapseTimer();
     autoCollapseTimer = setTimeout(() => {
-        // Auto-collapse after 1.5 seconds of no activity (Universal in mini-mode)
-        const isMiniMode = window.innerWidth <= 500 || window.innerHeight <= 660;
+        // Auto-collapse after 2 seconds of no activity (Universal in mini-mode)
+        const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
 
         if (floatingInner && isMiniMode) {
             const isExpanded = floatingInner.classList.contains('mini-expanded') ||
@@ -391,7 +391,7 @@ function startAutoCollapseTimer() {
                 }
             }
         }
-    }, 1500);
+    }, 2000);
 }
 
 function clearAutoCollapseTimer() {
@@ -408,7 +408,7 @@ function updateFloatingHero() {
     const isScrollingDown = scrollDelta > 2;
 
     const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
-    const isMiniMode = window.innerWidth <= 500 || window.innerHeight <= 660;
+    const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
 
     if (currentScroll > heroHeight) {
         // PAST HERO
