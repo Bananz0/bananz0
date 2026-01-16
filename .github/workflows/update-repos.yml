@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: write
+  actions: write
+  pages: write
 
 jobs:
   update-repos:
@@ -37,3 +39,16 @@ jobs:
           git add _data/github_repos.json
           git commit -m "chore: update GitHub repos list [skip ci]"
           git push
+
+      - name: Trigger Pages deploy
+        if: steps.git-check.outputs.changed == 'true'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'jekyll.yml',
+              ref: 'main'
+            })
