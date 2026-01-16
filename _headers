@@ -6,7 +6,7 @@
   # Permissions-Policy: () means DENY access - blocks these features entirely
   Permissions-Policy: geolocation=(), microphone=(), camera=(), usb=(), payment=()
   
-  # Content-Type with UTF-8 charset
+  #  Content-Type with UTF-8 charset
   Content-Type: text/html; charset=utf-8
 
 /assets/css/*
