@@ -1,0 +1,25 @@
+/*
+  # Security Headers
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Permissions-Policy: () means DENY access - blocks these features entirely
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), usb=(), payment=()
+  
+  # Content-Type with UTF-8 charset
+  Content-Type: text/html; charset=utf-8
+
+/assets/css/*
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/js/*
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/cv/*.pdf
+  Content-Type: application/pdf
+  Cache-Control: public, max-age=3600

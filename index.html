@@ -160,7 +160,9 @@ title: Home
                     <h3>{{ gbe_repo.name }}</h3>
                     <p>{{ gbe_repo.description }}</p>
                     <div class="project-stats">
-                        <span class="stat"><strong>8.3K+</strong> Downloads</span>
+                        {% if gbe_repo.download_count and gbe_repo.download_count > 0 %}
+                        <span class="stat"><strong>{{ gbe_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</strong> Downloads</span>
+                        {% endif %}
                         <span class="stat"><strong>{{ gbe_repo.stargazers_count }}+</strong> Stars</span>
                         <span class="stat"><strong>21</strong> Device Profiles</span>
                     </div>
@@ -194,7 +196,10 @@ title: Home
                     <h3>eGPU Auto-Enabler</h3>
                     <p>{{ egpu_repo.description }}</p>
                     <div class="project-stats">
-                        <span class="stat"><strong>99.9%</strong> Reliability</span>
+                        {% if egpu_repo.download_count and egpu_repo.download_count > 0 %}
+                        <span class="stat"><strong>{{ egpu_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</strong> Downloads</span>
+                        {% endif %}
+                        <span class="stat"><strong>{{ egpu_repo.stargazers_count }}+</strong> Stars</span>
                         <span class="stat"><strong>&lt;50ms</strong> Latency</span>
                     </div>
                     <div class="tech-tags">
@@ -226,9 +231,11 @@ title: Home
                     <h3>GramSMC + GramControlCenter</h3>
                     <p>VirtualSMC plugin providing native macOS support for LG Gram 13Z990-R. Custom ACPI tables and DriverKit-based kext using macOS Kernel SDK for hardware control via reverse-engineered embedded controller.</p>
                     <div class="project-stats">
+                        {% if gramsmc_repo.download_count and gramsmc_repo.download_count > 0 %}
+                        <span class="stat"><strong>{{ gramsmc_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</strong> Downloads</span>
+                        {% endif %}
+                        <span class="stat"><strong>{{ gramsmc_repo.stargazers_count }}+</strong> Stars</span>
                         <span class="stat"><strong>DriverKit</strong> Based</span>
-                        <span class="stat"><strong>ACPI</strong> Custom Tables</span>
-                        <span class="stat"><strong>EC</strong> Reverse Eng.</span>
                     </div>
                     <div class="tech-tags">
                         <span class="tech-tag">DriverKit</span>
@@ -383,7 +390,7 @@ title: Home
 
             {% assign repos = site.data.github_repos | where_exp: "r", "r.hidden != true" %}
             {% if repos and repos.size > 0 %}
-            {% assign repos_sorted = repos | sort: 'stargazers_count' | reverse %}
+            {% assign repos_sorted = repos | sort_natural: 'score' | reverse %}
             <div class="repo-grid repo-grid-compact">
                 {% for repo in repos_sorted limit: 12 %}
                 <a class="project-card-full repo-card-full repo-card-full-compact" data-spring="default" data-bounce="1" href="{{ repo.html_url }}" target="_blank" rel="noopener">
@@ -404,6 +411,11 @@ title: Home
                     {% endif %}
 
                     <div class="project-stats">
+                        {% if repo.download_count and repo.download_count >= 1000 %}
+                        <span class="stat"><strong>{{ repo.download_count | divided_by: 1000.0 | round: 1 }}K</strong> Downloads</span>
+                        {% elsif repo.download_count and repo.download_count > 0 %}
+                        <span class="stat"><strong>{{ repo.download_count }}</strong> Downloads</span>
+                        {% endif %}
                         <span class="stat"><strong>★ {{ repo.stargazers_count | default: 0 }}</strong> Stars</span>
                         {% if repo.forks_count and repo.forks_count > 0 %}<span class="stat"><strong>⑂ {{ repo.forks_count }}</strong> Forks</span>{% endif %}
                     </div>

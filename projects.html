@@ -24,7 +24,7 @@ permalink: /projects/
 
         {% assign repos = site.data.github_repos | where_exp: "r", "r.hidden != true" %}
         {% if repos and repos.size > 0 %}
-        {% assign repos_sorted = repos | sort: 'pushed_at' | reverse %}
+        {% assign repos_sorted = repos | sort_natural: 'score' | reverse %}
 
         <div class="repo-grid fade-in">
             {% for repo in repos_sorted %}
@@ -48,6 +48,11 @@ permalink: /projects/
                 {% endif %}
 
                 <div class="project-stats">
+                    {% if repo.download_count and repo.download_count >= 1000 %}
+                    <span class="stat"><strong>{{ repo.download_count | divided_by: 1000.0 | round: 1 }}K</strong> Downloads</span>
+                    {% elsif repo.download_count and repo.download_count > 0 %}
+                    <span class="stat"><strong>{{ repo.download_count }}</strong> Downloads</span>
+                    {% endif %}
                     <span class="stat"><strong>★ {{ repo.stargazers_count | default: 0 }}</strong> Stars</span>
                     {% if repo.forks_count and repo.forks_count > 0 %}<span class="stat"><strong>⑂ {{ repo.forks_count }}</strong> Forks</span>{% endif %}
                     {% if repo.pushed_at %}<span class="stat">Updated <strong>{{ repo.pushed_at | date: "%b %Y" }}</strong></span>{% endif %}
