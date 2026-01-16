@@ -269,7 +269,6 @@ nav {
     background: rgba(3, 0, 20, 0.8);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(251, 191, 36, 0.15);
     z-index: 1000;
     display: flex;
@@ -514,7 +513,6 @@ nav.scrolled {
     background: rgba(18, 18, 18, 0.6);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: var(--radius-md);
     text-decoration: none;
@@ -577,7 +575,6 @@ nav.scrolled {
     background: rgba(18, 18, 18, 0.6);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: var(--radius-md);
     text-decoration: none;
@@ -632,6 +629,24 @@ nav.scrolled {
     }
 }
 
+/* Small utility classes moved from inline styles */
+.orcid-img {
+    display: block;
+}
+
+.project-link.dim {
+    opacity: 0.7;
+}
+
+.section-subtitle.centered-override {
+    text-align: center;
+    margin: 0 auto var(--space-xl);
+    max-width: 70ch;
+}
+
+.key-modules { margin-top: var(--space-md); }
+.muted-lead { margin-top: var(--space-lg); color: var(--text-secondary); }
+
 /* ==========================================
    Floating Glass Header
    ========================================== */
@@ -655,7 +670,6 @@ nav.scrolled {
     background: rgba(18, 18, 18, 0.48);
     -webkit-backdrop-filter: blur(10px) saturate(120%);
     backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
     border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-lg);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);
@@ -1074,7 +1088,6 @@ nav.scrolled {
     background: var(--bg-glass);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     padding: var(--space-xl);
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
@@ -1599,7 +1612,6 @@ text-align: center; }
     background: var(--bg-glass);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
@@ -1808,7 +1820,6 @@ text-align: center; }
     );
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
@@ -1856,8 +1867,8 @@ text-align: center; }
 }
 
 @keyframes liquidShimmer {
-    0%, 100% { left: -100%; }
-    50% { left: 100%; }
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
 }
 
 /* Active card state */
@@ -2271,8 +2282,8 @@ text-align: center; }
 }
 
 @keyframes dividerShine {
-    0% { left: -50%; }
-    100% { left: 150%; }
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(150%); }
 }
 
 
@@ -2373,7 +2384,6 @@ text-align: center; }
         background: rgba(3, 0, 20, 0.98);
         -webkit-backdrop-filter: blur(30px);
         backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
         flex-direction: column;
         padding: 6rem 2rem 2rem;
         transition: right var(--transition-normal);
@@ -2584,7 +2594,6 @@ text-align: center; }
     background: var(--bg-glass);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
@@ -2855,7 +2864,6 @@ text-align: center; }
     background: var(--bg-glass);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
@@ -3472,7 +3480,7 @@ textarea:focus-visible {
     }
     
     .hero {
-        min-height: auto;
+        min-height: 0;
         padding: 2rem;
     }
 }
@@ -3552,7 +3560,6 @@ textarea:focus-visible {
     background: var(--bg-glass);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(251, 191, 36, 0.15);
 }
 
@@ -3650,7 +3657,7 @@ html, body {
 /* Moved from index.html */
 /* Single Page Layout Overrides */
 .page-section {
-    min-height: auto;
+    min-height: 0;
     padding: var(--space-3xl) var(--space-xl);
 }
 
