@@ -12,7 +12,10 @@ $ErrorActionPreference = "Stop"
 # Manual hide list (kept in the JSON as `hidden: true` so the site can filter)
 $HiddenRepoNames = @(
   "bananz0",
+  "p2"
+  "p3",
   "p4",
+  "p5",
   "mag-air"
 )
 $HiddenRepoLookup = @{}

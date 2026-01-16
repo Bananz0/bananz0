@@ -45,7 +45,7 @@ updateSmoothMouse();
 // PREMIUM INTERACTIVE PARTICLE SYSTEM
 // ==========================================
 const canvas = document.getElementById('particles');
-const ctx = canvas ? canvas.getContext('2d', { 
+const ctx = canvas ? canvas.getContext('2d', {
     alpha: true,
     desynchronized: true,  // Allows canvas to bypass compositor for lower latency
     willReadFrequently: false
@@ -62,8 +62,8 @@ if (ctx) {
     resizeCanvas();
 
     // OPTIMIZED: Detect device performance and adjust particle count
-    const isLowEnd = navigator.hardwareConcurrency <= 4 || 
-                     /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+    const isLowEnd = navigator.hardwareConcurrency <= 4 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
     const particles = [];
     const particleCount = isLowEnd ? 45 : (window.innerWidth < 768 ? 65 : 90);
 
@@ -91,7 +91,7 @@ if (ctx) {
                 const force = (interactionRadius - distance) / interactionRadius;
                 const angle = Math.atan2(dy, dx);
                 const repelStrength = 2;
-                
+
                 this.vx = this.baseVx + Math.cos(angle) * force * repelStrength;
                 this.vy = this.baseVy + Math.sin(angle) * force * repelStrength;
             } else {
@@ -116,9 +116,9 @@ if (ctx) {
             const dy = this.y - mouseParticleY;
             const distSq = dx * dx + dy * dy;
             const maxDistSq = 22500; // 150^2
-            
+
             let opacity = 0.4;
-            
+
             // Change color when near mouse
             if (distSq < maxDistSq) {
                 const proximity = 1 - Math.sqrt(distSq / maxDistSq);
@@ -177,28 +177,28 @@ if (ctx) {
         // Draw connections using spatial hash (check only adjacent cells)
         const maxDistSq = 6400; // 80^2
         const drawnConnections = new Set();
-        
+
         particles.forEach(particle => {
             const cellX = Math.floor(particle.x / cellSize);
             const cellY = Math.floor(particle.y / cellSize);
-            
+
             // Check only adjacent cells (9 cells total)
             for (let dx = -1; dx <= 1; dx++) {
                 for (let dy = -1; dy <= 1; dy++) {
                     const key = `${cellX + dx},${cellY + dy}`;
                     const neighbors = grid.get(key);
                     if (!neighbors) continue;
-                    
+
                     neighbors.forEach(neighbor => {
                         if (particle === neighbor) return;
-                        
+
                         // Prevent duplicate connections
-                        const connectionKey = particle.x < neighbor.x ? 
+                        const connectionKey = particle.x < neighbor.x ?
                             `${particle.x},${particle.y}-${neighbor.x},${neighbor.y}` :
                             `${neighbor.x},${neighbor.y}-${particle.x},${particle.y}`;
                         if (drawnConnections.has(connectionKey)) return;
                         drawnConnections.add(connectionKey);
-                        
+
                         const dx = particle.x - neighbor.x;
                         const dy = particle.y - neighbor.y;
                         const distSq = dx * dx + dy * dy;
@@ -275,7 +275,7 @@ const observer = new IntersectionObserver((entries) => {
                     entry.target.classList.add('visible');
                 }, index * 100);
             };
-            
+
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(addVisible, { timeout: 500 });
             } else {
@@ -324,42 +324,195 @@ if (mobileMenuToggle) {
 }
 
 // ==========================================
-// FLOATING HERO SCROLL EFFECT
+// FLOATING HERO SCROLL EFFECT & MINI-TOGGLE
 // ==========================================
 const floatingCtas = document.querySelector('.floating-ctas');
 const floatingInner = document.querySelector('.floating-inner');
 const heroSection = document.querySelector('.hero');
+const miniToggle = document.querySelector('.mini-toggle');
 let lastScroll = 0;
 let ticking = false;
+let autoCollapseTimer = null;
+
+// Handle Mini-Mode Toggle Click
+if (floatingInner && miniToggle) {
+    const toggleExpansion = (e) => {
+        e.stopPropagation();
+        if (window.innerWidth <= 500 || window.innerHeight <= 660) {
+            // Check for BOTH expanded states to determine if currently expanded
+            const isExpanded = floatingInner.classList.contains('mini-expanded') ||
+                floatingInner.classList.contains('expanded');
+
+            if (isExpanded) {
+                // Collapse
+                floatingInner.classList.remove('mini-expanded', 'expanded');
+                floatingInner.classList.add('compact');
+                if (floatingCtas) floatingCtas.classList.remove('visible');
+            } else {
+                // Expand manually
+                floatingInner.classList.add('mini-expanded', 'expanded');
+                floatingInner.classList.remove('compact');
+                if (floatingCtas) floatingCtas.classList.add('visible');
+            }
+            // Reset timer on click too
+            startAutoCollapseTimer();
+        }
+    };
+
+    if (miniToggle) miniToggle.addEventListener('click', toggleExpansion);
+
+    const titleGroup = floatingInner.querySelector('.title-group');
+    if (titleGroup) titleGroup.addEventListener('click', toggleExpansion);
+}
+
+function startAutoCollapseTimer() {
+    clearAutoCollapseTimer();
+    autoCollapseTimer = setTimeout(() => {
+        // Auto-collapse after 1.5 seconds of no activity (Universal in mini-mode)
+        const isMiniMode = window.innerWidth <= 500 || window.innerHeight <= 660;
+
+        if (floatingInner && isMiniMode) {
+            const isExpanded = floatingInner.classList.contains('mini-expanded') ||
+                floatingInner.classList.contains('expanded');
+
+            if (isExpanded) {
+                floatingInner.classList.remove('mini-expanded', 'expanded');
+                floatingInner.classList.add('compact');
+                if (floatingCtas) floatingCtas.classList.remove('visible');
+
+                // Keep the chevron highlighted if the page has been scrolled past the hero.
+                // Only remove the highlight when the user is inside the hero area.
+                if (miniToggle) {
+                    const currentScroll = window.pageYOffset;
+                    const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
+                    if (currentScroll <= heroHeight) {
+                        miniToggle.classList.remove('highlight');
+                    }
+                }
+            }
+        }
+    }, 1500);
+}
+
+function clearAutoCollapseTimer() {
+    if (autoCollapseTimer) {
+        clearTimeout(autoCollapseTimer);
+        autoCollapseTimer = null;
+    }
+}
 
 function updateFloatingHero() {
     const currentScroll = window.pageYOffset;
-    
-    // Get the height of the hero section (or fallback to 500px)
+    const scrollDelta = currentScroll - lastScroll;
+    const isScrollingUp = scrollDelta < -2;
+    const isScrollingDown = scrollDelta > 2;
+
     const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
+    const isMiniMode = window.innerWidth <= 500 || window.innerHeight <= 660;
 
     if (currentScroll > heroHeight) {
-        // Past the hero - show floating CTAs and expand container
-        if (floatingCtas) {
-            floatingCtas.classList.add('visible');
+        // PAST HERO
+        if (!isMiniMode) {
+            // Desktop/Tablet stays expanded
+            if (floatingCtas) floatingCtas.classList.add('visible');
+            if (floatingInner) {
+                floatingInner.classList.remove('compact', 'mini-expanded');
+                floatingInner.classList.add('expanded');
+            }
+            clearAutoCollapseTimer();
+        } else {
+            // Mobile past hero: can be compact UNLESS actively interacting/scrolling stop timer
+            // We only FORCE expansion on scroll-up
+            if (isScrollingUp) {
+                if (floatingInner) {
+                    floatingInner.classList.remove('compact');
+                    floatingInner.classList.add('mini-expanded', 'expanded');
+                    if (floatingCtas) floatingCtas.classList.add('visible');
+                }
+            } else if (isScrollingDown) {
+                if (floatingInner) {
+                    floatingInner.classList.remove('mini-expanded', 'expanded');
+                    floatingInner.classList.add('compact');
+                    if (floatingCtas) floatingCtas.classList.remove('visible');
+                }
+            }
         }
-        if (floatingInner) {
-            floatingInner.classList.add('expanded');
-            floatingInner.classList.remove('compact');
+        if (miniToggle) {
+            // Preserve chevron highlight for mini-mode users when they've scrolled past
+            // the hero/CTAs. Only remove highlight for non-mini (desktop/tablet).
+            if (!isMiniMode) {
+                miniToggle.classList.remove('highlight');
+            } else {
+                // If the header is expanded (user opened it), don't keep highlight
+                if (floatingInner && (floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded'))) {
+                    miniToggle.classList.remove('highlight');
+                }
+                // Otherwise keep the highlight so the chevron remains noticeable
+            }
         }
     } else {
-        // In hero section - hide floating CTAs and compact container
-        if (floatingCtas) {
-            floatingCtas.classList.remove('visible');
-        }
-        if (floatingInner) {
-            floatingInner.classList.remove('expanded');
-            floatingInner.classList.add('compact');
+        // IN HERO SECTION
+        if (isMiniMode) {
+            if (isScrollingUp && currentScroll > 50) {
+                // Expand momentarily on scroll-up
+                if (floatingInner) {
+                    floatingInner.classList.add('mini-expanded', 'expanded');
+                    floatingInner.classList.remove('compact');
+                }
+                if (floatingCtas) floatingCtas.classList.add('visible');
+                if (miniToggle) miniToggle.classList.remove('highlight');
+            } else if (isScrollingDown && currentScroll > 50) {
+                // Immediate collapse hint on scroll-down
+                if (floatingInner) {
+                    floatingInner.classList.remove('mini-expanded', 'expanded');
+                    floatingInner.classList.add('compact');
+                    if (floatingCtas) floatingCtas.classList.remove('visible');
+                }
+                if (miniToggle) miniToggle.classList.add('highlight');
+            } else if (currentScroll < 50) {
+                // Full reset at top
+                if (floatingInner) {
+                    floatingInner.classList.remove('mini-expanded', 'expanded');
+                    floatingInner.classList.add('compact');
+                }
+                if (floatingCtas) floatingCtas.classList.remove('visible');
+                if (miniToggle) miniToggle.classList.remove('highlight');
+                clearAutoCollapseTimer();
+            }
+        } else {
+            // Desktop/Tablet
+            if (floatingCtas) floatingCtas.classList.remove('visible');
+            if (floatingInner) {
+                floatingInner.classList.remove('expanded', 'mini-expanded');
+                floatingInner.classList.add('compact');
+            }
+            if (miniToggle) miniToggle.classList.remove('highlight');
+            clearAutoCollapseTimer();
         }
     }
 
     lastScroll = currentScroll;
-    ticking = false;
+    ticking = true;
+}
+
+// Tick management with scroll-stop detection
+function handleScroll() {
+    if (!ticking) {
+        requestAnimationFrame(() => {
+            updateFloatingHero();
+            ticking = false;
+        });
+        ticking = true;
+    }
+
+    // Clear existing timer while scrolling
+    clearAutoCollapseTimer();
+
+    // Start timer when scrolling stops (debounced)
+    clearTimeout(window.scrollStopTimer);
+    window.scrollStopTimer = setTimeout(() => {
+        startAutoCollapseTimer();
+    }, 150); // Wait 150ms after scroll stops before starting the 2-second timer
 }
 
 // Initialize with compact state
@@ -368,12 +521,7 @@ if (floatingInner) {
 }
 
 // OPTIMIZED: Passive scroll listener for better performance
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        requestAnimationFrame(updateFloatingHero);
-        ticking = true;
-    }
-}, { passive: true });
+window.addEventListener('scroll', handleScroll, { passive: true });
 
 // Scroll to top when logo badge is clicked
 const logoBadge = document.querySelector('.static-logo-badge a');
@@ -450,7 +598,7 @@ class TextScramble {
 document.querySelectorAll('.glitch, .section-title span').forEach(el => {
     const scrambler = new TextScramble(el);
     el.addEventListener('mouseenter', () => {
-        if(el.dataset.scrambling) return;
+        if (el.dataset.scrambling) return;
         el.dataset.scrambling = true;
         scrambler.setText(el.innerText).then(() => {
             el.dataset.scrambling = false;
@@ -744,23 +892,23 @@ function initProjectCarousel() {
     // Go to specific slide
     function goToSlide(index) {
         if (isAnimating) return;
-        
+
         const maxIndex = cards.length - visibleCards;
         currentIndex = Math.max(0, Math.min(index, maxIndex));
-        
+
         isAnimating = true;
-        
+
         // Calculate offset
         const gap = 24; // Gap between cards
         const offset = currentIndex * (cardWidth + gap);
-        
+
         track.style.transform = `translateX(-${offset}px)`;
-        
+
         // Update card states with liquid glass effect
         cards.forEach((card, i) => {
             const distance = Math.abs(i - currentIndex - Math.floor(visibleCards / 2));
             const isVisible = i >= currentIndex && i < currentIndex + visibleCards;
-            
+
             if (isVisible) {
                 card.classList.add('active');
                 card.style.opacity = '1';
@@ -775,7 +923,7 @@ function initProjectCarousel() {
         });
 
         updateDots();
-        
+
         setTimeout(() => {
             isAnimating = false;
         }, 500);
@@ -911,20 +1059,20 @@ document.addEventListener('DOMContentLoaded', initProjectCarousel);
 // ==========================================
 function initSmoothScroll() {
     document.querySelectorAll('a[href*="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
             // Extract the hash from the href (handles both #id and /path#id)
             const hashIndex = href.indexOf('#');
             if (hashIndex === -1) return;
-            
+
             const targetId = href.substring(hashIndex);
             const targetElement = document.querySelector(targetId);
-            
+
             if (targetElement) {
                 e.preventDefault();
                 const navHeight = document.querySelector('nav')?.offsetHeight || 0;
                 const targetPosition = targetElement.offsetTop - navHeight - 20;
-                
+
                 window.scrollTo({
                     top: targetPosition,
                     behavior: 'smooth'
@@ -932,7 +1080,7 @@ function initSmoothScroll() {
 
                 // Update URL without jumping
                 history.pushState(null, null, targetId);
-                
+
                 // Close mobile menu if open
                 const navLinks = document.querySelector('.nav-links');
                 const mobileToggle = document.querySelector('.mobile-menu-toggle');
@@ -954,7 +1102,7 @@ initSmoothScroll();
 function initActiveNavHighlight() {
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a[href*="#"]');
-    
+
     if (sections.length === 0 || navLinks.length === 0) return;
 
     const observerOptions = {
@@ -989,7 +1137,7 @@ initActiveNavHighlight();
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('loaded');
-    
+
     // Trigger initial animations after a short delay
     setTimeout(() => {
         document.querySelectorAll('.hero-content > *').forEach((el, i) => {
@@ -1005,28 +1153,28 @@ if (window.location.search.includes('debug=perf')) {
     let frameCount = 0;
     let lastTime = performance.now();
     let fps = 0;
-    
+
     // FPS Monitor
     function measureFPS() {
         frameCount++;
         const currentTime = performance.now();
-        
+
         if (currentTime >= lastTime + 1000) {
             fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
             frameCount = 0;
             lastTime = currentTime;
-            
+
             // Warn if FPS drops below 30
             if (fps < 30) {
                 console.warn(`⚠️ Low FPS detected: ${fps} fps`);
             }
         }
-        
+
         requestAnimationFrame(measureFPS);
     }
-    
+
     measureFPS();
-    
+
     // Long Task Detection
     if ('PerformanceObserver' in window) {
         const perfObserver = new PerformanceObserver((list) => {
@@ -1036,14 +1184,14 @@ if (window.location.search.includes('debug=perf')) {
                 }
             }
         });
-        
+
         try {
             perfObserver.observe({ entryTypes: ['longtask'] });
         } catch (e) {
             // longtask not supported
         }
     }
-    
+
     console.log('%c🔍 Performance Monitoring Active', 'color: #00f5ff; font-size: 14px; font-weight: bold;');
     console.log('%cAdd ?debug=perf to URL to enable', 'color: #a855f7; font-size: 12px;');
 }
@@ -1052,7 +1200,7 @@ if (window.location.search.includes('debug=perf')) {
 // SMOOTH PAGE TRANSITIONS
 // ==========================================
 document.querySelectorAll('a:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([download])').forEach(link => {
-    link.addEventListener('click', function(e) {
+    link.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
         // Skip if it's a download link or external
         if (href && !href.startsWith('http') && !href.startsWith('//') && !this.hasAttribute('download')) {
