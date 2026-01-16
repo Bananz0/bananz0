@@ -108,3 +108,6 @@ cache/
 # If you keep project-specific generated files in a folder, ignore it:
 # /out/
 agents.md
+
+# allow committed vendor assets (three.min.js)
+!assets/js/vendor/three.min.js
