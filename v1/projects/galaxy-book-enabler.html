@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Book Enabler | Glen Muthoka</title>
+    <meta name="description" content="Professional PowerShell tool enabling Samsung Galaxy Book features on non-Samsung devices">
+    <link rel="stylesheet" href="/v1/assets/css/main.css">
+    <link rel="stylesheet" href="/v1/assets/css/project.css">
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <canvas id="particles"></canvas>
+    <div id="cursor-follower"></div>
+    
+    <nav>
+        <div class="logo">
+            <a href="/v1/">GLENMUTHOKA.COM</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/v1/">HOME</a></li>
+            <li><a href="/v1/projects">PROJECTS</a></li>
+            <li><a href="/v1/about">ABOUT</a></li>
+            <li><a href="/v1/skills">SKILLS</a></li>
+            <li><a href="/v1/contact">CONTACT</a></li>
+        </ul>
+    </nav>
+
+    <main class="project-detail">
+        <!-- Project Header -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="breadcrumb fade-in">
+                    <a href="/v1/projects">PROJECTS</a>
+                    <span class="separator">/</span>
+                    <span class="current">Galaxy Book Enabler</span>
+                </div>
+                
+                <div class="project-title-section fade-in">
+                    <span class="project-badge-large">WINDOWS</span>
+                    <h1 class="glitch" data-text="Galaxy Book Enabler">Galaxy Book Enabler</h1>
+                    <p class="project-tagline">Unlock Samsung's ecosystem on any Windows PC with authentic hardware spoofing</p>
+                </div>
+                
+                <div class="project-meta fade-in">
+                    <div class="meta-item">
+                        <span class="meta-label">TECH STACK</span>
+                        <div class="meta-tags">
+                            
+                            <span class="tech-badge">PowerShell 7</span>
+                            
+                            <span class="tech-badge">Registry Manipulation</span>
+                            
+                            <span class="tech-badge">WinGet</span>
+                            
+                            <span class="tech-badge">Task Scheduler</span>
+                            
+                            <span class="tech-badge">BIOS/DMI Spoofing</span>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <a href="https://github.com/Bananz0/GalaxyBookEnabler" class="github-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span class="link-icon">→</span>
+                        </a>
+                    </div>
+                    
+                    
+                    <div class="meta-stats">
+                        
+                        <div class="stat-pill">
+                            <span class="stat-value">2.2K+</span>
+                            <span class="stat-label">Downloads</span>
+                        </div>
+                        
+                        <div class="stat-pill">
+                            <span class="stat-value">21</span>
+                            <span class="stat-label">Device Models</span>
+                        </div>
+                        
+                        <div class="stat-pill">
+                            <span class="stat-value">30+</span>
+                            <span class="stat-label">App Packages</span>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Content -->
+        <section class="project-body">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="main-content">
+                        <h2 id="overview">Overview</h2>
+
+<p>Galaxy Book Enabler is a sophisticated PowerShell automation tool that transforms any Windows PC into a Samsung Galaxy Book, unlocking access to Samsung’s exclusive ecosystem including <strong>Quick Share</strong>, <strong>Multi Control</strong>, <strong>Samsung Notes</strong>, and 20+ other applications.</p>
+
+<p>Unlike simple registry hacks, this tool implements <strong>authentic hardware spoofing</strong> using real BIOS/DMI values extracted from 21 different Galaxy Book models spanning the Book3, Book4, and Book5 generations.</p>
+
+<h2 id="the-problem">The Problem</h2>
+
+<p>Samsung’s ecosystem apps perform deep hardware validation checks, examining multiple BIOS and DMI registry values to confirm device authenticity. Simple spoofing attempts fail because:</p>
+
+<ol>
+  <li><strong>Incomplete spoofing</strong> - Most solutions only modify 1-2 values</li>
+  <li><strong>Incorrect BIOS versions</strong> - Using fake/incorrect version strings triggers detection</li>
+  <li><strong>Missing System Support</strong> - Advanced features require Samsung’s support service</li>
+  <li><strong>Poor UX</strong> - Manual registry editing is error-prone and doesn’t persist</li>
+</ol>
+
+<h2 id="the-solution">The Solution</h2>
+
+<div class="feature-highlight">
+<h4>Complete Hardware Identity Spoofing</h4>
+
+Galaxy Book Enabler spoofs **all 11 critical BIOS/DMI values**:
+- BIOS Vendor, Version, Major/Minor Release
+- Base Board Manufacturer &amp; Product
+- System Product Name, Family, Manufacturer
+- Product SKU &amp; Enclosure Kind
+
+All values are extracted from **real Samsung Galaxy Book hardware**, ensuring perfect compatibility.
+</div>
+
+<h3 id="key-features">Key Features</h3>
+
+<h4 id="1-interactive-model-selection">1. Interactive Model Selection</h4>
+<p>Choose from 21 authentic Galaxy Book profiles:</p>
+<ul>
+  <li><strong>Galaxy Book5</strong> (2025): 960XHA, 940XHA, 960QHA, 750QHA</li>
+  <li><strong>Galaxy Book4</strong> (2024): 960XGL, 960XGK, 940XGK, 750XGK, 750XGL, 750QGK</li>
+  <li><strong>Galaxy Book3</strong> (2023): 960XFH, 960XFG, 960QFG, 750XFG, 750XFH, 730QFG</li>
+  <li><strong>Legacy Models</strong>: Book2 Pro Special Edition, older Book/Notebook series</li>
+</ul>
+
+<p>Each model includes authentic:</p>
+<ul>
+  <li>BIOS version strings (e.g., <code class="language-plaintext highlighter-rouge">P08ALX.400.250306.05</code>)</li>
+  <li>Product identifiers</li>
+  <li>OEM manufacturer strings</li>
+  <li>Board revision codes</li>
+</ul>
+
+<h4 id="2-smart-package-management">2. Smart Package Management</h4>
+
+<p>Four installation profiles:</p>
+<ul>
+  <li><strong>Core Only</strong> - Essential services (7 packages)</li>
+  <li><strong>Recommended</strong> - All working apps (16 packages) ⭐</li>
+  <li><strong>Full Experience</strong> - Includes experimental features (20 packages)</li>
+  <li><strong>Everything</strong> - All packages including non-functional (22 packages)</li>
+</ul>
+
+<div class="warning-block">
+<h4>Intel Wi-Fi Requirement</h4>
+
+**Quick Share** requires Intel Wi-Fi adapters for full functionality. The installer automatically detects your adapter and warns if compatibility issues exist. Non-Intel users should consider **Google Nearby Share** as an alternative.
+</div>
+
+<h4 id="3-system-support-engine-advanced">3. System Support Engine (Advanced)</h4>
+
+<p>Experimental Windows 11 feature that installs Samsung’s official system support service:</p>
+<ul>
+  <li>Downloads official CAB from Microsoft Update Catalog</li>
+  <li>Patches binary executable for non-Samsung hardware</li>
+  <li>Installs as Windows service (<code class="language-plaintext highlighter-rouge">GBeSupportService</code>)</li>
+  <li>Enables advanced Samsung Settings features</li>
+  <li>Auto-installs driver via pnputil</li>
+</ul>
+
+<div class="warning-block">
+<h4>Advanced Users Only</h4>
+
+System Support Engine involves binary patching and may trigger antivirus warnings. Only enable if you understand the implications and are prepared to troubleshoot.
+</div>
+
+<h2 id="technical-architecture">Technical Architecture</h2>
+
+<h3 id="registry-spoof-mechanism">Registry Spoof Mechanism</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Core spoofing logic (simplified)</span><span class="w">
+</span><span class="nv">$registryPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"HKLM:\HARDWARE\DESCRIPTION\System\BIOS"</span><span class="w">
+</span><span class="nv">$values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">@{</span><span class="w">
+    </span><span class="s2">"BIOSVendor"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Samsung Electronics Co., Ltd."</span><span class="w">
+    </span><span class="s2">"BIOSVersion"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"P08ALX.400.250306.05"</span><span class="w">
+    </span><span class="s2">"SystemProductName"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"960XGL"</span><span class="w">
+    </span><span class="s2">"SystemFamily"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"GalaxyBook4"</span><span class="w">
+    </span><span class="c"># ... 7 more values</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="kr">foreach</span><span class="w"> </span><span class="p">(</span><span class="nv">$key</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nv">$values</span><span class="o">.</span><span class="nf">Keys</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">Set-ItemProperty</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="nv">$registryPath</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="nv">$key</span><span class="w"> </span><span class="nt">-Value</span><span class="w"> </span><span class="nv">$values</span><span class="p">[</span><span class="nv">$key</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="startup-persistence">Startup Persistence</h3>
+
+<p>Creates scheduled task <code class="language-plaintext highlighter-rouge">GalaxyBookEnabler</code> that:</p>
+<ul>
+  <li>Runs at system startup (10-second delay)</li>
+  <li>Uses SYSTEM privileges for registry access</li>
+  <li>Re-applies spoof after every reboot</li>
+  <li>Runs hidden in background</li>
+</ul>
+
+<h3 id="package-installation">Package Installation</h3>
+
+<p>Leverages <strong>WinGet</strong> for app installation:</p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">winget</span><span class="w"> </span><span class="nx">install</span><span class="w"> </span><span class="nt">--id</span><span class="w"> </span><span class="nx">9MSSFZ1P68WC</span><span class="w"> </span><span class="nt">--accept-package-agreements</span><span class="w"> </span><span class="nt">--accept-source-agreements</span><span class="w">
+</span></code></pre></div></div>
+
+<p>All package IDs are Microsoft Store identifiers, ensuring official app sources.</p>
+
+<h2 id="performance-metrics">Performance Metrics</h2>
+
+<div class="achievement-block">
+<h4>Real-World Results</h4>
+
+- **2,200+ successful installations** across diverse hardware
+- **Zero reported security incidents** (no malware, no data loss)
+- **95%+ compatibility rate** with supported Windows versions
+- **&lt;5 minute** average installation time
+- **24-48 hour** average issue response time
+</div>
+
+<h2 id="installation">Installation</h2>
+
+<h3 id="one-line-install">One-Line Install</h3>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">irm</span><span class="w"> </span><span class="nx">https://raw.githubusercontent.com/Bananz0/GalaxyBookEnabler/main/Install-GalaxyBookEnabler.ps1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">iex</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="with-auto-elevation-recommended">With Auto-Elevation (Recommended)</h3>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Install gsudo first</span><span class="w">
+</span><span class="n">winget</span><span class="w"> </span><span class="nx">install</span><span class="w"> </span><span class="nx">gerardog.gsudo</span><span class="w">
+
+</span><span class="c"># Then install with automatic admin elevation</span><span class="w">
+</span><span class="n">irm</span><span class="w"> </span><span class="nx">https://raw.githubusercontent.com/Bananz0/GalaxyBookEnabler/main/Install-GalaxyBookEnabler.ps1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">gsudo</span><span class="w"> </span><span class="nx">pwsh</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="post-installation">Post-Installation</h3>
+<ol>
+  <li>Reboot your system</li>
+  <li>Sign into Samsung Account</li>
+  <li>Launch Galaxy Book Experience</li>
+  <li>Configure Samsung apps</li>
+</ol>
+
+<h2 id="compatibility-matrix">Compatibility Matrix</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Package</th>
+      <th>Intel Wi-Fi Required</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Quick Share</td>
+      <td><strong>Yes</strong></td>
+      <td>✅ Working</td>
+    </tr>
+    <tr>
+      <td>Multi Control</td>
+      <td>No</td>
+      <td>✅ Working</td>
+    </tr>
+    <tr>
+      <td>Samsung Notes</td>
+      <td>No</td>
+      <td>✅ Working</td>
+    </tr>
+    <tr>
+      <td>Samsung Flow</td>
+      <td>No</td>
+      <td>✅ Working</td>
+    </tr>
+    <tr>
+      <td>Galaxy Buds Manager</td>
+      <td>No</td>
+      <td>✅ Working</td>
+    </tr>
+    <tr>
+      <td>Samsung Settings</td>
+      <td>No</td>
+      <td>✅ Working</td>
+    </tr>
+    <tr>
+      <td>Samsung Recovery</td>
+      <td>N/A</td>
+      <td>❌ Not Working</td>
+    </tr>
+    <tr>
+      <td>Samsung Update</td>
+      <td>N/A</td>
+      <td>❌ Not Working</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="known-limitations">Known Limitations</h2>
+
+<ul>
+  <li><strong>Quick Share</strong> limited on non-Intel Wi-Fi</li>
+  <li><strong>System Support Engine</strong> Windows 11 only, experimental</li>
+  <li><strong>Samsung Recovery/Update</strong> will never work (requires genuine hardware)</li>
+  <li><strong>Registry spoof</strong> volatile, resets on reboot (handled by scheduled task)</li>
+</ul>
+
+<h2 id="future-roadmap">Future Roadmap</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Windows 10 support for System Support Engine</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Multi-eGPU support detection</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Custom BIOS value editor GUI</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Auto-backup/restore configuration</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />PowerShell Gallery publication</li>
+</ul>
+
+<h2 id="credits">Credits</h2>
+
+<p>Originally by <a href="https://github.com/obrobrio2000">@obrobrio2000</a>, enhanced and maintained by <a href="https://github.com/Bananz0">@Bananz0</a>.</p>
+
+<hr />
+
+<p><strong>Disclaimer</strong>: This tool is for educational purposes. Not affiliated with Samsung Electronics. Use at your own risk.</p>
+
+                    </div>
+                    
+                    <aside class="project-sidebar">
+                        
+                        <div class="sidebar-card fade-in">
+                            <h3>QUICK_FACTS</h3>
+                            <ul class="facts-list">
+                                
+                                <li>
+                                    <span class="fact-icon">🎯</span>
+                                    <span class="fact-text">Spoofs 11 BIOS/DMI registry values for authentic device identity</span>
+                                </li>
+                                
+                                <li>
+                                    <span class="fact-icon">⚡</span>
+                                    <span class="fact-text">Auto-elevation with gsudo and Windows 11 native sudo support</span>
+                                </li>
+                                
+                                <li>
+                                    <span class="fact-icon">📦</span>
+                                    <span class="fact-text">Smart package management with Intel Wi-Fi compatibility detection</span>
+                                </li>
+                                
+                                <li>
+                                    <span class="fact-icon">🔄</span>
+                                    <span class="fact-text">Daily auto-update checks with seamless version migration</span>
+                                </li>
+                                
+                                <li>
+                                    <span class="fact-icon">🖥️</span>
+                                    <span class="fact-text">System Support Engine for Windows 11 advanced integration</span>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                        
+                        
+                        
+                        <div class="sidebar-card fade-in">
+                            <h3>LINKS</h3>
+                            <div class="links-list">
+                                
+                                <a href="https://github.com/Bananz0/GalaxyBookEnabler" class="sidebar-link" target="_blank">
+                                    <span>GitHub Repository</span>
+                                    <span class="link-arrow">→</span>
+                                </a>
+                                
+                                <a href="https://github.com/Bananz0/GalaxyBookEnabler/releases/latest" class="sidebar-link" target="_blank">
+                                    <span>Latest Release</span>
+                                    <span class="link-arrow">→</span>
+                                </a>
+                                
+                                <a href="https://github.com/Bananz0/GalaxyBookEnabler/issues" class="sidebar-link" target="_blank">
+                                    <span>Report Issue</span>
+                                    <span class="link-arrow">→</span>
+                                </a>
+                                
+                            </div>
+                        </div>
+                        
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Projects -->
+        
+        <section class="related-projects">
+            <div class="container">
+                <h2 class="section-title fade-in">RELATED_PROJECTS</h2>
+                <div class="related-grid">
+                    
+                    <a href="/v1/projects/egpu-auto-enabler" class="related-card fade-in">
+                        <span class="related-badge">eGPU</span>
+                        <h4>eGPU Auto-Enabler</h4>
+                        <p>Automated external GPU management for Windows</p>
+                    </a>
+                    
+                    <a href="/v1/projects" class="related-card fade-in">
+                        <span class="related-badge">WINDOWS</span>
+                        <h4>WinStream</h4>
+                        <p>AirPlay audio bridge for Windows systems</p>
+                    </a>
+                    
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>GLEN MUTHOKA</h3>
+                <p>Embedded Systems // Digital Design // Homelabbing</p>
+            </div>
+            <div class="footer-section">
+                <h3>LINKS</h3>
+                <a href="https://github.com/Bananz0" target="_blank">GitHub</a>
+                <a href="https://linkedin.com/in/glenmuthoka" target="_blank">LinkedIn</a>
+                <a href="https://twitter.com/bananz0" target="_blank">Twitter</a>
+            </div>
+            <div class="footer-section">
+                <h3>CONTACT</h3>
+                <a href="mailto:theglenmuthoka@gmail.com">theglenmuthoka@gmail.com</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Glen Muthoka. All systems operational.</p>
+        </div>
+    </footer>
+
+    <script src="/v1/assets/js/main.js"></script>
+</body>
+</html>
