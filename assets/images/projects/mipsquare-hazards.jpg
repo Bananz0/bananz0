@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgb(20,20,24);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(30,30,38);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#grad5)"/>
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Space Grotesk, sans-serif" font-size="32" font-weight="700" fill="rgb(245, 158, 11)" text-anchor="middle">Hazard Detection Logic</text>
+  <text x="600" y="80" font-family="Inter, sans-serif" font-size="16" fill="rgba(229, 231, 235, 0.6)" text-anchor="middle">Forwarding, Stalling & Branch Resolution</text>
+  
+  <!-- Three main hazard types -->
+  <!-- 1. Data Hazards -->
+  <rect x="80" y="120" width="340" height="280" rx="8" fill="rgba(245, 158, 11, 0.08)" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2"/>
+  <text x="250" y="155" font-family="Space Grotesk, sans-serif" font-size="20" font-weight="700" fill="rgb(245, 158, 11)" text-anchor="middle">Data Hazards (RAW)</text>
+  
+  <text x="110" y="190" font-family="JetBrains Mono, monospace" font-size="13" fill="rgba(229, 231, 235, 0.8)">add $t0, $t1, $t2</text>
+  <text x="110" y="210" font-family="JetBrains Mono, monospace" font-size="13" fill="rgb(245, 158, 11)">sub $t3, $t0, $t4</text>
+  <text x="320" y="210" font-family="Inter, sans-serif" font-size="11" fill="rgb(245, 158, 11)">← needs $t0</text>
+  
+  <text x="110" y="245" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgba(229, 231, 235, 0.9)">Detection:</text>
+  <text x="120" y="265" font-family="JetBrains Mono, monospace" font-size="11" fill="rgba(229, 231, 235, 0.7)">if (EX/MEM.RegWrite &&</text>
+  <text x="120" y="282" font-family="JetBrains Mono, monospace" font-size="11" fill="rgba(229, 231, 235, 0.7)">    EX/MEM.Rd == ID/EX.Rs)</text>
+  <text x="120" y="299" font-family="JetBrains Mono, monospace" font-size="11" fill="rgba(229, 231, 235, 0.7)">  → Forward from EX/MEM</text>
+  
+  <text x="110" y="330" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgba(229, 231, 235, 0.9)">Solution:</text>
+  <rect x="120" y="340" width="280" height="45" rx="4" fill="rgba(16, 185, 129, 0.15)"/>
+  <text x="130" y="360" font-family="Inter, sans-serif" font-size="13" fill="rgb(16, 185, 129)">✓ Forward data from EX/MEM</text>
+  <text x="130" y="377" font-family="Inter, sans-serif" font-size="13" fill="rgb(16, 185, 129)">✓ Forward data from MEM/WB</text>
+  
+  <!-- 2. Load-Use Hazards -->
+  <rect x="440" y="120" width="340" height="280" rx="8" fill="rgba(34, 211, 238, 0.08)" stroke="rgba(34, 211, 238, 0.4)" stroke-width="2"/>
+  <text x="610" y="155" font-family="Space Grotesk, sans-serif" font-size="20" font-weight="700" fill="rgb(34, 211, 238)" text-anchor="middle">Load-Use Hazards</text>
+  
+  <text x="470" y="190" font-family="JetBrains Mono, monospace" font-size="13" fill="rgba(229, 231, 235, 0.8)">lw $t0, 0($t1)</text>
+  <text x="470" y="210" font-family="JetBrains Mono, monospace" font-size="13" fill="rgb(34, 211, 238)">add $t2, $t0, $t3</text>
+  <text x="680" y="210" font-family="Inter, sans-serif" font-size="11" fill="rgb(34, 211, 238)">← stall!</text>
+  
+  <text x="470" y="245" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgba(229, 231, 235, 0.9)">Problem:</text>
+  <text x="480" y="265" font-family="Inter, sans-serif" font-size="12" fill="rgba(229, 231, 235, 0.7)">Load data not available</text>
+  <text x="480" y="282" font-family="Inter, sans-serif" font-size="12" fill="rgba(229, 231, 235, 0.7)">until MEM stage completes</text>
+  <text x="480" y="299" font-family="Inter, sans-serif" font-size="12" fill="rgba(229, 231, 235, 0.7)">→ Forwarding insufficient</text>
+  
+  <text x="470" y="330" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgba(229, 231, 235, 0.9)">Solution:</text>
+  <rect x="480" y="340" width="280" height="45" rx="4" fill="rgba(236, 72, 153, 0.15)"/>
+  <text x="490" y="360" font-family="Inter, sans-serif" font-size="13" fill="rgb(236, 72, 153)">⏸ Stall pipeline 1 cycle</text>
+  <text x="490" y="377" font-family="Inter, sans-serif" font-size="13" fill="rgb(236, 72, 153)">⏸ Insert bubble (NOP)</text>
+  
+  <!-- 3. Control Hazards -->
+  <rect x="800" y="120" width="340" height="280" rx="8" fill="rgba(147, 51, 234, 0.08)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="2"/>
+  <text x="970" y="155" font-family="Space Grotesk, sans-serif" font-size="20" font-weight="700" fill="rgb(147, 51, 234)" text-anchor="middle">Control Hazards</text>
+  
+  <text x="830" y="190" font-family="JetBrains Mono, monospace" font-size="13" fill="rgba(229, 231, 235, 0.8)">beq $t0, $t1, Label</text>
+  <text x="830" y="210" font-family="JetBrains Mono, monospace" font-size="13" fill="rgb(147, 51, 234)">add $t2, $t3, $t4</text>
+  <text x="1040" y="210" font-family="Inter, sans-serif" font-size="11" fill="rgb(147, 51, 234)">← wrong?</text>
+  
+  <text x="830" y="245" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgba(229, 231, 235, 0.9)">Problem:</text>
+  <text x="840" y="265" font-family="Inter, sans-serif" font-size="12" fill="rgba(229, 231, 235, 0.7)">Branch outcome unknown</text>
+  <text x="840" y="282" font-family="Inter, sans-serif" font-size="12" fill="rgba(229, 231, 235, 0.7)">until EX stage</text>
+  <text x="840" y="299" font-family="Inter, sans-serif" font-size="12" fill="rgba(229, 231, 235, 0.7)">→ May fetch wrong path</text>
+  
+  <text x="830" y="330" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgba(229, 231, 235, 0.9)">Solution:</text>
+  <rect x="840" y="340" width="280" height="45" rx="4" fill="rgba(245, 158, 11, 0.15)"/>
+  <text x="850" y="360" font-family="Inter, sans-serif" font-size="13" fill="rgb(245, 158, 11)">🚫 Flush pipeline (2 cycles)</text>
+  <text x="850" y="377" font-family="Inter, sans-serif" font-size="13" fill="rgb(245, 158, 11)">⚡ Branch prediction (future)</text>
+  
+  <!-- Forwarding unit diagram -->
+  <rect x="80" y="430" width="520" height="310" rx="8" fill="rgba(18,18,18,0.8)" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2"/>
+  <text x="340" y="465" font-family="Space Grotesk, sans-serif" font-size="22" font-weight="700" fill="rgb(245, 158, 11)" text-anchor="middle">Forwarding Unit Logic</text>
+  
+  <text x="110" y="505" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">// EX Hazard (from EX/MEM stage)</text>
+  <text x="110" y="525" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(147, 51, 234)">if</text>
+  <text x="135" y="525" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">(EX_MEM.RegWrite &&</text>
+  <text x="110" y="545" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">    (EX_MEM.Rd != 0) &&</text>
+  <text x="110" y="565" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">    (EX_MEM.Rd == ID_EX.Rs))</text>
+  <text x="135" y="585" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(16, 185, 129)">ForwardA</text>
+  <text x="230" y="585" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">= 10;</text>
+  <text x="320" y="585" font-family="Inter, sans-serif" font-size="11" fill="rgba(229, 231, 235, 0.5)">// from EX/MEM</text>
+  
+  <text x="110" y="615" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">// MEM Hazard (from MEM/WB stage)</text>
+  <text x="110" y="635" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(147, 51, 234)">else if</text>
+  <text x="185" y="635" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">(MEM_WB.RegWrite &&</text>
+  <text x="110" y="655" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">         (MEM_WB.Rd != 0) &&</text>
+  <text x="110" y="675" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">         (MEM_WB.Rd == ID_EX.Rs))</text>
+  <text x="135" y="695" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(16, 185, 129)">ForwardA</text>
+  <text x="230" y="695" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">= 01;</text>
+  <text x="320" y="695" font-family="Inter, sans-serif" font-size="11" fill="rgba(229, 231, 235, 0.5)">// from MEM/WB</text>
+  
+  <text x="110" y="720" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(147, 51, 234)">else</text>
+  <text x="135" y="720" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(16, 185, 129)">ForwardA</text>
+  <text x="230" y="720" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">= 00;</text>
+  <text x="320" y="720" font-family="Inter, sans-serif" font-size="11" fill="rgba(229, 231, 235, 0.5)">// no hazard</text>
+  
+  <!-- Stall detection diagram -->
+  <rect x="620" y="430" width="520" height="310" rx="8" fill="rgba(18,18,18,0.8)" stroke="rgba(34, 211, 238, 0.3)" stroke-width="2"/>
+  <text x="880" y="465" font-family="Space Grotesk, sans-serif" font-size="22" font-weight="700" fill="rgb(34, 211, 238)" text-anchor="middle">Hazard Detection Unit</text>
+  
+  <text x="650" y="505" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">// Load-Use detection</text>
+  <text x="650" y="525" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(147, 51, 234)">if</text>
+  <text x="675" y="525" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">(ID_EX.MemRead &&</text>
+  <text x="650" y="545" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">    ((ID_EX.Rt == IF_ID.Rs) ||</text>
+  <text x="650" y="565" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">     (ID_EX.Rt == IF_ID.Rt)))</text>
+  <text x="650" y="585" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">{</text>
+  <text x="675" y="605" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(236, 72, 153)">PC_Write</text>
+  <text x="785" y="605" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">= 0;</text>
+  <text x="850" y="605" font-family="Inter, sans-serif" font-size="11" fill="rgba(229, 231, 235, 0.5)">// stall PC</text>
+  <text x="675" y="625" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(236, 72, 153)">IF_ID_Write</text>
+  <text x="815" y="625" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">= 0;</text>
+  <text x="850" y="625" font-family="Inter, sans-serif" font-size="11" fill="rgba(229, 231, 235, 0.5)">// stall IF/ID</text>
+  <text x="675" y="645" font-family="JetBrains Mono, monospace" font-size="12" fill="rgb(236, 72, 153)">ID_EX_Controls</text>
+  <text x="835" y="645" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">= 0;</text>
+  <text x="870" y="645" font-family="Inter, sans-serif" font-size="11" fill="rgba(229, 231, 235, 0.5)">// bubble</text>
+  <text x="650" y="665" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(229, 231, 235, 0.9)">}</text>
+  
+  <text x="650" y="695" font-family="Inter, sans-serif" font-size="13" fill="rgba(229, 231, 235, 0.7)">Result:</text>
+  <text x="650" y="715" font-family="Inter, sans-serif" font-size="12" fill="rgb(16, 185, 129)">✓ 1 cycle stall inserted</text>
+  <text x="650" y="732" font-family="Inter, sans-serif" font-size="12" fill="rgb(16, 185, 129)">✓ Data available after MEM stage</text>
+</svg>

@@ -8,9 +8,9 @@ permalink: /projects/
     <div class="container projects-container-wide">
         <h1 class="glitch fade-in" data-text="PROJECTS">PROJECTS</h1>
         <p class="hero-subtitle fade-in">69 REPOSITORIES ACROSS PUBLIC, PRIVATE, AND FORKED WORK. THIS PAGE LISTS ONLY PUBLIC REPOS THAT LOOK ACTIVELY MAINTAINED.</p>
-        <div class="projects-hero-cta fade-in">
-            <a href="{{ '/' | relative_url }}#projects" class="cta-btn primary">FEATURED HIGHLIGHTS</a>
-            <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" target="_blank" rel="noopener">GITHUB PROFILE</a>
+        <div class="projects-hero-cta fade-in" data-spring="snappy" data-bounce="1">
+            <a href="{{ '/' | relative_url }}#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">FEATURED HIGHLIGHTS</a>
+            <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" data-spring="snappy" data-bounce="1" target="_blank" rel="noopener">GITHUB PROFILE</a>
         </div>
     </div>
 </section>
@@ -28,7 +28,7 @@ permalink: /projects/
 
         <div class="repo-grid fade-in">
             {% for repo in repos_sorted %}
-            <a class="project-card-full repo-card-full" href="{{ repo.html_url }}" target="_blank" rel="noopener">
+            <a class="project-card-full repo-card-full" data-spring="default" data-bounce="1" href="{{ repo.html_url }}" target="_blank" rel="noopener">
                 <div class="project-header">
                     <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif %}</span>
                     <div class="project-meta">
@@ -76,7 +76,7 @@ permalink: /projects/
         </div>
 
         <div class="view-all-projects fade-in">
-            <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" target="_blank" rel="noopener">BROWSE ON GITHUB</a>
+            <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" data-spring="snappy" data-bounce="1" target="_blank" rel="noopener">BROWSE ON GITHUB</a>
         </div>
         {% else %}
         <div class="holo-panel fade-in" style="text-align:center; padding: var(--space-2xl);">

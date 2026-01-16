@@ -55,7 +55,7 @@ title: Home
                             <li>Collaborated with cross-functional team on <strong>CubeSat subsystem integration</strong> (ADCS, comms, power)</li>
                         </ul>
                     </div>
-                    <div class="work-item">
+                    <div class="work-item space-grotesk">
                         <h3>Open Source Contributor</h3>
                         <h4>Various Projects</h4>
                         <p class="work-period">2023 → Present</p>
@@ -312,7 +312,10 @@ title: Home
                 </div>
 
                 <!-- WattsApp: Embedded System Management Platform -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                     data-modal-images="/assets/images/projects/wattsapp-dashboard.jpg,/assets/images/projects/wattsapp-circuit.jpg,/assets/images/projects/wattsapp-grafana.jpg"
+                     data-modal-captions="Real-time monitoring dashboard|ATMega644p circuit with sensors|Grafana visualization interface"
+                     data-modal-title="WattsApp: Smart System Management Platform">
                     <div class="project-header">
                         <span class="project-badge">EMBEDDED SYSTEMS</span>
                         <div class="project-meta">
@@ -345,7 +348,10 @@ title: Home
                 </div>
 
                 <!-- MIPSquare++ MIPS Simulator -->
-                <div class="project-card-full fade-in">
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                     data-modal-images="/assets/images/projects/mipsquare-pipeline.jpg,/assets/images/projects/mipsquare-hazards.jpg"
+                     data-modal-captions="5-stage pipeline architecture diagram|Hazard detection and forwarding logic"
+                     data-modal-title="MIPSquare++: 5-Stage Pipelined MIPS Simulator">
                     <div class="project-header">
                         <span class="project-badge">COMPUTER ARCH</span>
                         <div class="project-meta">
@@ -437,7 +443,7 @@ title: Home
             {% endif %}
 
             <div class="view-all-projects">
-                <a href="{{ '/projects/' | relative_url }}" class="cta-btn primary">FULL PROJECT ARCHIVE</a>
+                <a href="{{ '/projects/' | relative_url }}" class="cta-btn primary" data-spring="snappy" data-bounce="1">FULL PROJECT ARCHIVE</a>
             </div>
         </div>
 
@@ -611,7 +617,7 @@ title: Home
                                 <textarea id="contact-message" name="message" autocomplete="on" class="terminal-textarea" rows="5" placeholder="Tell me about your project..." required></textarea>
                             </div>
                             
-                            <button type="submit" class="cta-btn primary">SEND MESSAGE</button>
+                            <button type="submit" class="cta-btn primary" data-spring="snappy" data-bounce="1">SEND MESSAGE</button>
                         </form>
                     </div>
                 </div>
@@ -619,25 +625,25 @@ title: Home
             
             <!-- Contact Info Cards -->
             <div class="contact-info-section">
-                <div class="contact-card fade-in">
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
                     <div class="contact-icon"></div>
                     <h3>EMAIL</h3>
                     <a href="mailto:theglenmuthoka@gmail.com" class="contact-link">theglenmuthoka@gmail.com</a>
                 </div>
                 
-                <div class="contact-card fade-in">
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
                     <div class="contact-icon"></div>
                     <h3>LINKEDIN</h3>
                     <a href="https://linkedin.com/in/glenmuthoka" target="_blank" class="contact-link">/in/glen-muthoka</a>
                 </div>
                 
-                <div class="contact-card fade-in">
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
                     <div class="contact-icon"></div>
                     <h3>GITHUB</h3>
                     <a href="https://github.com/Bananz0" target="_blank" class="contact-link">github.com/Bananz0</a>
                 </div>
                 
-                <div class="contact-card fade-in">
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
                     <div class="contact-icon"></div>
                     <h3>LOCATION</h3>
                     <span class="contact-text">Southampton, UK  From Kenya</span>
@@ -646,8 +652,8 @@ title: Home
         </div>
         
         <!-- Availability Status -->
-        <div class="availability-section fade-in">
-            <div class="availability-card">
+        <div class="availability-section fade-in" data-spring="smooth" data-bounce="1">
+            <div class="availability-card" data-spring="smooth" data-bounce="1">
                 <div class="status-indicator">
                     <span class="status-dot active"></span>
                     <span class="status-text">CURRENTLY AVAILABLE FOR OPPORTUNITIES</span>
@@ -670,8 +676,8 @@ title: Home
         </div>
 
         <!-- CV Download -->
-        <div class="cv-section fade-in">
-            <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cv-download-btn" download="Glen_Muthoka_CV.pdf">
+        <div class="cv-section fade-in" data-spring="smooth" data-bounce="1">
+            <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cv-download-btn" download="Glen_Muthoka_CV.pdf" data-spring="smooth" data-bounce="1">
                 <span class="cv-icon"></span>
                 <span class="cv-text">
                     <strong>DOWNLOAD CV</strong>

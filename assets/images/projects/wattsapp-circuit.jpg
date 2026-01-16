@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgb(20,20,24);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(30,30,38);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#grad2)"/>
+  
+  <!-- Circuit board pattern -->
+  <line x1="200" y1="100" x2="200" y2="700" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  <line x1="400" y1="100" x2="400" y2="700" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  <line x1="600" y1="100" x2="600" y2="700" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  <line x1="800" y1="100" x2="800" y2="700" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  <line x1="1000" y1="100" x2="1000" y2="700" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  
+  <line x1="100" y1="200" x2="1100" y2="200" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  <line x1="100" y1="400" x2="1100" y2="400" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  <line x1="100" y1="600" x2="1100" y2="600" stroke="rgba(245, 158, 11, 0.2)" stroke-width="2"/>
+  
+  <!-- ATMega644p chip (center) -->
+  <rect x="450" y="300" width="300" height="200" rx="4" fill="rgba(18,18,18,0.95)" stroke="rgb(245, 158, 11)" stroke-width="3"/>
+  <text x="600" y="380" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="rgb(245, 158, 11)" text-anchor="middle">ATMega644p</text>
+  <text x="600" y="415" font-family="Inter, sans-serif" font-size="14" fill="rgba(229, 231, 235, 0.5)" text-anchor="middle">16MHz • 64KB Flash</text>
+  
+  <!-- Pins (simplified) -->
+  <rect x="430" y="320" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="430" y="345" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="430" y="370" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="430" y="395" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="430" y="420" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="430" y="445" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="430" y="470" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  
+  <rect x="755" y="320" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="755" y="345" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="755" y="370" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="755" y="395" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="755" y="420" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="755" y="445" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  <rect x="755" y="470" width="15" height="8" fill="rgb(245, 158, 11)"/>
+  
+  <!-- Sensors (peripherals) -->
+  <!-- Temperature sensor (I2C) -->
+  <rect x="200" y="350" width="120" height="80" rx="4" fill="rgba(34, 211, 238, 0.1)" stroke="rgb(34, 211, 238)" stroke-width="2"/>
+  <text x="260" y="385" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="rgb(34, 211, 238)" text-anchor="middle">TEMP</text>
+  <text x="260" y="405" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(34, 211, 238, 0.7)" text-anchor="middle">I2C</text>
+  <line x1="320" y1="390" x2="430" y2="390" stroke="rgb(34, 211, 238)" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- ADC Module -->
+  <rect x="880" y="350" width="120" height="80" rx="4" fill="rgba(16, 185, 129, 0.1)" stroke="rgb(16, 185, 129)" stroke-width="2"/>
+  <text x="940" y="385" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="rgb(16, 185, 129)" text-anchor="middle">ADC</text>
+  <text x="940" y="405" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(16, 185, 129, 0.7)" text-anchor="middle">10-bit</text>
+  <line x1="770" y1="390" x2="880" y2="390" stroke="rgb(16, 185, 129)" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- UART connection -->
+  <rect x="520" y="120" width="160" height="60" rx="4" fill="rgba(245, 158, 11, 0.1)" stroke="rgb(245, 158, 11)" stroke-width="2"/>
+  <text x="600" y="150" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="rgb(245, 158, 11)" text-anchor="middle">UART → PC</text>
+  <text x="600" y="167" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(245, 158, 11, 0.7)" text-anchor="middle">115200 baud</text>
+  <line x1="600" y1="180" x2="600" y2="300" stroke="rgb(245, 158, 11)" stroke-width="2"/>
+  
+  <!-- Power supply indicator -->
+  <circle cx="150" cy="150" r="20" fill="rgba(16, 185, 129, 0.2)" stroke="rgb(16, 185, 129)" stroke-width="2"/>
+  <text x="150" y="157" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="rgb(16, 185, 129)" text-anchor="middle">5V</text>
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Space Grotesk, sans-serif" font-size="28" font-weight="700" fill="rgb(245, 158, 11)" text-anchor="middle">Circuit Schematic</text>
+  
+  <!-- Connection nodes -->
+  <circle cx="200" cy="200" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="400" cy="200" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="600" cy="200" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="800" cy="200" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="1000" cy="200" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="200" cy="400" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="400" cy="400" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="600" cy="400" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="800" cy="400" r="5" fill="rgb(245, 158, 11)"/>
+  <circle cx="1000" cy="400" r="5" fill="rgb(245, 158, 11)"/>
+</svg>

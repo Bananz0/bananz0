@@ -499,7 +499,7 @@ nav.scrolled {
     position: fixed;
     top: var(--space-lg);
     left: var(--space-lg);
-    z-index: 9998;
+    z-index: 10002;
     opacity: 1;
     transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -561,7 +561,7 @@ nav.scrolled {
     position: fixed;
     top: var(--space-lg);
     right: var(--space-lg);
-    z-index: 9998;
+    z-index: 10002;
     display: flex;
     gap: var(--space-sm);
 }
@@ -655,7 +655,7 @@ nav.scrolled {
     top: var(--space-xl);
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9999;
+    z-index: 10000;
     width: min(92%, 980px);
     display: flex;
     justify-content: center;
@@ -676,6 +676,8 @@ nav.scrolled {
     transition: all var(--transition-normal);
     width: auto;
     max-width: max-content;
+    height: auto;
+    box-sizing: border-box;
 }
 
 .floating-inner .site-title {
@@ -695,6 +697,63 @@ nav.scrolled {
     white-space: nowrap;
 }
 
+/* Center title + subtitle when CTAs are collapsed (compact state) */
+/* Primary: use :has() to detect collapsed CTA state when supported */
+.floating-inner:has(.floating-ctas:not(.visible)) {
+    justify-content: center;
+}
+
+.floating-inner:has(.floating-ctas:not(.visible)) .site-title,
+.floating-inner:has(.floating-ctas:not(.visible)) .site-sub {
+    text-align: center;
+    width: 100%;
+    margin: 0;
+}
+
+/* Fallbacks for browsers without :has() - center on smaller viewports */
+@media (max-width: 1024px) {
+    .floating-inner {
+        justify-content: center;
+    }
+
+    .floating-inner .site-title,
+    .floating-inner .site-sub {
+        text-align: center;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+/* Small screens: center the floating header title/sub for compact view */
+@media (max-width: 500px), (max-height: 660px) {
+    .floating-hero {
+        width: max-content;
+    }
+
+    .floating-inner {
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        width: auto;
+    }
+
+    .floating-inner .site-title,
+    .floating-inner .site-sub {
+        text-align: center;
+        width: auto;
+        margin: 0.15rem 0;
+    }
+
+    /* Ensure CTAs stack below and remain centered */
+    .floating-ctas {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
 .floating-ctas {
     display: flex;
     gap: var(--space-sm);
@@ -709,10 +768,10 @@ nav.scrolled {
     overflow: hidden;
     
     transition: 
-        max-width var(--spring-default),
-        margin-left var(--spring-default),
-        opacity var(--spring-default),
-        transform var(--spring-default);
+        max-width var(--spring-snappy),
+        margin-left var(--spring-snappy),
+        opacity var(--spring-snappy),
+        transform var(--spring-snappy);
 }
 
 .floating-ctas.visible {
@@ -726,8 +785,13 @@ nav.scrolled {
 
 /* Scale buttons to fit in floating header */
 .floating-ctas .cta-btn {
-    padding: var(--space-sm) var(--space-lg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0.6em 1em; /* use em so padding scales with font-size */
     font-size: 0.85rem;
+    line-height: 1;
     border-radius: var(--radius-md);
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -796,13 +860,13 @@ nav.scrolled {
 
 /* PHONE OPTIMIZATIONS (< 500px) */
 /* Stacked layout for very small screens to avoid cramping */
-@media (max-width: 500px) {
+@media (max-width: 500px), (max-height: 660px) {
     .floating-inner {
         flex-direction: column;
         /* Remove gap here so it collapses fully when CTAs are hidden */
         gap: 0; 
         padding: 10px 12px;
-        align-items: center;
+        align-items: stretch; /* allow header to resize with stacked buttons */
     }
     
     /* Mobile Animation: Height instead of Width */
@@ -810,32 +874,61 @@ nav.scrolled {
         margin-left: 0 !important;
         width: 100%;
         max-width: 100%; /* Override desktop restriction */
+        flex-direction: column; /* Stack buttons vertically for top-to-bottom morph */
         
         /* Start collapsed vertically */
         max-height: 0;
         margin-top: 0;
         opacity: 0;
         transform: translateY(-10px);
+        transform-origin: top center;
         
-            /* New transitions for mobile properties (spring-based) */
+            /* New transitions for mobile properties (spring-based, faster) */
             transition: 
-                max-height var(--spring-default),
-                margin-top var(--spring-default),
-                opacity var(--spring-default),
-                transform var(--spring-default);
+                max-height var(--spring-snappy),
+                margin-top var(--spring-snappy),
+                opacity var(--spring-snappy),
+                transform var(--spring-snappy),
+                padding var(--spring-snappy),
+                height var(--spring-snappy),
+                flex-direction var(--spring-snappy);
     }
     
     .floating-ctas.visible {
         /* Expand vertically */
-        max-height: 60px; 
+        max-height: 150px; /* Allow vertical stacking */
         margin-top: 8px; /* Gap logic moved here */
         opacity: 1;
         transform: translateY(0);
         justify-content: center;
+        gap: 6px; /* Space between stacked buttons */
+    }
+
+    /* Button entry morph: slide each button down from the top with stagger */
+    .floating-ctas .cta-btn {
+        transform: translateY(-10px);
+        opacity: 0;
+        transition: transform var(--spring-snappy), opacity var(--spring-snappy);
+        transform-origin: top center;
+    }
+
+    .floating-ctas.visible .cta-btn {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .floating-ctas.visible .cta-btn:nth-child(1) { transition-delay: 0ms; }
+    .floating-ctas.visible .cta-btn:nth-child(2) { transition-delay: 50ms; }
+    .floating-ctas.visible .cta-btn:nth-child(3) { transition-delay: 100ms; }
+
+    /* Reset delays when CTAs are hidden to avoid stuck transitions */
+    .floating-ctas:not(.visible) .cta-btn {
+        transition-delay: 0ms !important;
     }
     
     /* Social Badges and Logo adjustments for Mobile */
     .social-badges {
+        z-index: 10002;
         top: auto;
         bottom: var(--space-md);
         right: var(--space-md);
@@ -856,9 +949,18 @@ nav.scrolled {
     }
     
     .static-logo-badge {
+        z-index: 10002; /* Match social badges */
         top: auto;
         bottom: var(--space-md);
         left: var(--space-md);
+    }
+    
+    /* Stacked CTA buttons on mobile */
+    .floating-ctas .cta-btn {
+        width: 100%;
+        padding: 0.7em 0.9em;
+        font-size: 0.8rem;
+        transition: all var(--spring-snappy);
     }
     
     .static-logo-badge a {
@@ -890,6 +992,15 @@ nav.scrolled {
     letter-spacing: 0.03em;
     transform: translateZ(0);
     will-change: transform;
+}
+
+/* Utility: Use Space Grotesk for highlighted blocks */
+.space-grotesk {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.space-grotesk h3, .space-grotesk h4 {
+    font-weight: 600;
 }
 
 .glitch::before,
@@ -1215,6 +1326,11 @@ nav.scrolled {
 .open-source-section .container,
 .projects-container-wide {
     max-width: 2000px;
+    /* Remove the default side padding on these section containers so
+       inner grids (projects/repo grids) can span edge-to-edge within
+       their parent container, matching the about grid behavior. */
+    padding-left: 0;
+    padding-right: 0;
 }
 
 @media (min-width: 2560px) {
@@ -1259,6 +1375,23 @@ nav.scrolled {
     margin-bottom: var(--space-2xl);
     justify-content: center;
     align-items: stretch;
+}
+
+/* Center projects grid and constrain width to match about/holo panels */
+.projects-section .projects-grid,
+.open-source-section .repo-grid {
+    max-width: 1100px; /* match typical panel width used in about section */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (min-width: 1100px) {
+    .projects-section .projects-grid,
+    .open-source-section .repo-grid {
+        max-width: 1200px;
+    }
 }
 
 /* Adaptive “pyramid” behavior:
@@ -1382,14 +1515,18 @@ nav.scrolled {
 }
 
 .project-card-full h3 {
-    font-size: 1.55rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
     color: var(--text-primary);
     margin-bottom: var(--space-sm);
-    line-height: 1.25;
+    line-height: 1.3;
 }
 
 .project-card-full > p {
+    font-family: 'Inter', sans-serif;
     color: var(--text-secondary);
+    font-size: 0.95rem;
     line-height: 1.7;
     margin-bottom: var(--space-md);
 }
@@ -1480,6 +1617,15 @@ a.project-card-full {
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Repo card descriptions match unified body text style */
+a.repo-card-full .repo-desc-muted,
+.repo-card-full > p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
 }
 
 .repo-card-full-compact {
@@ -1605,6 +1751,28 @@ text-align: center; }
 
     .projects-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Ensure repo grid stacks and centers on small screens like featured projects */
+@media (max-width: 768px) {
+    .repo-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-lg);
+    }
+
+    .repo-grid > * {
+        flex: 1 1 520px; /* match featured/project card sizing */
+        width: 100%;
+        max-width: 780px; /* match featured card max width for consistent sizing */
+        margin: 0 auto;
+    }
+
+    .repo-grid-compact > * {
+        flex-basis: 100%;
+        max-width: 720px;
     }
 }
 
@@ -3599,6 +3767,7 @@ html, body {
 @media (max-width: 600px) and (min-width: 501px) {
     /* Move social badges and logo to bottom corners to avoid top-bar collisions */
     .social-badges {
+        z-index: 10002;
         top: auto;
         bottom: var(--space-md);
         right: var(--space-md);
@@ -3607,6 +3776,7 @@ html, body {
     }
 
     .static-logo-badge {
+        z-index: 10002; /* Match social badges */
         top: auto;
         bottom: var(--space-md);
         left: var(--space-md);
@@ -4199,14 +4369,17 @@ html, body {
     }
     
     .project-card-full h3 {
-        font-size: 1.1rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
         margin-bottom: 0.5rem;
-        line-height: 1.3;
+        line-height: 1.35;
     }
     
     .project-card-full > p {
+        font-family: 'Inter', sans-serif;
         font-size: 0.85rem;
-        line-height: 1.5;
+        line-height: 1.7;
         margin-bottom: var(--space-sm);
     }
     

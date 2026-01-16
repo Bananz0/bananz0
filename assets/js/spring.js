@@ -10,7 +10,7 @@ class SpringAnimation {
      */
     static presets = {
         // Snappy, responsive - for UI interactions
-        snappy: {
+        bouncy: {
             stiffness: 520,
             damping: 28,
             mass: 0.9,
@@ -31,7 +31,7 @@ class SpringAnimation {
             initialVelocity: 0
         },
         // Bouncy - playful but still responsive
-        bouncy: {
+         snappy: {
             stiffness: 340,
             damping: 16,
             mass: 1.0,
@@ -95,16 +95,16 @@ class SpringAnimation {
         if (zeta >= 1) {
             // Overdamped or critically damped - smooth, no overshoot
             return [0.4, 0, 0.2, 1];
-        } else if (zeta >= 0.8) {
+        } else if (zeta >= 0.7) {
             // Slightly underdamped - gentle bounce
-            return [0.36, 0, 0.66, 1.02];
-        } else if (zeta >= 0.5) {
+            return [0.36, 0, 0.66, 1.04];
+        } else if (zeta >= 0.45) {
             // Moderate underdamping - noticeable bounce
-            return [0.34, 0, 0.55, 1.05];
+            return [0.32, 0, 0.55, 1.08];
         } else {
             // Heavily underdamped - pronounced bounce with overshoot
-            const overshoot = Math.min(1.15, (1 - zeta) * 0.8 + 1);
-            return [0.32, 0, 0.5, overshoot];
+            const overshoot = Math.min(1.2, (1 - zeta) * 1.2 + 1);
+            return [0.28, 0, 0.42, overshoot];
         }
     }
 
@@ -185,9 +185,9 @@ class SpringAnimation {
                 if (bounceAttr !== null) {
                     const factor = parseFloat(bounceAttr) || 1;
                     const base = config ? { ...config } : { ...this.presets.default };
-                    // reduce damping to allow controlled overshoot; clamp to reasonable range
-                    const dampReduction = Math.min(20, Math.max(4, 10 * factor));
-                    const newDamping = Math.max(6, (base.damping || this.presets.default.damping) - dampReduction);
+                    // reduce damping aggressively to create visible overshoot
+                    const dampReduction = Math.min(32, Math.max(12, 16 * factor));
+                    const newDamping = Math.max(10, (base.damping || this.presets.default.damping) - dampReduction);
                     anim = this.calculate(base.stiffness || this.presets.default.stiffness, newDamping, base.mass || this.presets.default.mass, base.initialVelocity || 0);
                 } else {
                     anim = config ? this.custom(config) : this.calculate();
