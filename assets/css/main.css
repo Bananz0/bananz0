@@ -331,6 +331,14 @@ main {
     z-index: 2;
 }
 
+/* Logo image sizing for favicon-derived logo */
+.static-logo-badge .logo-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
+}
+
 
 nav {
     position: fixed;

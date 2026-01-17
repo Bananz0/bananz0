@@ -755,15 +755,22 @@ if (floatingInner) {
 // OPTIMIZED: Passive scroll listener for better performance
 window.addEventListener('scroll', handleScroll, { passive: true });
 
-// Scroll to top when logo badge is clicked
+// Scroll to top when logo badge is clicked (only prevent reload if on home page)
 const logoBadge = document.querySelector('.static-logo-badge a');
 if (logoBadge) {
     logoBadge.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        const currentPath = window.location.pathname;
+        const isHomePage = currentPath === '/' || currentPath === '/index.html';
+        
+        if (isHomePage) {
+            // On home page - just scroll to top
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        // Otherwise allow normal navigation to home page
     });
 }
 
@@ -1465,6 +1472,16 @@ document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([hr
         const href = this.getAttribute('href');
         // Skip if it's a download link or external
         if (href && !href.startsWith('http') && !href.startsWith('//') && !this.hasAttribute('download')) {
+            // If the link points to the current path (e.g. clicking the home logo while already on home),
+            // don't perform the page-transition (prevents fade-to-black when staying on same page).
+            const currentPath = window.location.pathname;
+            const normalizedHref = href === '' ? '/' : href;
+            const isSameTarget = normalizedHref === currentPath || (normalizedHref === '/' && (currentPath === '/' || currentPath === '/index.html'));
+            if (isSameTarget) {
+                // Let any element-specific handlers manage the event (they may call preventDefault).
+                return;
+            }
+
             e.preventDefault();
             document.body.classList.add('page-transitioning');
             setTimeout(() => {
