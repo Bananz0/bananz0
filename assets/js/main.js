@@ -61,11 +61,96 @@ if (ctx) {
 
     resizeCanvas();
 
-    // OPTIMIZED: Detect device performance and adjust particle count
-    const isLowEnd = navigator.hardwareConcurrency <= 4 ||
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+    // ==========================================
+    // ADAPTIVE PARTICLE COUNT SYSTEM
+    // Runtime detection with high-end phone support
+    // ==========================================
     const particles = [];
-    const particleCount = isLowEnd ? 45 : (window.innerWidth < 768 ? 65 : 90);
+    let particleCount = 45; // Safe fallback
+    let targetParticleCount = 45;
+
+    function detectDeviceCapability() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+        const isTablet = isMobile && (width >= 768 || height >= 768);
+        const cores = navigator.hardwareConcurrency || 4;
+        const memory = navigator.deviceMemory || 4; // GB
+        
+        // Detect high-end devices (PRIMARY: hardware specs, SECONDARY: user agent hint)
+        // Note: FPS monitoring will fine-tune the actual count in real-time
+        const hasHighEndSpecs = cores >= 8 && memory >= 6;
+        const hasHighEndHint = /Snapdragon (8|X) Elite|A1[7-9] Bionic|A[2-9][0-9] Bionic|Dimensity 9[0-9]{3}|Google Tensor G[3-9]/i.test(navigator.userAgent);
+        const isHighEndDevice = hasHighEndSpecs || (hasHighEndHint && cores >= 6);
+
+        // Base counts by device class (conservative start - FPS monitoring adjusts up/down)
+        let baseCount;
+        let deviceClass;
+        
+        if (!isMobile) {
+            // Desktop
+            if (memory >= 8 && cores >= 8) {
+                baseCount = 140;
+                deviceClass = 'desktop-high';
+            } else if (memory >= 4) {
+                baseCount = 110;
+                deviceClass = 'desktop-mid';
+            } else {
+                baseCount = 90;
+                deviceClass = 'desktop-low';
+            }
+        } else if (isTablet) {
+            // Tablet
+            if (isHighEndDevice) {
+                baseCount = 120;
+                deviceClass = 'tablet-high';
+            } else if (memory >= 4) {
+                baseCount = 90;
+                deviceClass = 'tablet-mid';
+            } else {
+                baseCount = 65;
+                deviceClass = 'tablet-low';
+            }
+        } else if (isHighEndDevice) {
+            // High-end mobile (based on specs, not just name)
+            baseCount = 100;
+            deviceClass = 'mobile-high';
+        } else {
+            // Standard phone
+            if (cores >= 6 && memory >= 4) {
+                baseCount = 70;
+                deviceClass = 'mobile-mid';
+            } else if (cores >= 4) {
+                baseCount = 55;
+                deviceClass = 'mobile-low';
+            } else {
+                baseCount = 45;
+                deviceClass = 'mobile-basic';
+            }
+        }
+
+        // Screen size adjustment
+        const pixels = width * height;
+        if (pixels > 2073600) baseCount = Math.floor(baseCount * 1.15); // 1080p+
+        else if (pixels < 921600) baseCount = Math.floor(baseCount * 0.85); // <HD
+
+        // Final clamp and diagnostics
+        const finalCount = Math.min(baseCount, 220); // Safety cap
+        console.info('Particle System Init:', {
+            deviceClass,
+            isHighEndDevice,
+            cores,
+            memory: `${memory}GB`,
+            resolution: `${width}x${height} (${(pixels / 1e6).toFixed(1)}MP)`,
+            initialParticles: finalCount,
+            note: 'FPS monitoring will adjust count in real-time'
+        });
+
+        return finalCount;
+    }
+
+    particleCount = detectDeviceCapability();
+    targetParticleCount = particleCount;
 
     class Particle {
         constructor() {
@@ -83,12 +168,13 @@ if (ctx) {
             // Calculate distance from mouse
             const dx = this.x - mouseParticleX;
             const dy = this.y - mouseParticleY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const interactionRadius = 120;
+            const distSq = dx * dx + dy * dy;
+            const interactionRadiusSq = 14400; // 120^2 - avoid sqrt
 
             // Apply repel force when mouse is near
-            if (distance < interactionRadius) {
-                const force = (interactionRadius - distance) / interactionRadius;
+            if (distSq < interactionRadiusSq) {
+                const distance = Math.sqrt(distSq);
+                const force = (120 - distance) / 120;
                 const angle = Math.atan2(dy, dx);
                 const repelStrength = 2;
 
@@ -130,33 +216,98 @@ if (ctx) {
         }
     }
 
-    // Initialize particles
+    // Initialize particles with unique IDs for efficient deduplication
     for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
+        const particle = new Particle();
+        particle.id = i;
+        particles.push(particle);
+    }
+
+    // ==========================================
+    // FPS MONITORING & ADAPTIVE SCALING
+    // ==========================================
+    let frameCount = 0;
+    let lastFpsCheck = performance.now();
+    let currentFps = 60;
+    let fpsCheckInterval = 2000; // Check every 2 seconds
+    let nextParticleId = particleCount;
+
+    function monitorAndAdaptPerformance() {
+        frameCount++;
+        const now = performance.now();
+        const elapsed = now - lastFpsCheck;
+
+        if (elapsed >= fpsCheckInterval) {
+            currentFps = Math.round((frameCount * 1000) / elapsed);
+            frameCount = 0;
+            lastFpsCheck = now;
+
+            // Adaptive scaling logic
+            if (currentFps < 45 && particles.length > 30) {
+                // Performance struggling - reduce by 10%
+                const removeCount = Math.max(5, Math.floor(particles.length * 0.1));
+                particles.splice(0, removeCount);
+                console.log(`Reduced particles to ${particles.length} (FPS: ${currentFps})`);
+            } else if (currentFps >= 58 && particles.length < targetParticleCount) {
+                // Great performance - add more particles progressively
+                const addCount = Math.min(10, targetParticleCount - particles.length);
+                for (let i = 0; i < addCount; i++) {
+                    const particle = new Particle();
+                    particle.id = nextParticleId++;
+                    particles.push(particle);
+                }
+                console.log(`Increased particles to ${particles.length} (FPS: ${currentFps})`);
+            } else if (currentFps >= 55 && particles.length < targetParticleCount * 1.2) {
+                // Excellent performance - try pushing beyond target
+                const addCount = Math.min(5, Math.floor(targetParticleCount * 1.2) - particles.length);
+                if (addCount > 0) {
+                    for (let i = 0; i < addCount; i++) {
+                        const particle = new Particle();
+                        particle.id = nextParticleId++;
+                        particles.push(particle);
+                    }
+                    console.log(`Bonus particles added: ${particles.length} (FPS: ${currentFps})`);
+                }
+            }
+        }
     }
 
     // OPTIMIZED: Spatial hash grid for efficient neighbor detection
     const cellSize = 80;
+    // Use bitwise operations for integer key to avoid string allocation
     function getSpatialKey(x, y) {
-        return `${Math.floor(x / cellSize)},${Math.floor(y / cellSize)}`;
+        const cx = Math.floor(x / cellSize) & 0xFFFF;
+        const cy = Math.floor(y / cellSize) & 0xFFFF;
+        return (cx << 16) | cy;
     }
 
+    // OPTIMIZED: Reuse Map/Set objects to reduce GC pressure
+    const grid = new Map();
+    const colorGroups = new Map();
+    const drawnConnections = new Set();
+
     function animateParticles() {
+        // Monitor performance and adapt particle count
+        monitorAndAdaptPerformance();
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Update all particles
-        particles.forEach(particle => particle.update());
+        // Update all particles using for loop (faster than forEach)
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+        }
 
         // OPTIMIZED: Build spatial hash grid O(n) instead of O(n²)
-        const grid = new Map();
-        particles.forEach(particle => {
+        grid.clear();
+        for (let i = 0; i < particles.length; i++) {
+            const particle = particles[i];
             const key = getSpatialKey(particle.x, particle.y);
             if (!grid.has(key)) grid.set(key, []);
             grid.get(key).push(particle);
-        });
+        }
 
-        // OPTIMIZED: Batch rendering by color groups
-        const colorGroups = new Map();
+        // OPTIMIZED: Batch rendering by color groups (reusing Map)
+        colorGroups.clear();
         particles.forEach(particle => {
             const color = particle.getColor();
             if (!colorGroups.has(color)) colorGroups.set(color, []);
@@ -176,27 +327,32 @@ if (ctx) {
 
         // Draw connections using spatial hash (check only adjacent cells)
         const maxDistSq = 6400; // 80^2
-        const drawnConnections = new Set();
+        drawnConnections.clear();
 
-        particles.forEach(particle => {
+        // OPTIMIZED: Batch all connection lines into single path per opacity level
+        const connectionsByOpacity = new Map();
+
+        for (let p = 0; p < particles.length; p++) {
+            const particle = particles[p];
             const cellX = Math.floor(particle.x / cellSize);
             const cellY = Math.floor(particle.y / cellSize);
 
             // Check only adjacent cells (9 cells total)
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    const key = `${cellX + dx},${cellY + dy}`;
+            for (let dxCell = -1; dxCell <= 1; dxCell++) {
+                for (let dyCell = -1; dyCell <= 1; dyCell++) {
+                    const key = getSpatialKey((cellX + dxCell) * cellSize, (cellY + dyCell) * cellSize);
                     const neighbors = grid.get(key);
                     if (!neighbors) continue;
 
-                    neighbors.forEach(neighbor => {
-                        if (particle === neighbor) return;
+                    for (let n = 0; n < neighbors.length; n++) {
+                        const neighbor = neighbors[n];
+                        if (particle === neighbor) continue;
 
-                        // Prevent duplicate connections
-                        const connectionKey = particle.x < neighbor.x ?
-                            `${particle.x},${particle.y}-${neighbor.x},${neighbor.y}` :
-                            `${neighbor.x},${neighbor.y}-${particle.x},${particle.y}`;
-                        if (drawnConnections.has(connectionKey)) return;
+                        // OPTIMIZED: Use particle IDs for connection key (integer math, no strings)
+                        const minId = particle.id < neighbor.id ? particle.id : neighbor.id;
+                        const maxId = particle.id < neighbor.id ? neighbor.id : particle.id;
+                        const connectionKey = (minId << 16) | maxId;
+                        if (drawnConnections.has(connectionKey)) continue;
                         drawnConnections.add(connectionKey);
 
                         const dx = particle.x - neighbor.x;
@@ -204,17 +360,32 @@ if (ctx) {
                         const distSq = dx * dx + dy * dy;
 
                         if (distSq < maxDistSq) {
-                            const opacity = (1 - distSq / maxDistSq) * 0.15;
-                            ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.beginPath();
-                            ctx.moveTo(particle.x, particle.y);
-                            ctx.lineTo(neighbor.x, neighbor.y);
-                            ctx.stroke();
+                            // Quantize opacity to reduce unique stroke styles (batch more lines)
+                            const rawOpacity = (1 - distSq / maxDistSq) * 0.15;
+                            const quantizedOpacity = Math.round(rawOpacity * 20) / 20; // 5% steps
+
+                            if (!connectionsByOpacity.has(quantizedOpacity)) {
+                                connectionsByOpacity.set(quantizedOpacity, []);
+                            }
+                            connectionsByOpacity.get(quantizedOpacity).push(
+                                particle.x, particle.y, neighbor.x, neighbor.y
+                            );
                         }
-                    });
+                    }
                 }
             }
+        }
+
+        // Draw batched connections by opacity level
+        ctx.lineWidth = 0.5;
+        connectionsByOpacity.forEach((lines, opacity) => {
+            ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
+            ctx.beginPath();
+            for (let i = 0; i < lines.length; i += 4) {
+                ctx.moveTo(lines[i], lines[i + 1]);
+                ctx.lineTo(lines[i + 2], lines[i + 3]);
+            }
+            ctx.stroke();
         });
 
         requestAnimationFrame(animateParticles);
@@ -333,42 +504,95 @@ const miniToggle = document.querySelector('.mini-toggle');
 let lastScroll = 0;
 let ticking = false;
 let autoCollapseTimer = null;
+let manuallyExpanded = false; // Track if user manually expanded the bar
 
 // Handle Mini-Mode Toggle Click
 if (floatingInner && miniToggle) {
+    // Improved toggle: use rAF and immediate pointer-events so CTAs appear promptly
     const toggleExpansion = (e) => {
-        e.stopPropagation();
-        if (window.innerWidth <= 870 || window.innerHeight <= 660) {
-            // Check for BOTH expanded states to determine if currently expanded
-            const isExpanded = floatingInner.classList.contains('mini-expanded') ||
-                floatingInner.classList.contains('expanded');
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-            if (isExpanded) {
-                // Collapse
+        const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
+        console.log('Toggle clicked! Mini mode:', isMiniMode, 'Width:', window.innerWidth, 'Height:', window.innerHeight);
+
+        if (!isMiniMode) return;
+
+        const isExpanded = floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded');
+        console.log('Current state - isExpanded:', isExpanded);
+
+        if (isExpanded) {
+            // Collapse: remove visible immediately, then adjust classes
+            console.log('Collapsing...');
+            manuallyExpanded = false; // Clear manual flag
+            if (floatingCtas) {
+                floatingCtas.classList.remove('visible');
+                floatingCtas.style.pointerEvents = 'none';
+            }
+
+            // allow the collapse transition to run
+            requestAnimationFrame(() => {
                 floatingInner.classList.remove('mini-expanded', 'expanded');
                 floatingInner.classList.add('compact');
-                if (floatingCtas) floatingCtas.classList.remove('visible');
-            } else {
-                // Expand manually
-                floatingInner.classList.add('mini-expanded', 'expanded');
-                floatingInner.classList.remove('compact');
-                if (floatingCtas) floatingCtas.classList.add('visible');
+            });
+        } else {
+            // Expand: set classes first to expose area, then make CTAs visible
+            console.log('Expanding...');
+            manuallyExpanded = true; // Set manual flag to prevent scroll override
+            floatingInner.classList.remove('compact');
+            // Force a reflow so the browser acknowledges layout change before animating CTAs
+            floatingInner.classList.add('mini-expanded', 'expanded');
+            void floatingInner.offsetHeight;
+
+            if (floatingCtas) {
+                // Make interactable immediately so clicks don't miss during transition
+                floatingCtas.style.pointerEvents = 'auto';
+                // Use rAF to ensure CSS transitions trigger properly
+                requestAnimationFrame(() => {
+                    floatingCtas.classList.add('visible');
+                });
             }
-            // Reset timer on click too
-            startAutoCollapseTimer();
         }
+
+        // reset auto-collapse timer whenever user manually toggles
+        clearAutoCollapseTimer();
+        startAutoCollapseTimer();
     };
 
-    if (miniToggle) miniToggle.addEventListener('click', toggleExpansion);
+    // Attach to mini-toggle button
+    miniToggle.addEventListener('click', toggleExpansion);
+    console.log('Mini-toggle handler attached');
 
+    // Attach to title group for broader click area
     const titleGroup = floatingInner.querySelector('.title-group');
-    if (titleGroup) titleGroup.addEventListener('click', toggleExpansion);
+    if (titleGroup) {
+        titleGroup.addEventListener('click', toggleExpansion);
+        console.log('Title-group handler attached');
+    }
+
+    // Also attach to header-center-box for even broader click area in mini mode
+    const headerCenterBox = floatingInner.querySelector('.header-center-box');
+    if (headerCenterBox) {
+        headerCenterBox.addEventListener('click', (e) => {
+            const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
+            if (isMiniMode) {
+                // Only trigger if click is not on CTA buttons
+                if (!e.target.closest('.floating-ctas')) {
+                    toggleExpansion(e);
+                }
+            }
+        });
+        console.log('Header-center-box handler attached');
+    }
 }
 
 function startAutoCollapseTimer() {
     clearAutoCollapseTimer();
     autoCollapseTimer = setTimeout(() => {
         // Auto-collapse after 2 seconds of no activity (Universal in mini-mode)
+        // Mini mode activates at 870px (horizontal) or 660px (vertical)
         const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
 
         if (floatingInner && isMiniMode) {
@@ -376,6 +600,7 @@ function startAutoCollapseTimer() {
                 floatingInner.classList.contains('expanded');
 
             if (isExpanded) {
+                manuallyExpanded = false; // Clear manual flag on auto-collapse
                 floatingInner.classList.remove('mini-expanded', 'expanded');
                 floatingInner.classList.add('compact');
                 if (floatingCtas) floatingCtas.classList.remove('visible');
@@ -391,7 +616,7 @@ function startAutoCollapseTimer() {
                 }
             }
         }
-    }, 2000);
+    }, 1200);
 }
 
 function clearAutoCollapseTimer() {
@@ -404,7 +629,7 @@ function clearAutoCollapseTimer() {
 function updateFloatingHero() {
     const currentScroll = window.pageYOffset;
     const scrollDelta = currentScroll - lastScroll;
-    const isScrollingUp = scrollDelta < -2;
+    const isScrollingUp = scrollDelta < -10;
     const isScrollingDown = scrollDelta > 2;
 
     const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
@@ -424,12 +649,16 @@ function updateFloatingHero() {
             // Mobile past hero: can be compact UNLESS actively interacting/scrolling stop timer
             // We only FORCE expansion on scroll-up
             if (isScrollingUp) {
+                // Always expand on scroll-up in mini-mode
                 if (floatingInner) {
                     floatingInner.classList.remove('compact');
                     floatingInner.classList.add('mini-expanded', 'expanded');
                     if (floatingCtas) floatingCtas.classList.add('visible');
                 }
+                manuallyExpanded = false; // Clear flag on scroll-up expand
             } else if (isScrollingDown) {
+                // Always collapse on scroll-down in mini-mode
+                manuallyExpanded = false; // Clear flag on scroll-down
                 if (floatingInner) {
                     floatingInner.classList.remove('mini-expanded', 'expanded');
                     floatingInner.classList.add('compact');
@@ -454,13 +683,14 @@ function updateFloatingHero() {
         // IN HERO SECTION
         if (isMiniMode) {
             if (isScrollingUp && currentScroll > 50) {
-                // Expand momentarily on scroll-up
+                // Always expand on scroll-up in mini-mode
                 if (floatingInner) {
                     floatingInner.classList.add('mini-expanded', 'expanded');
                     floatingInner.classList.remove('compact');
                 }
                 if (floatingCtas) floatingCtas.classList.add('visible');
                 if (miniToggle) miniToggle.classList.remove('highlight');
+                manuallyExpanded = false; // Clear flag
             } else if (isScrollingDown && currentScroll > 50) {
                 // Immediate collapse hint on scroll-down
                 if (floatingInner) {
@@ -469,8 +699,10 @@ function updateFloatingHero() {
                     if (floatingCtas) floatingCtas.classList.remove('visible');
                 }
                 if (miniToggle) miniToggle.classList.add('highlight');
+                manuallyExpanded = false; // Clear flag on scroll-down
             } else if (currentScroll < 50) {
                 // Full reset at top
+                manuallyExpanded = false; // Clear flag at top
                 if (floatingInner) {
                     floatingInner.classList.remove('mini-expanded', 'expanded');
                     floatingInner.classList.add('compact');
@@ -564,27 +796,33 @@ class TextScramble {
         return promise;
     }
     update() {
-        let output = '';
+        const outputParts = [];
         let complete = 0;
+        let hasStyledChars = false;
+
         for (let i = 0, n = this.queue.length; i < n; i++) {
             let { from, to, start, end, char } = this.queue[i];
             if (this.frame >= end) {
                 complete++;
-                output += to;
+                outputParts.push(to);
             } else if (this.frame >= start) {
                 if (!char || Math.random() < 0.28) {
                     char = this.randomChar();
                     this.queue[i].char = char;
                 }
-                output += `<span class="dud" style="color: var(--neon-magenta)">${char}</span>`;
+                hasStyledChars = true;
+                outputParts.push(`<span class="dud" style="color: var(--neon-magenta)">${char}</span>`);
             } else {
-                output += from;
+                outputParts.push(from);
             }
         }
-        this.el.innerHTML = output;
+
+        // Use textContent when complete (faster, no HTML parsing)
         if (complete === this.queue.length) {
+            this.el.textContent = outputParts.join('');
             this.resolve();
         } else {
+            this.el.innerHTML = outputParts.join('');
             this.frameRequest = requestAnimationFrame(this.update);
             this.frame++;
         }
@@ -608,15 +846,38 @@ document.querySelectorAll('.glitch, .section-title span').forEach(el => {
 
 // ==========================================
 // LIQUID BUTTON EFFECT
+// OPTIMIZED: Cache bounds on mouseenter and throttle CSS updates via rAF
 // ==========================================
 function initLiquidButtons() {
     document.querySelectorAll('.cta-btn, .cv-btn, .filter-btn').forEach(btn => {
+        let cachedRect = null;
+        let rafPending = false;
+        let latestX = 0;
+        let latestY = 0;
+
+        // Cache bounds on mouseenter to avoid getBoundingClientRect in mousemove
+        btn.addEventListener('mouseenter', () => {
+            cachedRect = btn.getBoundingClientRect();
+        });
+
         btn.addEventListener('mousemove', (e) => {
-            const rect = btn.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            btn.style.setProperty('--x', `${x}px`);
-            btn.style.setProperty('--y', `${y}px`);
+            if (!cachedRect) cachedRect = btn.getBoundingClientRect();
+            latestX = e.clientX - cachedRect.left;
+            latestY = e.clientY - cachedRect.top;
+
+            // Throttle CSS updates to align with browser refresh rate
+            if (!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(() => {
+                    btn.style.setProperty('--x', `${latestX}px`);
+                    btn.style.setProperty('--y', `${latestY}px`);
+                    rafPending = false;
+                });
+            }
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            cachedRect = null;
         });
     });
 }
@@ -833,10 +1094,10 @@ if (contactForm) {
 // CONSOLE EASTER EGG
 // ==========================================
 console.log('%c⚡ NEXUS SYSTEM INITIALIZED ⚡', 'color: #ff2d92; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #ff2d92;');
-console.log('%c🚀 Glen Muthoka - Embedded Systems Engineer', 'color: #00f5ff; font-size: 16px; font-weight: 600;');
-console.log('%c📍 From Kenya, Based in Southampton, UK', 'color: #a855f7; font-size: 14px;');
-console.log('%c📧 Contact: theglenmuthoka@gmail.com', 'color: #fbbf24; font-size: 14px;');
-console.log('%c\n💡 Interested in the code? Check out the source!', 'color: #22d3ee; font-size: 12px;');
+console.log('%c Glen Muthoka - Embedded Systems Engineer', 'color: #00f5ff; font-size: 16px; font-weight: 600;');
+console.log('%c From Kenya, Based in Southampton, UK', 'color: #a855f7; font-size: 14px;');
+console.log('%c Contact: theglenmuthoka@gmail.com', 'color: #fbbf24; font-size: 14px;');
+console.log('%c\n Interested in the code? Check out the source!', 'color: #22d3ee; font-size: 12px;');
 
 // ==========================================
 // PROJECT CAROUSEL - LIQUID GLASS EFFECT
@@ -1166,7 +1427,7 @@ if (window.location.search.includes('debug=perf')) {
 
             // Warn if FPS drops below 30
             if (fps < 30) {
-                console.warn(`⚠️ Low FPS detected: ${fps} fps`);
+                console.warn(`Low FPS detected: ${fps} fps`);
             }
         }
 
@@ -1180,7 +1441,7 @@ if (window.location.search.includes('debug=perf')) {
         const perfObserver = new PerformanceObserver((list) => {
             for (const entry of list.getEntries()) {
                 if (entry.duration > 50) {
-                    console.warn(`⚠️ Long task detected: ${entry.duration.toFixed(2)}ms`);
+                    console.warn(`Long task detected: ${entry.duration.toFixed(2)}ms`);
                 }
             }
         });
@@ -1192,14 +1453,14 @@ if (window.location.search.includes('debug=perf')) {
         }
     }
 
-    console.log('%c🔍 Performance Monitoring Active', 'color: #00f5ff; font-size: 14px; font-weight: bold;');
+    console.log('%cPerformance Monitoring Active', 'color: #00f5ff; font-size: 14px; font-weight: bold;');
     console.log('%cAdd ?debug=perf to URL to enable', 'color: #a855f7; font-size: 12px;');
 }
 
 // ==========================================
 // SMOOTH PAGE TRANSITIONS
 // ==========================================
-document.querySelectorAll('a:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([download])').forEach(link => {
+document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([href^=\"mailto\"]):not([download])').forEach(link => {
     link.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
         // Skip if it's a download link or external
@@ -1212,3 +1473,88 @@ document.querySelectorAll('a:not([target="_blank"]):not([href^="#"]):not([href^=
         }
     });
 });
+
+// ==========================================
+// RESPONSIVE BADGE ANIMATIONS (600px breakpoint)
+// Uses spring.js timing for smooth in-place transitions
+// ==========================================
+(function initResponsiveBadgeAnimations() {
+    const gmBadge = document.querySelector('.static-logo-badge');
+    const socialBadgesMobile = document.querySelector('.social-badges-mobile');
+    const socialBadgesInline = document.querySelector('.social-badges-inline');
+
+    if (!gmBadge) return;
+
+    let wasMobile = window.innerWidth <= 600;
+
+    // Track when crossing the 600px breakpoint
+    function handleBreakpointCross() {
+        const isMobile = window.innerWidth <= 600;
+
+        if (isMobile !== wasMobile) {
+            // Crossed the breakpoint - animate badges in place
+            if (isMobile) {
+                // Going to mobile: fade/scale in place (no diagonal movement)
+                gmBadge.style.transform = 'scale(0.9)';
+                gmBadge.style.opacity = '0';
+
+                // Use requestAnimationFrame to ensure styles are applied before transition
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        gmBadge.style.transform = 'scale(1)';
+                        gmBadge.style.opacity = '1';
+                    });
+                });
+
+                // Fade out inline badges in place (scale down)
+                if (socialBadgesInline) {
+                    socialBadgesInline.style.transform = 'scale(0.8)';
+                    socialBadgesInline.style.opacity = '0';
+                }
+
+                // Fade in mobile badges in place (scale up)
+                if (socialBadgesMobile) {
+                    socialBadgesMobile.style.transform = 'scale(0.8)';
+                    socialBadgesMobile.style.opacity = '0';
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            socialBadgesMobile.style.transform = 'scale(1)';
+                            socialBadgesMobile.style.opacity = '1';
+                        });
+                    });
+                }
+            } else {
+                // Going to desktop: reset to normal state
+                gmBadge.style.transform = '';
+                gmBadge.style.opacity = '';
+
+                if (socialBadgesInline) {
+                    socialBadgesInline.style.transform = '';
+                    socialBadgesInline.style.opacity = '';
+                }
+
+                if (socialBadgesMobile) {
+                    socialBadgesMobile.style.transform = '';
+                    socialBadgesMobile.style.opacity = '';
+                }
+            }
+
+            wasMobile = isMobile;
+        }
+    }
+
+    // Debounce resize handler
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(handleBreakpointCross, 100);
+    }, { passive: true });
+
+    // Initial state check
+    if (wasMobile && gmBadge) {
+        // If starting on mobile, ensure proper initial state
+        gmBadge.style.transform = 'scale(1)';
+        gmBadge.style.opacity = '1';
+    }
+})();

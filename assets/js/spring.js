@@ -31,7 +31,7 @@ class SpringAnimation {
             initialVelocity: 0
         },
         // Bouncy - playful but still responsive
-         snappy: {
+        snappy: {
             stiffness: 340,
             damping: 16,
             mass: 1.0,
@@ -58,11 +58,11 @@ class SpringAnimation {
         // Calculate natural frequency and damping ratio
         const omega0 = Math.sqrt(stiffness / mass);
         const zeta = damping / (2 * Math.sqrt(stiffness * mass));
-        
+
         // Determine if underdamped, critically damped, or overdamped
         const isUnderdamped = zeta < 1;
         const isCriticallyDamped = Math.abs(zeta - 1) < 0.001;
-        
+
         // Calculate settling time (time to reach 2% of final value)
         let duration;
         if (isUnderdamped) {
@@ -70,10 +70,10 @@ class SpringAnimation {
         } else {
             duration = (3.5 / omega0) * 1000;
         }
-        
+
         // Generate cubic-bezier approximation for the spring
         const bezier = this.springToBezier(stiffness, damping, mass, duration);
-        
+
         return {
             duration: Math.max(160, Math.min(duration, 2200)), // Clamp between 160ms-2.2s for responsive feel
             timingFunction: `cubic-bezier(${bezier.join(', ')})`,
@@ -90,7 +90,7 @@ class SpringAnimation {
      */
     static springToBezier(stiffness, damping, mass, duration) {
         const zeta = damping / (2 * Math.sqrt(stiffness * mass));
-        
+
         // Apple-style bezier approximations with enhanced bounce
         if (zeta >= 1) {
             // Overdamped or critically damped - smooth, no overshoot
@@ -108,13 +108,23 @@ class SpringAnimation {
         }
     }
 
+    // Cache for reduced motion preference (updated by event listener)
+    static _prefersReducedMotion = null;
+
+    static get prefersReducedMotion() {
+        if (this._prefersReducedMotion === null) {
+            this._prefersReducedMotion = (typeof window !== 'undefined' && window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        }
+        return this._prefersReducedMotion;
+    }
+
     /**
      * Apply spring animation to CSS custom properties
      */
     static applySprings() {
         const root = document.documentElement;
-        const prefersReduced = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-        if (prefersReduced) {
+        if (this.prefersReducedMotion) {
             // Respect user preference: minimize motion
             root.style.setProperty('--spring-snappy', `0ms linear`);
             root.style.setProperty('--spring-default', `0ms linear`);
@@ -128,33 +138,33 @@ class SpringAnimation {
                 document.querySelectorAll('[data-spring]').forEach(el => {
                     el.style.transition = 'none';
                 });
-            } catch (e) {}
+            } catch (e) { }
             return;
         }
-        
+
         // Calculate spring animations for different speeds
         const snappy = this.calculate(400, 30, 1);
         const defaultSpring = this.calculate(300, 28, 1);
         const smooth = this.calculate(320, 38, 1.6);
         const bouncy = this.calculate(380, 18, 1);
-        
+
         // Set CSS custom properties
         root.style.setProperty('--spring-snappy-duration', `${snappy.duration}ms`);
         root.style.setProperty('--spring-snappy-timing', snappy.timingFunction);
         root.style.setProperty('--spring-snappy', `${snappy.duration}ms ${snappy.timingFunction}`);
-        
+
         root.style.setProperty('--spring-default-duration', `${defaultSpring.duration}ms`);
         root.style.setProperty('--spring-default-timing', defaultSpring.timingFunction);
         root.style.setProperty('--spring-default', `${defaultSpring.duration}ms ${defaultSpring.timingFunction}`);
-        
+
         root.style.setProperty('--spring-smooth-duration', `${smooth.duration}ms`);
         root.style.setProperty('--spring-smooth-timing', smooth.timingFunction);
         root.style.setProperty('--spring-smooth', `${smooth.duration}ms ${smooth.timingFunction}`);
-        
+
         root.style.setProperty('--spring-bouncy-duration', `${bouncy.duration}ms`);
         root.style.setProperty('--spring-bouncy-timing', bouncy.timingFunction);
         root.style.setProperty('--spring-bouncy', `${bouncy.duration}ms ${bouncy.timingFunction}`);
-        
+
         // Update old transition variables to use springs
         root.style.setProperty('--transition-fast', `${snappy.duration}ms ${snappy.timingFunction}`);
         root.style.setProperty('--transition-normal', `${defaultSpring.duration}ms ${defaultSpring.timingFunction}`);
@@ -211,8 +221,8 @@ class SpringAnimation {
                     props.push(`width ${t}`, `height ${t}`);
                 }
                 el.style.transition = props.join(', ');
-                // Hint the compositor for smoother animations
-                try { el.style.willChange = 'transform, opacity, max-height, max-width'; } catch (e) {}
+                // Note: will-change removed to reduce GPU memory pressure
+                // Elements that need compositor hints have transform: translateZ(0) in CSS
             });
         } catch (e) {
             // ignore in environments without DOM
@@ -260,9 +270,13 @@ window.addEventListener('orientationchange', reapply, { passive: true });
 // React to user's reduced-motion preference changes
 if (typeof window !== 'undefined' && window.matchMedia) {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handleMotionChange = () => {
+        SpringAnimation._prefersReducedMotion = mq.matches;
+        SpringAnimation.applySprings();
+    };
     if (mq.addEventListener) {
-        mq.addEventListener('change', () => SpringAnimation.applySprings());
+        mq.addEventListener('change', handleMotionChange);
     } else if (mq.addListener) {
-        mq.addListener(() => SpringAnimation.applySprings());
+        mq.addListener(handleMotionChange);
     }
 }
