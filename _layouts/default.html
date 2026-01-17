@@ -16,9 +16,8 @@
     <title>{% if page.title %}{{ page.title }} | {% endif %}Glen Muthoka</title>
     <meta name="description" content="{{ site.description }}">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}">
-    <link rel="alternate icon" href="{{ '/favicon.ico' | relative_url }}">
+    <!-- Favicon (ICO fallback only) -->
+    <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}">
 
     {% assign asset_version = site.github.build_revision | default: site.time | date: '%s' %}
@@ -36,10 +35,10 @@
 
     <div class="floating-hero">
         <div class="floating-inner">
-            <!-- GM Logo Badge (order: 1, no visual box) -->
+            <!-- GM Logo Badge (order: 1, using favicon image) -->
             <div class="static-logo-badge" data-spring="snappy" data-bounce="1">
                 <a href="{{ '/' | relative_url }}">
-                    <span class="logo-text">GM</span>
+                    <img class="logo-img" src="{{ '/favicon.ico' | relative_url }}" alt="GM" width="40" height="40" />
                 </a>
             </div>
 
@@ -102,7 +101,7 @@
                 </a>
                 <a href="https://orcid.org/0000-0001-5248-0163" target="_blank" rel="noopener noreferrer"
                     class="social-badge" data-spring="snappy" data-bounce="1" aria-label="ORCID">
-                    <img class="orcid-img" src="{{ '/assets/icons/orcid.unauth_reversed.32x32.svg' | relative_url }}"
+                    <img class="orcid-img" src="{{ '/orcid.unauth_reversed.32x32.svg' | relative_url }}"
                         alt="ORCID iD" width="32" height="32" aria-label="ORCID" />
                 </a>
             </div>
