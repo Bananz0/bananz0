@@ -364,8 +364,11 @@ function updateSourceIndicators() {
                 indicator.classList.add('connected');
             }
         } else if (source === 'spotify') {
-            // Spotify is 'connected' if we have a valid token (used for enrichment)
-            if (CONFIG.spotify.accessToken) {
+            // Spotify is 'active' if it provided the current track image/enrichment
+            // Spotify is 'connected' if we just have a valid token
+            if (state.sources.lastfm.track && state.sources.lastfm.track.artistImage && CONFIG.spotify.accessToken) {
+                indicator.classList.add('active');
+            } else if (CONFIG.spotify.accessToken) {
                 indicator.classList.add('connected');
             }
         } else {
@@ -447,6 +450,36 @@ function updateNowPlayingCard(track, isPlaying) {
 
             const timeAgo = lastTrack.date ? getTimeAgo(lastTrack.date) : 'recently';
             elements.listeningStatus.textContent = `Last played ${timeAgo}`;
+
+            // ENRICHMENT: Fetch high-res art/artist image for the last played track too
+            if (CONFIG.spotify.enabled && !lastTrack.enriched) {
+                lastTrack.enriched = true; // prevent loop
+                getSpotifyTrackData(lastTrack.name, lastTrack.artist).then(spotifyData => {
+                    if (spotifyData) {
+                        if (spotifyData.albumImage) {
+                            lastTrack.image = spotifyData.albumImage;
+                            elements.albumArt.src = spotifyData.albumImage;
+
+                            // Also update dynamic colors for high-res image
+                            extractColors(spotifyData.albumImage).then(colors => {
+                                if (colors) applyDynamicColors(colors);
+                            });
+                        }
+                        if (spotifyData.artistImage) {
+                            elements.artistThumbnail.src = spotifyData.artistImage;
+                            elements.artistThumbnailContainer.classList.add('loaded');
+                            elements.artistBackdrop.style.backgroundImage = `url(${spotifyData.artistImage})`;
+                            elements.artistBackdrop.classList.add('loaded');
+                            if (elements.immersiveBg) {
+                                elements.immersiveBg.style.backgroundImage = `url(${spotifyData.artistImage})`;
+                            }
+                        }
+                    }
+                });
+            } else if (lastTrack.enriched) {
+                // If already enriched, ensure we show the artist bg/thumbnail
+                // (we might need to store artistImage on lastTrack object in fetchLastFmNowPlaying loop, but for now we just handle the fetch above)
+            }
         } else {
             elements.listeningStatus.textContent = 'Nothing playing';
         }
@@ -583,9 +616,19 @@ function applyDynamicColors(colors) {
         elements.artistBackdrop.classList.add('loaded');
     }
 
-    // Apply accent colors to card
+    // Calculate blended color for a richer glow effect
+    const blendedR = Math.round((primaryRaw.r + secondaryRaw.r) / 2);
+    const blendedG = Math.round((primaryRaw.g + secondaryRaw.g) / 2);
+    const blendedB = Math.round((primaryRaw.b + secondaryRaw.b) / 2);
+
+    // Apply accent colors to card with enhanced glow
     elements.card.style.setProperty('--dynamic-primary', primary);
     elements.card.style.setProperty('--dynamic-secondary', secondary);
+    elements.card.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`);
+    elements.card.style.setProperty('--dynamic-border-color', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
+    elements.card.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
+    elements.card.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
+    elements.card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
     elements.card.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
 
     // Update playing indicator color
@@ -601,23 +644,44 @@ function applyDynamicColors(colors) {
         elements.artistName.style.color = primary;
     }
 
-    // Apply to Header (Navbar)
+    // Apply to Header (Navbar) with enhanced glow
     if (elements.headerBox) {
         elements.headerBox.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
-        elements.headerBox.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.1)`;
+        elements.headerBox.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 25px rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.2)`;
+        elements.headerBox.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.2)`);
     }
 
-    // Apply to Recent Tracks Card
+    // Apply to Recent Tracks Card (via CSS Variables for responsiveness) with enhanced glow
     if (elements.recentTracksCard) {
-        elements.recentTracksCard.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.2)`;
+        elements.recentTracksCard.style.setProperty('--dynamic-border', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
+        elements.recentTracksCard.style.setProperty('--dynamic-shadow', `0 20px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.2)`);
+        elements.recentTracksCard.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`);
+        elements.recentTracksCard.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
+        elements.recentTracksCard.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
     }
 
-    // Apply to Social Badges & Home Icon (Main Site Elements)
+    // Apply to Social Badges & Home Icon (Main Site Elements) with enhanced glow
     const badges = document.querySelectorAll('.social-badge, .static-logo-badge a');
     badges.forEach(badge => {
+        badge.style.setProperty('--dynamic-border-color', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
+        badge.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
+        badge.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.25)`);
         badge.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
-        badge.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.15)`;
+        badge.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.15)`;
     });
+
+    // Apply to source indicators
+    const sourceIndicators = document.querySelectorAll('.source-pill:not(.active)');
+    sourceIndicators.forEach(pill => {
+        pill.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.15)`);
+    });
+
+    // Apply scrollbar colors globally to music hero section
+    if (elements.musicHero) {
+        elements.musicHero.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
+        elements.musicHero.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
+        elements.musicHero.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`);
+    }
 }
 
 function resetDynamicColors() {
@@ -641,6 +705,11 @@ function resetDynamicColors() {
 
     if (elements.artistName) {
         elements.artistName.style.color = '';
+    }
+
+    if (elements.recentTracksCard) {
+        elements.recentTracksCard.style.removeProperty('--dynamic-border');
+        elements.recentTracksCard.style.removeProperty('--dynamic-shadow');
     }
 }
 
@@ -716,6 +785,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the polling
     startPolling();
+
+
+
+    // Fade source indicators when scrolling behind the fixed header
+    const sourceIndicators = document.querySelector('.source-indicators');
+    if (sourceIndicators) {
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            // Start fading at 50px, completely hidden by 120px
+            const fadeStart = 50;
+            const fadeEnd = 150;
+
+            if (scrollY > fadeStart) {
+                const opacity = Math.max(0, 1 - (scrollY - fadeStart) / (fadeEnd - fadeStart));
+                sourceIndicators.style.opacity = opacity;
+                sourceIndicators.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+            } else {
+                sourceIndicators.style.opacity = 1;
+                sourceIndicators.style.pointerEvents = 'auto';
+            }
+        }, { passive: true });
+    }
 
     // Log configuration status
     console.log('Music page initialized', {

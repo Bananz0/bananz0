@@ -1,0 +1,90 @@
+/* ==========================================
+   Music Page - Header Customizations
+   Override main site floating header for music page
+   ========================================== */
+
+/* Hide work-related CTAs */
+.floating-ctas {
+    display: none !important;
+}
+
+/* Hide the chevron toggle */
+.mini-toggle {
+    display: none !important;
+}
+
+/* Customize header text - replace original content */
+.site-title {
+    font-size: 0 !important;
+    line-height: 0;
+}
+
+.site-title::before {
+    content: "Music";
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+    display: block;
+}
+
+.site-sub {
+    font-size: 0 !important;
+    line-height: 0;
+}
+
+.site-sub::before {
+    content: "A collection of my favorite tunes";
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--text-muted);
+    display: block;
+}
+
+/* Ensure header stays compact and doesn't try to expand */
+.floating-inner.expanded,
+.floating-inner.mini-expanded {
+    gap: var(--header-element-gap) !important;
+}
+
+.floating-inner.compact {
+    gap: var(--header-element-gap) !important;
+}
+
+/* Adjust center box to not expect CTAs */
+.header-center-box {
+    padding: var(--space-sm) var(--space-lg);
+}
+
+.header-reveal {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.title-group {
+    text-align: center;
+}
+
+/* Dynamic Glow for Social Badges & Logo */
+.social-badge,
+.static-logo-badge a {
+    transition: all var(--spring-snappy);
+    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.12));
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
+                0 0 15px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
+}
+
+.social-badge:hover,
+.static-logo-badge a:hover {
+    border-color: var(--dynamic-border-color-bright, rgba(245, 158, 11, 0.5));
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 
+                0 0 30px var(--dynamic-glow-color, rgba(245, 158, 11, 0.35)),
+                0 0 50px var(--dynamic-glow-color, rgba(245, 158, 11, 0.2));
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Enhanced Header Center Box Glow */
+.header-center-box {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
+                0 0 20px var(--dynamic-glow-color, rgba(245, 158, 11, 0.1));
+    transition: all var(--spring-smooth);
+}

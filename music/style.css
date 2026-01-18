@@ -3,6 +3,33 @@
    Integrated with main site theme
    ========================================== */
 
+/* Custom Scrollbar with Dynamic Colors */
+.music-hero ::-webkit-scrollbar,
+.recent-tracks ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.music-hero ::-webkit-scrollbar-track,
+.recent-tracks ::-webkit-scrollbar-track {
+    background: rgba(18, 18, 18, 0.3);
+    border-radius: var(--radius-md);
+}
+
+.music-hero ::-webkit-scrollbar-thumb,
+.recent-tracks ::-webkit-scrollbar-thumb {
+    background: var(--dynamic-scrollbar-color, rgba(245, 158, 11, 0.5));
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 10px var(--dynamic-glow-color, rgba(245, 158, 11, 0.3));
+    transition: all var(--spring-snappy);
+}
+
+.music-hero ::-webkit-scrollbar-thumb:hover,
+.recent-tracks ::-webkit-scrollbar-thumb:hover {
+    background: var(--dynamic-scrollbar-color-bright, rgba(245, 158, 11, 0.8));
+    box-shadow: 0 0 15px var(--dynamic-glow-color, rgba(245, 158, 11, 0.5));
+}
+
 .music-hero {
     min-height: calc(100vh - 200px);
     display: flex;
@@ -97,22 +124,28 @@
 /* Source-specific active colors */
 .source-pill[data-source="lastfm"].active {
     border-color: rgba(185, 0, 0, 0.5);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(185, 0, 0, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 
+                0 0 25px rgba(185, 0, 0, 0.4),
+                0 0 40px rgba(185, 0, 0, 0.2);
 }
 
 .source-pill[data-source="lastfm"].active .status-dot {
     background: #b90000;
-    box-shadow: 0 0 12px rgba(185, 0, 0, 0.8);
+    box-shadow: 0 0 15px rgba(185, 0, 0, 0.9),
+                0 0 25px rgba(185, 0, 0, 0.6);
 }
 
 .source-pill[data-source="spotify"].active {
     border-color: rgba(29, 185, 84, 0.5);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(29, 185, 84, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 
+                0 0 25px rgba(29, 185, 84, 0.4),
+                0 0 40px rgba(29, 185, 84, 0.2);
 }
 
 .source-pill[data-source="spotify"].active .status-dot {
     background: #1DB954;
-    box-shadow: 0 0 12px rgba(29, 185, 84, 0.8);
+    box-shadow: 0 0 15px rgba(29, 185, 84, 0.9),
+                0 0 25px rgba(29, 185, 84, 0.6);
 }
 
 
@@ -167,7 +200,8 @@
     overflow: hidden;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.5),
-        0 4px 20px rgba(245, 158, 11, 0.05);
+        0 4px 20px rgba(245, 158, 11, 0.05),
+        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
     transition: all var(--spring-smooth);
     /* Promote to layer to avoid re-rendering backdrop filter on child animation */
     transform: translateZ(0);
@@ -177,7 +211,8 @@
     border-color: rgba(245, 158, 11, 0.25);
     box-shadow:
         0 25px 70px rgba(0, 0, 0, 0.6),
-        0 8px 30px rgba(245, 158, 11, 0.1);
+        0 8px 30px rgba(245, 158, 11, 0.1),
+        0 0 60px var(--dynamic-glow-color, rgba(245, 158, 11, 0.25));
     transform: translateY(-4px);
 }
 
@@ -549,11 +584,14 @@
         background: rgba(18, 18, 18, 0.4);
         -webkit-backdrop-filter: blur(20px) saturate(150%);
         backdrop-filter: blur(20px) saturate(150%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--dynamic-border, rgba(255, 255, 255, 0.08));
+        box-shadow: var(--dynamic-shadow, 0 20px 60px rgba(0, 0, 0, 0.3));
         border-radius: var(--radius-xl);
         padding: var(--space-lg);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        height: auto;
+        width: 100%;
+        margin-top: 0;
+        /* Reset margin */
+        transition: border-color 0.5s ease, box-shadow 0.5s ease;
         /* Allow stretch */
         display: flex;
         flex-direction: column;
@@ -585,7 +623,7 @@
     }
 
     .now-playing-card {
-        max-width: 100%;
+        max-width: 420px;
     }
 
     .card-content {

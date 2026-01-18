@@ -12,32 +12,18 @@
 // - Device-based particle count adjustment
 // - Throttled resize handlers
 // - requestIdleCallback for non-critical animations
+// - Removed dead code (cursor-follower, smooth mouse tracking)
 // ==========================================
 
-// Shared smoothed mouse position for consistent animation timing
-let smoothMouseX = window.innerWidth / 2;
-let smoothMouseY = window.innerHeight / 2;
-let rawMouseX = window.innerWidth / 2;
-let rawMouseY = window.innerHeight / 2;
+// Mouse position for particle interaction
 let mouseParticleX = -1000;
 let mouseParticleY = -1000;
 
-// OPTIMIZED: Single unified mouse tracking handler for all features
+// OPTIMIZED: Single unified mouse tracking handler for particle system
 document.addEventListener('mousemove', (e) => {
-    rawMouseX = e.clientX;
-    rawMouseY = e.clientY;
     mouseParticleX = e.clientX;
     mouseParticleY = e.clientY;
 }, { passive: true });
-
-// Single animation loop for smooth mouse position
-function updateSmoothMouse() {
-    const easing = 0.15;
-    smoothMouseX += (rawMouseX - smoothMouseX) * easing;
-    smoothMouseY += (rawMouseY - smoothMouseY) * easing;
-    requestAnimationFrame(updateSmoothMouse);
-}
-updateSmoothMouse();
 
 // Dot grid removed - focusing on liquid glass and cyberpunk aesthetics
 
@@ -287,8 +273,8 @@ if (ctx) {
     const drawnConnections = new Set();
 
     function animateParticles() {
-        // Optimization: Skip rendering if canvas is hidden (e.g. on Music page)
-        if (canvas.offsetParent === null) {
+        // Optimization: Skip rendering if canvas is hidden or detached
+        if (!canvas.offsetParent && getComputedStyle(canvas).display === 'none') {
             requestAnimationFrame(animateParticles);
             return;
         }
@@ -512,6 +498,9 @@ let ticking = false;
 let autoCollapseTimer = null;
 let manuallyExpanded = false; // Track if user manually expanded the bar
 
+// Detect if we're on the music page
+const isMusicPage = window.location.pathname.includes('/music');
+
 // Handle Mini-Mode Toggle Click
 if (floatingInner && miniToggle) {
     // Improved toggle: use rAF and immediate pointer-events so CTAs appear promptly
@@ -633,6 +622,16 @@ function clearAutoCollapseTimer() {
 }
 
 function updateFloatingHero() {
+    // Skip CTA logic entirely on music page
+    if (isMusicPage) {
+        // Keep header compact at all times
+        if (floatingInner) {
+            floatingInner.classList.add('compact');
+            floatingInner.classList.remove('expanded', 'mini-expanded');
+        }
+        return;
+    }
+
     const currentScroll = window.pageYOffset;
     const scrollDelta = currentScroll - lastScroll;
     const isScrollingUp = scrollDelta < -10;
@@ -761,10 +760,10 @@ if (floatingInner) {
 // OPTIMIZED: Passive scroll listener for better performance
 window.addEventListener('scroll', handleScroll, { passive: true });
 
-// Scroll to top when logo badge is clicked (only prevent reload if on home page)
-const logoBadge = document.querySelector('.static-logo-badge a');
-if (logoBadge) {
-    logoBadge.addEventListener('click', (e) => {
+// Scroll to top when nav hub main button is clicked (only prevent reload if on home page)
+const navHubMain = document.querySelector('.nav-hub .hub-main');
+if (navHubMain) {
+    navHubMain.addEventListener('click', (e) => {
         const currentPath = window.location.pathname;
         const isHomePage = currentPath === '/' || currentPath === '/index.html';
 
@@ -779,6 +778,47 @@ if (logoBadge) {
         // Otherwise allow normal navigation to home page
     });
 }
+
+// ==========================================
+// EXPANDABLE NAVIGATION HUB
+// Enhanced hover interactions with keyboard support
+// ==========================================
+(function initExpandableNav() {
+    const navHub = document.querySelector('.nav-hub');
+    if (!navHub) return;
+
+    // Add keyboard navigation support
+    const secondaryButtons = navHub.querySelectorAll('.hub-btn');
+    
+    secondaryButtons.forEach((btn, index) => {
+        // Ensure buttons are tabbable when visible
+        btn.setAttribute('tabindex', '0');
+        
+        // Add keyboard support for better accessibility
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && index < secondaryButtons.length - 1) {
+                secondaryButtons[index + 1].focus();
+            } else if (e.key === 'ArrowLeft' && index > 0) {
+                secondaryButtons[index - 1].focus();
+            }
+        });
+    });
+
+    // Optional: Add touch support for mobile hover simulation
+    if ('ontouchstart' in window) {
+        let touchTimeout;
+        navHub.addEventListener('touchstart', (e) => {
+            clearTimeout(touchTimeout);
+            navHub.classList.add('touch-active');
+        }, { passive: true });
+
+        navHub.addEventListener('touchend', () => {
+            touchTimeout = setTimeout(() => {
+                navHub.classList.remove('touch-active');
+            }, 3000); // Keep visible for 3s after touch
+        }, { passive: true });
+    }
+})();
 
 // OPTIMIZED: Removed MutationObserver - using event delegation instead
 
@@ -1471,6 +1511,19 @@ if (window.location.search.includes('debug=perf')) {
 }
 
 // ==========================================
+// GLOBAL POWER SAVING
+// Pause animations when tab is hidden
+// ==========================================
+document.addEventListener('visibilitychange', () => {
+    const body = document.body;
+    if (document.hidden) {
+        body.classList.add('animations-paused');
+    } else {
+        body.classList.remove('animations-paused');
+    }
+});
+
+// ==========================================
 // SMOOTH PAGE TRANSITIONS
 // ==========================================
 document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([href^=\"mailto\"]):not([download])').forEach(link => {
@@ -1502,11 +1555,11 @@ document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([hr
 // Uses spring.js timing for smooth in-place transitions
 // ==========================================
 (function initResponsiveBadgeAnimations() {
-    const gmBadge = document.querySelector('.static-logo-badge');
+    const navHub = document.querySelector('.nav-hub');
     const socialBadgesMobile = document.querySelector('.social-badges-mobile');
     const socialBadgesInline = document.querySelector('.social-badges-inline');
 
-    if (!gmBadge) return;
+    if (!navHub) return;
 
     let wasMobile = window.innerWidth <= 600;
 
@@ -1518,14 +1571,14 @@ document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([hr
             // Crossed the breakpoint - animate badges in place
             if (isMobile) {
                 // Going to mobile: fade/scale in place (no diagonal movement)
-                gmBadge.style.transform = 'scale(0.9)';
-                gmBadge.style.opacity = '0';
+                navHub.style.transform = 'scale(0.9)';
+                navHub.style.opacity = '0';
 
                 // Use requestAnimationFrame to ensure styles are applied before transition
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        gmBadge.style.transform = 'scale(1)';
-                        gmBadge.style.opacity = '1';
+                        navHub.style.transform = 'scale(1)';
+                        navHub.style.opacity = '1';
                     });
                 });
 

@@ -105,11 +105,88 @@ title: Contact
                                 </button>
                             </div>
 
-                            <div class="terminal-line-typing">
+                            <div class="terminal-line-typing" id="terminal-output">
                                 <span class="terminal-prompt">$</span>
                                 <span class="cursor-blink">_</span>
                             </div>
                         </form>
+
+                        <script>
+                            (function () {
+                                const form = document.getElementById('contact-form');
+                                const emailInput = document.getElementById('contact-email');
+                                const terminalOutput = document.getElementById('terminal-output');
+                                let disposableDomains = [];
+
+                                // Fetch disposable domains list
+                                fetch('/assets/data/disposable_domains.json')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        disposableDomains = new Set(data);
+                                        console.log('Loaded ' + disposableDomains.size + ' disposable domains.');
+                                    })
+                                    .catch(err => console.error('Failed to load disposable domains:', err));
+
+                                function typeWriter(text, element) {
+                                    element.innerHTML = '<span class="terminal-prompt">$</span> ';
+                                    let i = 0;
+                                    function type() {
+                                        if (i < text.length) {
+                                            element.innerHTML += text.charAt(i);
+                                            i++;
+                                            setTimeout(type, 30);
+                                        } else {
+                                            element.innerHTML += '<span class="cursor-blink">_</span>';
+                                        }
+                                    }
+                                    type();
+                                }
+
+                                form.addEventListener('submit', function (e) {
+                                    const email = emailInput.value.trim().toLowerCase();
+                                    const domain = email.split('@')[1];
+
+                                    // 1. Basic format check (implicit in type="email", but extra safety)
+                                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                    if (!emailRegex.test(email)) {
+                                        e.preventDefault();
+                                        typeWriter('Error: Invalid email format. Syntax error.', terminalOutput);
+                                        return;
+                                    }
+
+                                    // 2. Allowlist (Explicitly allowed privacy providers - heuristic override)
+                                    const allowedDomains = ['proton.me', 'protonmail.com', 'duck.com', 'icloud.com', 'me.com'];
+                                    if (allowedDomains.includes(domain)) {
+                                        // Pass through
+                                        return;
+                                    }
+
+                                    // 3. Blocklist check
+                                    if (disposableDomains.has(domain)) {
+                                        e.preventDefault();
+                                        typeWriter('Error: Disposable email detected. Access denied.', terminalOutput);
+                                        return;
+                                    }
+
+                                    // 4. Heuristic "Stupid" check
+                                    // Block specific obvious garbage or testing domains
+                                    const blockedHeuristics = ['xyz.com', 'test.com', 'example.com', 'mail.com', 'email.com', 'tempmail.com', '10minutemail.com'];
+                                    if (blockedHeuristics.includes(domain) || domain.endsWith('.xyz') || domain.length < 4) {
+                                        // Allows legitimate .xyz if needed, but blocking for now as per "gibberish"
+                                        // Actually user said "gibberish such as xyz.com", maybe not all .xyz.
+                                        // Let's stick to the list and specifically "xyz.com".
+                                        if (blockedHeuristics.includes(domain)) {
+                                            e.preventDefault();
+                                            typeWriter('Error: Invalid domain. Please use a real address.', terminalOutput);
+                                            return;
+                                        }
+                                    }
+
+                                    // Success - show sending message (Formspree will handle the rest)
+                                    terminalOutput.innerHTML = '<span class="terminal-prompt">$</span> Sending packet...';
+                                });
+                            })();
+                        </script>
                     </div>
                 </div>
             </div>
