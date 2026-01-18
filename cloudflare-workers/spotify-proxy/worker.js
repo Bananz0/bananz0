@@ -16,9 +16,20 @@ let tokenExpiry = 0;
 
 export default {
     async fetch(request, env) {
-        // CORS headers for cross-origin requests
+        const url = new URL(request.url);
+        const origin = request.headers.get('Origin');
+
+        // Allow localhost for development
+        let allowedOrigin = 'https://glenmuthoka.com';
+        if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+            allowedOrigin = origin;
+        } else if (origin && origin.endsWith('.glenmuthoka.com')) {
+            allowedOrigin = origin;
+        }
+
+        // CORS headers
         const corsHeaders = {
-            'Access-Control-Allow-Origin': 'https://*.glenmuthoka.com', 
+            'Access-Control-Allow-Origin': allowedOrigin,
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
             'Content-Type': 'application/json',
@@ -27,6 +38,14 @@ export default {
         // Handle CORS preflight
         if (request.method === 'OPTIONS') {
             return new Response(null, { headers: corsHeaders });
+        }
+
+        // Check for missing secrets immediately
+        if (!env.SPOTIFY_CLIENT_ID || !env.SPOTIFY_CLIENT_SECRET) {
+            return new Response(
+                JSON.stringify({ error: 'Configuration Error: SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET is missing in Cloudflare variables' }),
+                { status: 503, headers: corsHeaders }
+            );
         }
 
         try {
