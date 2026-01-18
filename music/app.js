@@ -79,7 +79,7 @@ async function getSpotifyArtistImage(artistName) {
 
     try {
         const response = await fetch(
-            `${CONFIG.spotify.workerUrl}?artist=${encodeURIComponent(artistName)}`
+            `${CONFIG.spotify.workerUrl}?type=spotify&artist=${encodeURIComponent(artistName)}`
         );
 
         if (!response.ok) throw new Error('Worker request failed');
@@ -108,7 +108,7 @@ async function getSpotifyTrackData(trackName, artistName) {
 
     try {
         const response = await fetch(
-            `${CONFIG.spotify.workerUrl}?track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
+            `${CONFIG.spotify.workerUrl}?type=spotify&track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
         );
 
         if (!response.ok) throw new Error('Worker request failed');
@@ -132,11 +132,24 @@ async function getSpotifyTrackData(trackName, artistName) {
 // Last.fm Integration
 // ==========================================
 async function fetchLastFmNowPlaying() {
-    if (!CONFIG.lastfm.enabled || !CONFIG.lastfm.apiKey) {
+    // Use worker if available, otherwise fall back to direct (for local dev)
+    const workerUrl = CONFIG.spotify.workerUrl; // Unified worker handles both
+
+    if (!CONFIG.lastfm.enabled) {
         return null;
     }
 
-    const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${CONFIG.maxRecentTracks + 1}`;
+    let url;
+    if (workerUrl) {
+        // Use secure worker proxy (production)
+        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getrecenttracks&limit=${CONFIG.maxRecentTracks + 1}`;
+    } else if (CONFIG.lastfm.apiKey) {
+        // Direct API call (local development only)
+        url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${CONFIG.maxRecentTracks + 1}`;
+    } else {
+        state.sources.lastfm.connected = false;
+        return null;
+    }
 
     try {
         const response = await fetch(url);
@@ -218,6 +231,7 @@ async function fetchLastFmNowPlaying() {
 
                                 if (state.activeSource === 'lastfm') {
                                     updateNowPlayingCard(state.sources.lastfm.track, true);
+                                    updateSourceIndicators();
                                 }
                             }
                         }
@@ -427,6 +441,7 @@ function updateNowPlayingCard(track, isPlaying) {
                                 elements.immersiveBg.style.backgroundImage = `url(${spotifyData.artistImage})`;
                             }
                         }
+                        updateSourceIndicators();
                     }
                 });
             } else if (lastTrack.enriched) {

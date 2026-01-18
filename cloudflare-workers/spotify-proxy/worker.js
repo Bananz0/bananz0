@@ -1,13 +1,13 @@
 /**
- * Spotify Proxy Worker
+ * Unified API Proxy Worker
  * 
- * Securely handles Spotify API authentication server-side.
- * Frontend calls this worker to get artist/track images without exposing credentials.
- * 
+ * Securely handles both Spotify and Last.fm API authentication server-side.
+ * Frontend calls this worker without exposing credentials.
  * 
  * Endpoints:
- * - GET /?artist=<name> → { artistImage: "url" }
- * - GET /?track=<name>&artist=<name> → { albumImage: "url", artistImage: "url" }
+ * - GET /?type=spotify&artist=<name> → { artistImage: "url" }
+ * - GET /?type=spotify&track=<name>&artist=<name> → { albumImage: "url", artistImage: "url" }
+ * - GET /?type=lastfm&user=<username>&method=<method> → Last.fm API response
  */
 
 // In-memory token cache (persists across requests within same isolate)
@@ -40,47 +40,14 @@ export default {
             return new Response(null, { headers: corsHeaders });
         }
 
-        // Check for missing secrets immediately
-        if (!env.SPOTIFY_CLIENT_ID || !env.SPOTIFY_CLIENT_SECRET) {
-            return new Response(
-                JSON.stringify({ error: 'Configuration Error: SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET is missing in Cloudflare variables' }),
-                { status: 503, headers: corsHeaders }
-            );
-        }
+        const type = url.searchParams.get('type') || 'spotify'; // Default to spotify for backward compat
 
         try {
-            const url = new URL(request.url);
-            const artist = url.searchParams.get('artist');
-            const track = url.searchParams.get('track');
-
-            if (!artist && !track) {
-                return new Response(
-                    JSON.stringify({ error: 'Missing artist or track parameter' }),
-                    { status: 400, headers: corsHeaders }
-                );
+            if (type === 'lastfm') {
+                return await handleLastFm(url, env, corsHeaders);
+            } else {
+                return await handleSpotify(url, env, corsHeaders);
             }
-
-            // Get access token
-            const token = await getAccessToken(env);
-            if (!token) {
-                return new Response(
-                    JSON.stringify({ error: 'Failed to authenticate with Spotify' }),
-                    { status: 500, headers: corsHeaders }
-                );
-            }
-
-            // If track is provided, search for track (includes album art)
-            if (track && artist) {
-                const result = await searchTrack(token, track, artist);
-                return new Response(JSON.stringify(result), { headers: corsHeaders });
-            }
-
-            // Otherwise search for artist only
-            if (artist) {
-                const result = await searchArtist(token, artist);
-                return new Response(JSON.stringify(result), { headers: corsHeaders });
-            }
-
         } catch (error) {
             console.error('Worker error:', error);
             return new Response(
@@ -90,6 +57,85 @@ export default {
         }
     }
 };
+
+// ==========================================
+// LAST.FM HANDLER
+// ==========================================
+async function handleLastFm(url, env, corsHeaders) {
+    if (!env.LASTFM_API_KEY) {
+        return new Response(
+            JSON.stringify({ error: 'Configuration Error: LASTFM_API_KEY is missing' }),
+            { status: 503, headers: corsHeaders }
+        );
+    }
+
+    const user = url.searchParams.get('user');
+    const method = url.searchParams.get('method') || 'user.getrecenttracks';
+    const limit = url.searchParams.get('limit') || '10';
+
+    if (!user) {
+        return new Response(
+            JSON.stringify({ error: 'Missing user parameter' }),
+            { status: 400, headers: corsHeaders }
+        );
+    }
+
+    const lastfmUrl = `https://ws.audioscrobbler.com/2.0/?method=${method}&user=${encodeURIComponent(user)}&api_key=${env.LASTFM_API_KEY}&format=json&limit=${limit}`;
+
+    const response = await fetch(lastfmUrl);
+    const data = await response.json();
+
+    return new Response(JSON.stringify(data), { headers: corsHeaders });
+}
+
+// ==========================================
+// SPOTIFY HANDLER
+// ==========================================
+async function handleSpotify(url, env, corsHeaders) {
+    // Check for missing secrets
+    if (!env.SPOTIFY_CLIENT_ID || !env.SPOTIFY_CLIENT_SECRET) {
+        return new Response(
+            JSON.stringify({ error: 'Configuration Error: SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET is missing' }),
+            { status: 503, headers: corsHeaders }
+        );
+    }
+
+    const artist = url.searchParams.get('artist');
+    const track = url.searchParams.get('track');
+
+    if (!artist && !track) {
+        return new Response(
+            JSON.stringify({ error: 'Missing artist or track parameter' }),
+            { status: 400, headers: corsHeaders }
+        );
+    }
+
+    // Get access token
+    const token = await getAccessToken(env);
+    if (!token) {
+        return new Response(
+            JSON.stringify({ error: 'Failed to authenticate with Spotify' }),
+            { status: 500, headers: corsHeaders }
+        );
+    }
+
+    // If track is provided, search for track (includes album art)
+    if (track && artist) {
+        const result = await searchTrack(token, track, artist);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+    }
+
+    // Otherwise search for artist only
+    if (artist) {
+        const result = await searchArtist(token, artist);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+    }
+
+    return new Response(
+        JSON.stringify({ error: 'Invalid request' }),
+        { status: 400, headers: corsHeaders }
+    );
+}
 
 async function getAccessToken(env) {
     // Check cache

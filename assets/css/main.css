@@ -353,7 +353,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-normal);
     transform: translateY(0);
     opacity: 1;
 }
@@ -721,7 +721,8 @@ nav.scrolled {
     top: -8px;
     left: -8px;
     right: -8px;
-    bottom: -200px; /* Extend hover area to cover secondary buttons */
+    bottom: -200px;
+    /* Extend hover area to cover secondary buttons */
     pointer-events: auto;
     z-index: 0;
 }
@@ -1556,7 +1557,8 @@ nav.scrolled {
         display: flex;
         top: auto;
         bottom: calc(var(--badge-size-sm) + 8px);
-        transform: translateY(10px); /* Reversed direction */
+        transform: translateY(10px);
+        /* Reversed direction */
     }
 
     .nav-hub:hover .hub-secondary,

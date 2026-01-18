@@ -233,7 +233,7 @@ if (ctx) {
                 // Performance struggling - reduce by 10%
                 const removeCount = Math.max(5, Math.floor(particles.length * 0.1));
                 particles.splice(0, removeCount);
-                console.log(`Reduced particles to ${particles.length} (FPS: ${currentFps})`);
+                // Particle count adjusted for performance
             } else if (currentFps >= 58 && particles.length < targetParticleCount) {
                 // Great performance - add more particles progressively
                 const addCount = Math.min(10, targetParticleCount - particles.length);
@@ -242,7 +242,7 @@ if (ctx) {
                     particle.id = nextParticleId++;
                     particles.push(particle);
                 }
-                console.log(`Increased particles to ${particles.length} (FPS: ${currentFps})`);
+                // Particle count increased
             } else if (currentFps >= 55 && particles.length < targetParticleCount * 1.2) {
                 // Excellent performance - try pushing beyond target
                 const addCount = Math.min(5, Math.floor(targetParticleCount * 1.2) - particles.length);
@@ -252,7 +252,7 @@ if (ctx) {
                         particle.id = nextParticleId++;
                         particles.push(particle);
                     }
-                    console.log(`Bonus particles added: ${particles.length} (FPS: ${currentFps})`);
+                    // Bonus particles added
                 }
             }
         }
@@ -511,16 +511,16 @@ if (floatingInner && miniToggle) {
         }
 
         const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
-        console.log('Toggle clicked! Mini mode:', isMiniMode, 'Width:', window.innerWidth, 'Height:', window.innerHeight);
+
 
         if (!isMiniMode) return;
 
         const isExpanded = floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded');
-        console.log('Current state - isExpanded:', isExpanded);
+
 
         if (isExpanded) {
             // Collapse: remove visible immediately, then adjust classes
-            console.log('Collapsing...');
+
             manuallyExpanded = false; // Clear manual flag
             if (floatingCtas) {
                 floatingCtas.classList.remove('visible');
@@ -534,7 +534,7 @@ if (floatingInner && miniToggle) {
             });
         } else {
             // Expand: set classes first to expose area, then make CTAs visible
-            console.log('Expanding...');
+
             manuallyExpanded = true; // Set manual flag to prevent scroll override
             floatingInner.classList.remove('compact');
             // Force a reflow so the browser acknowledges layout change before animating CTAs
@@ -558,13 +558,13 @@ if (floatingInner && miniToggle) {
 
     // Attach to mini-toggle button
     miniToggle.addEventListener('click', toggleExpansion);
-    console.log('Mini-toggle handler attached');
+
 
     // Attach to title group for broader click area
     const titleGroup = floatingInner.querySelector('.title-group');
     if (titleGroup) {
         titleGroup.addEventListener('click', toggleExpansion);
-        console.log('Title-group handler attached');
+
     }
 
     // Also attach to header-center-box for even broader click area in mini mode
@@ -579,7 +579,7 @@ if (floatingInner && miniToggle) {
                 }
             }
         });
-        console.log('Header-center-box handler attached');
+
     }
 }
 
@@ -789,11 +789,11 @@ if (navHubMain) {
 
     // Add keyboard navigation support
     const secondaryButtons = navHub.querySelectorAll('.hub-btn');
-    
+
     secondaryButtons.forEach((btn, index) => {
         // Ensure buttons are tabbable when visible
         btn.setAttribute('tabindex', '0');
-        
+
         // Add keyboard support for better accessibility
         btn.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' && index < secondaryButtons.length - 1) {
@@ -815,7 +815,7 @@ if (navHubMain) {
         navHub.addEventListener('touchend', () => {
             touchTimeout = setTimeout(() => {
                 navHub.classList.remove('touch-active');
-            }, 3000); // Keep visible for 3s after touch
+            }, 1500); // Keep visible for 1.5s after touch
         }, { passive: true });
     }
 })();
@@ -1505,9 +1505,6 @@ if (window.location.search.includes('debug=perf')) {
             // longtask not supported
         }
     }
-
-    console.log('%cPerformance Monitoring Active', 'color: #00f5ff; font-size: 14px; font-weight: bold;');
-    console.log('%cAdd ?debug=perf to URL to enable', 'color: #a855f7; font-size: 12px;');
 }
 
 // ==========================================
@@ -1526,7 +1523,7 @@ document.addEventListener('visibilitychange', () => {
 // ==========================================
 // SMOOTH PAGE TRANSITIONS
 // ==========================================
-document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([href^=\"mailto\"]):not([download])').forEach(link => {
+document.querySelectorAll('a:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([download])').forEach(link => {
     link.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
         // Skip if it's a download link or external
@@ -1602,8 +1599,8 @@ document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([hr
                 }
             } else {
                 // Going to desktop: reset to normal state
-                gmBadge.style.transform = '';
-                gmBadge.style.opacity = '';
+                navHub.style.transform = '';
+                navHub.style.opacity = '';
 
                 if (socialBadgesInline) {
                     socialBadgesInline.style.transform = '';
@@ -1628,9 +1625,9 @@ document.querySelectorAll('a:not([target=\"_blank\"]):not([href^=\"#\"]):not([hr
     }, { passive: true });
 
     // Initial state check
-    if (wasMobile && gmBadge) {
+    if (wasMobile && navHub) {
         // If starting on mobile, ensure proper initial state
-        gmBadge.style.transform = 'scale(1)';
-        gmBadge.style.opacity = '1';
+        navHub.style.transform = 'scale(1)';
+        navHub.style.opacity = '1';
     }
 })();
