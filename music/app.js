@@ -318,10 +318,10 @@ function updateSourceIndicators() {
             }
         } else if (source === 'spotify') {
             // Spotify is 'active' if it provided the current track image/enrichment
-            // Spotify is 'connected' if we just have a valid token
-            if (state.sources.lastfm.track && state.sources.lastfm.track.artistImage && CONFIG.spotify.accessToken) {
+            // Spotify is 'connected' if we have successfully contacted the worker
+            if (state.sources.lastfm.track && state.sources.lastfm.track.artistImage && state.sources.spotify.connected) {
                 indicator.classList.add('active');
-            } else if (CONFIG.spotify.accessToken) {
+            } else if (state.sources.spotify.connected) {
                 indicator.classList.add('connected');
             }
         } else {
