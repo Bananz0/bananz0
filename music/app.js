@@ -18,12 +18,8 @@ const CONFIG = {
         pollInterval: 10000,
     },
     spotify: {
-        enabled: true, // Used for metadata enrichment (artist images)
-        clientId: window.MUSIC_CONFIG?.spotify?.clientId || '',
-        clientSecret: window.MUSIC_CONFIG?.spotify?.clientSecret || '',
-        // We'll use client credentials flow for public data (artist images)
-        accessToken: null,
-        tokenExpiry: null,
+        enabled: window.MUSIC_CONFIG?.spotify?.enabled ?? true,
+        workerUrl: window.MUSIC_CONFIG?.spotify?.workerUrl || '',
     },
     maxRecentTracks: 8, // Increased for desktop view
 };
@@ -69,108 +65,65 @@ const elements = {
 };
 
 // ==========================================
-// Spotify API (Client Credentials - for artist images)
+// Spotify API (via Cloudflare Worker Proxy)
 // ==========================================
-async function getSpotifyAccessToken() {
-    // Check if we have a valid token
-    if (CONFIG.spotify.accessToken && CONFIG.spotify.tokenExpiry > Date.now()) {
-        return CONFIG.spotify.accessToken;
-    }
-
-    if (!CONFIG.spotify.clientId || !CONFIG.spotify.clientSecret) {
-        return null;
-    }
-
-    try {
-        const response = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + btoa(CONFIG.spotify.clientId + ':' + CONFIG.spotify.clientSecret),
-            },
-            body: 'grant_type=client_credentials',
-        });
-
-        if (!response.ok) throw new Error('Spotify auth failed');
-
-        const data = await response.json();
-        CONFIG.spotify.accessToken = data.access_token;
-        CONFIG.spotify.tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000; // 1 min buffer
-        state.sources.spotify.connected = true;
-        return data.access_token;
-    } catch (error) {
-        console.warn('Spotify token fetch failed:', error);
-        state.sources.spotify.connected = false;
-        return null;
-    }
-}
-
 async function getSpotifyArtistImage(artistName) {
     // Check cache first
     if (state.artistCache.has(artistName)) {
         return state.artistCache.get(artistName);
     }
 
-    const token = await getSpotifyAccessToken();
-    if (!token) return null;
+    if (!CONFIG.spotify.workerUrl) {
+        return null;
+    }
 
     try {
         const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist&limit=1`,
-            {
-                headers: { 'Authorization': `Bearer ${token}` },
-            }
+            `${CONFIG.spotify.workerUrl}?artist=${encodeURIComponent(artistName)}`
         );
 
-        if (!response.ok) throw new Error('Spotify search failed');
+        if (!response.ok) throw new Error('Worker request failed');
 
         const data = await response.json();
-        const artist = data.artists?.items?.[0];
+        state.sources.spotify.connected = true;
 
-        if (artist?.images?.length > 0) {
-            // Get medium-sized image (usually index 1)
-            const image = artist.images[1]?.url || artist.images[0]?.url;
-            state.artistCache.set(artistName, image);
-            return image;
+        if (data.artistImage) {
+            state.artistCache.set(artistName, data.artistImage);
+            return data.artistImage;
         }
 
         state.artistCache.set(artistName, null);
         return null;
     } catch (error) {
-        console.warn('Spotify artist search failed:', error);
+        console.warn('Spotify artist fetch failed:', error);
+        state.sources.spotify.connected = false;
         return null;
     }
 }
 
 async function getSpotifyTrackData(trackName, artistName) {
-    const token = await getSpotifyAccessToken();
-    if (!token) return null;
+    if (!CONFIG.spotify.workerUrl) {
+        return null;
+    }
 
     try {
-        const query = `track:${trackName} artist:${artistName}`;
         const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
-            {
-                headers: { 'Authorization': `Bearer ${token}` },
-            }
+            `${CONFIG.spotify.workerUrl}?track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
         );
 
-        if (!response.ok) throw new Error('Spotify track search failed');
+        if (!response.ok) throw new Error('Worker request failed');
 
         const data = await response.json();
-        const track = data.tracks?.items?.[0];
+        state.sources.spotify.connected = true;
 
-        if (track) {
-            return {
-                albumImage: track.album?.images?.[0]?.url || null,
-                artistImage: await getSpotifyArtistImage(artistName),
-                spotifyUrl: track.external_urls?.spotify || null,
-            };
-        }
-
-        return null;
+        return {
+            albumImage: data.albumImage || null,
+            artistImage: data.artistImage || null,
+            spotifyUrl: data.spotifyUrl || null,
+        };
     } catch (error) {
-        console.warn('Spotify track search failed:', error);
+        console.warn('Spotify track fetch failed:', error);
+        state.sources.spotify.connected = false;
         return null;
     }
 }

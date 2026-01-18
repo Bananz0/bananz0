@@ -87,8 +87,8 @@ title: Now Playing
             username: '{{ site.lastfm_username | default: "glenfire" }}'
         },
         spotify: {
-            clientId: '{{ site.spotify_client_id | default: "" }}',
-            clientSecret: '{{ site.spotify_client_secret | default: "" }}'
+            enabled: true,
+            workerUrl: '{{ site.spotify_worker_url | default: "" }}'
         }
     };
 </script>
