@@ -1,4 +1,4 @@
-name = "bananz0_spotify_worker"
+name = "portfolio-spotify-worker"
 main = "worker.js"
 compatibility_date = "2024-01-18"
 
