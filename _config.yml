@@ -13,6 +13,7 @@ github_username: Bananz0
 linkedin_username: glenmuthoka
 twitter_username: bananz0
 lastfm_username: glenfire
+spotify_worker_url: "https://portfolio-spotify-worker.glen-muthoka.workers.dev"
 
 # Build settings
 markdown: kramdown

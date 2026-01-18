@@ -1,0 +1,6 @@
+name = "bananz0_spotify_worker"
+main = "worker.js"
+compatibility_date = "2024-01-18"
+
+# We don't put secrets here. They are set in the Cloudflare Dashboard.
+        
