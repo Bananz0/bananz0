@@ -188,6 +188,13 @@ async function fetchLastFmNowPlaying() {
             trackInfo.image = state.sources.lastfm.track.image;
             trackInfo.artistImage = state.sources.lastfm.track.artistImage;
 
+            // FIX: If colors are missing (e.g. first load failed), retry extraction
+            if (!state.currentColors && trackInfo.image) {
+                extractColors(trackInfo.image).then(colors => {
+                    if (colors) applyDynamicColors(colors);
+                });
+            }
+
             // Still fetch in background to check for updates (silent)
             if (CONFIG.spotify.enabled) {
                 getSpotifyTrackData(trackInfo.name, trackInfo.artist).then(spotifyData => {
@@ -582,6 +589,11 @@ function applyDynamicColors(colors) {
     if (elements.artistBackdrop) {
         elements.artistBackdrop.style.background = gradientBlur;
         elements.artistBackdrop.classList.add('loaded');
+    }
+
+    // Apply to Immersive Background (Fallback if no artist image)
+    if (elements.immersiveBg && !elements.immersiveBg.style.backgroundImage) {
+        elements.immersiveBg.style.background = gradientBlur;
     }
 
     // Calculate blended color for a richer glow effect
