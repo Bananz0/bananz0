@@ -111,3 +111,4 @@ agents.md
 
 # allow committed vendor assets (three.min.js)
 !assets/js/vendor/three.min.js
+_config.secrets.yml

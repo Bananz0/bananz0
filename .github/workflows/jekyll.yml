@@ -43,6 +43,18 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+      - name: Inject API Keys
+        run: |
+          # Inject API keys from GitHub secrets into _config.yml
+          if [ -n "${{ secrets.LASTFM_API_KEY }}" ]; then
+            sed -i 's/lastfm_api_key: ""/lastfm_api_key: "${{ secrets.LASTFM_API_KEY }}"/' _config.yml
+          fi
+          if [ -n "${{ secrets.SPOTIFY_CLIENT_ID }}" ]; then
+            sed -i 's/spotify_client_id: ""/spotify_client_id: "${{ secrets.SPOTIFY_CLIENT_ID }}"/' _config.yml
+          fi
+          if [ -n "${{ secrets.SPOTIFY_CLIENT_SECRET }}" ]; then
+            sed -i 's/spotify_client_secret: ""/spotify_client_secret: "${{ secrets.SPOTIFY_CLIENT_SECRET }}"/' _config.yml
+          fi
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"

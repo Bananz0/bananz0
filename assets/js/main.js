@@ -76,7 +76,7 @@ if (ctx) {
         const isTablet = isMobile && (width >= 768 || height >= 768);
         const cores = navigator.hardwareConcurrency || 4;
         const memory = navigator.deviceMemory || 4; // GB
-        
+
         // Detect high-end devices (PRIMARY: hardware specs, SECONDARY: user agent hint)
         // Note: FPS monitoring will fine-tune the actual count in real-time
         const hasHighEndSpecs = cores >= 8 && memory >= 6;
@@ -86,7 +86,7 @@ if (ctx) {
         // Base counts by device class (conservative start - FPS monitoring adjusts up/down)
         let baseCount;
         let deviceClass;
-        
+
         if (!isMobile) {
             // Desktop
             if (memory >= 8 && cores >= 8) {
@@ -287,6 +287,12 @@ if (ctx) {
     const drawnConnections = new Set();
 
     function animateParticles() {
+        // Optimization: Skip rendering if canvas is hidden (e.g. on Music page)
+        if (canvas.offsetParent === null) {
+            requestAnimationFrame(animateParticles);
+            return;
+        }
+
         // Monitor performance and adapt particle count
         monitorAndAdaptPerformance();
 
@@ -761,7 +767,7 @@ if (logoBadge) {
     logoBadge.addEventListener('click', (e) => {
         const currentPath = window.location.pathname;
         const isHomePage = currentPath === '/' || currentPath === '/index.html';
-        
+
         if (isHomePage) {
             // On home page - just scroll to top
             e.preventDefault();

@@ -599,9 +599,9 @@ nav.scrolled {
     justify-content: center;
     width: var(--badge-size-lg);
     height: var(--badge-size-lg);
-    background: rgba(18, 18, 18, 0.48);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    backdrop-filter: blur(10px) saturate(120%);
+    background: rgba(18, 18, 18, 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
     border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-md);
     text-decoration: none;
@@ -716,9 +716,9 @@ nav.scrolled {
     justify-content: center;
     width: var(--badge-size-lg);
     height: var(--badge-size-lg);
-    background: rgba(18, 18, 18, 0.48);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    backdrop-filter: blur(10px) saturate(120%);
+    background: rgba(18, 18, 18, 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
     border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-md);
     text-decoration: none;
@@ -865,9 +865,9 @@ nav.scrolled {
     /* Match GM logo height for alignment */
 
     /* Glass box styling - ONLY on center section */
-    background: rgba(18, 18, 18, 0.48);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    backdrop-filter: blur(10px) saturate(120%);
+    background: rgba(18, 18, 18, 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
     border: 1px solid rgba(245, 158, 11, 0.12);
     border-radius: var(--radius-lg);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);

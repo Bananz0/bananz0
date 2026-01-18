@@ -6,12 +6,19 @@ description: >-
   Building at the intersection of hardware and software.
 baseurl: ""
 url: "https://glenmuthoka.com"
-version: "2.0.1"  # Updated: CV download, favicon, contact form
+version: "2.0.1"
 
 # Social
 github_username: Bananz0
 linkedin_username: glenmuthoka
 twitter_username: bananz0
+lastfm_username: glenfire
+
+# Music Page API Keys (injected via environment variables at build time)
+# Set these as repository secrets in GitHub: LASTFM_API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
+lastfm_api_key: ""
+spotify_client_id: ""
+spotify_client_secret: ""
 
 # Build settings
 markdown: kramdown
@@ -27,12 +34,6 @@ exclude:
   - vendor
   - README.md
   - .gitignore
-
-# Collections (if you want blog posts later)
-# collections:
-#   projects:
-#     output: true
-#     permalink: /projects/:name
 
 # Defaults
 defaults:

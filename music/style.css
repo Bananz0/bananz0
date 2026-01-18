@@ -1,0 +1,613 @@
+/* ==========================================
+   Music Page - Now Playing Styles
+   Integrated with main site theme
+   ========================================== */
+
+.music-hero {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+.music-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    max-width: 1200px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.split-content-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    width: 100%;
+    align-items: center;
+}
+
+/* ==========================================
+   Source Indicator Pills (Glassmorphic)
+   Matches main site's social-badge style
+   ========================================== */
+.source-indicators {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.source-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    /* Glassmorphism - matches .social-badge from main.css */
+    background: rgba(18, 18, 18, 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(245, 158, 11, 0.12);
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all var(--spring-snappy);
+    /* Match header element opacity and shadow */
+    opacity: 1;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);
+}
+
+.source-pill:hover {
+    background: rgba(18, 18, 18, 0.8);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.15);
+    transform: translateY(-2px);
+}
+
+.source-pill svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.source-pill .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: all var(--spring-snappy);
+    will-change: transform, opacity;
+}
+
+/* Active source state */
+.source-pill.active {
+    color: var(--text-primary);
+}
+
+.source-pill.active .status-dot {
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* Source-specific active colors */
+.source-pill[data-source="lastfm"].active {
+    border-color: rgba(185, 0, 0, 0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(185, 0, 0, 0.3);
+}
+
+.source-pill[data-source="lastfm"].active .status-dot {
+    background: #b90000;
+    box-shadow: 0 0 12px rgba(185, 0, 0, 0.8);
+}
+
+.source-pill[data-source="spotify"].active {
+    border-color: rgba(29, 185, 84, 0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(29, 185, 84, 0.3);
+}
+
+.source-pill[data-source="spotify"].active .status-dot {
+    background: #1DB954;
+    box-shadow: 0 0 12px rgba(29, 185, 84, 0.8);
+}
+
+
+
+/* Connected but not playing state */
+.source-pill.connected {
+    opacity: 0.85;
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+.source-pill.connected .status-dot {
+    background: var(--neon-cyan);
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
+}
+
+/* Spotify connected = GREEN (it's providing enrichment data) */
+.source-pill[data-source="spotify"].connected {
+    border-color: rgba(29, 185, 84, 0.3);
+}
+
+.source-pill[data-source="spotify"].connected .status-dot {
+    background: #1DB954;
+    box-shadow: 0 0 8px rgba(29, 185, 84, 0.5);
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: 0.7;
+    }
+}
+
+/* ==========================================
+   Now Playing Card - Enhanced
+   ========================================== */
+.now-playing-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(18, 18, 18, 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(245, 158, 11, 0.12);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 4px 20px rgba(245, 158, 11, 0.05);
+    transition: all var(--spring-smooth);
+    /* Promote to layer to avoid re-rendering backdrop filter on child animation */
+    transform: translateZ(0);
+}
+
+.now-playing-card:hover {
+    border-color: rgba(245, 158, 11, 0.25);
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.6),
+        0 8px 30px rgba(245, 158, 11, 0.1);
+    transform: translateY(-4px);
+}
+
+/* Artist Backdrop (blurred background) */
+.artist-backdrop {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px) brightness(0.4);
+    opacity: 0;
+    transition: opacity var(--spring-smooth);
+    z-index: 0;
+    /* Hardware acceleration for the massive blur */
+    transform: translateZ(0);
+}
+
+.artist-backdrop.loaded {
+    opacity: 1;
+}
+
+.card-content {
+    position: relative;
+    z-index: 1;
+    padding: var(--space-lg);
+}
+
+/* Album Art Section */
+.album-art-section {
+    position: relative;
+    margin-bottom: var(--space-lg);
+}
+
+.album-art-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.album-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity var(--spring-smooth);
+}
+
+.album-art.loaded {
+    opacity: 1;
+}
+
+.album-art-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(6, 182, 212, 0.1));
+    transition: opacity var(--spring-smooth);
+}
+
+.album-art-placeholder svg {
+    width: 64px;
+    height: 64px;
+    fill: var(--text-muted);
+    opacity: 0.5;
+}
+
+.album-art.loaded+.album-art-placeholder {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Artist Thumbnail (circular, overlapping album art) */
+.artist-thumbnail {
+    position: absolute;
+    bottom: -16px;
+    right: 16px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    border: 3px solid rgba(18, 18, 18, 0.9);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all var(--spring-bouncy);
+}
+
+.artist-thumbnail.loaded {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.artist-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Playing Indicator (Sound Bars) */
+.playing-indicator {
+    position: absolute;
+    bottom: var(--space-md);
+    left: var(--space-md);
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 20px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transition: opacity var(--spring-snappy);
+}
+
+.playing-indicator.active {
+    opacity: 1;
+}
+
+.playing-indicator span {
+    width: 3px;
+    background: var(--neon-gold);
+    border-radius: 2px;
+    animation: soundBar 0.8s ease-in-out infinite;
+    will-change: transform;
+}
+
+.playing-indicator span:nth-child(1) {
+    height: 8px;
+    animation-delay: 0s;
+}
+
+.playing-indicator span:nth-child(2) {
+    height: 14px;
+    animation-delay: 0.2s;
+}
+
+.playing-indicator span:nth-child(3) {
+    height: 10px;
+    animation-delay: 0.4s;
+}
+
+@keyframes soundBar {
+
+    0%,
+    100% {
+        transform: scaleY(0.5);
+    }
+
+    50% {
+        transform: scaleY(1);
+    }
+}
+
+/* Track Info */
+.track-info {
+    text-align: center;
+    margin-bottom: var(--space-md);
+    padding-top: var(--space-sm);
+}
+
+.track-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.artist-name {
+    font-size: var(--text-base);
+    color: var(--neon-amber);
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
+}
+
+.album-name {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Track Meta */
+.track-meta {
+    text-align: center;
+    padding-top: var(--space-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.listening-status {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.listening-status.now-playing {
+    color: #1DB954;
+}
+
+/* ==========================================
+   Recent Tracks
+   ========================================== */
+.recent-tracks {
+    width: 100%;
+    max-width: 420px;
+}
+
+.recent-tracks h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--space-md);
+    text-align: center;
+}
+
+.recent-tracks ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.recent-tracks li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(18, 18, 18, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    transition: all var(--spring-snappy);
+}
+
+.recent-tracks li:hover {
+    background: rgba(18, 18, 18, 0.6);
+    border-color: rgba(245, 158, 11, 0.15);
+}
+
+.recent-tracks .track-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.recent-tracks .track-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.recent-tracks .track-details .name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-tracks .track-details .artist {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-tracks .track-time {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* ==========================================
+   Responsive
+   ========================================== */
+/* ==========================================
+   Immersive Background
+   ========================================== */
+.immersive-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background-color: #000;
+    background-size: cover;
+    background-position: center;
+    filter: blur(50px) brightness(0.4) saturate(1.2);
+    transform: scale(1.1);
+    /* Prevent blur edges */
+    transition: background-image 1s ease-in-out;
+    pointer-events: none;
+    /* Force GPU layer for this massive full-screen blurred element */
+    will-change: transform;
+    transform: scale(1.1) translateZ(0);
+}
+
+/* ==========================================
+   Responsive Desktop Layout */
+@media (min-width: 1024px) {
+    .split-content-row {
+        flex-direction: row;
+        align-items: stretch;
+        /* Forces equal height */
+        justify-content: center;
+        gap: 3rem;
+    }
+
+    /* Left Column: Now Playing */
+    .now-playing-card {
+        flex: 1;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        /* Make artist thumbnail bigger on desktop */
+    }
+
+    .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .album-art-section {
+        flex: 0 0 auto;
+    }
+
+    .track-info {
+        flex: 0 0 auto;
+    }
+
+    .track-meta {
+        margin-top: auto;
+        /* Pushes meta to bottom if extra space */
+    }
+
+    .artist-thumbnail {
+        width: 100px;
+        height: 100px;
+        bottom: -25px;
+        right: 25px;
+    }
+
+    /* Right Column: Recently Played */
+    .recent-tracks {
+        flex: 1;
+        max-width: 500px;
+        background: rgba(18, 18, 18, 0.4);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+        backdrop-filter: blur(20px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-xl);
+        padding: var(--space-lg);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        height: auto;
+        /* Allow stretch */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .recent-tracks ul {
+        flex: 1;
+        /* Fill available space */
+    }
+
+    .recent-tracks h3 {
+        text-align: left;
+        margin-left: var(--space-xs);
+        margin-bottom: var(--space-lg);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 1023px) {
+    .recent-tracks {
+        max-width: 420px;
+        /* Simplify mobile recent tracks to avoid too much glass nesting */
+    }
+}
+
+@media (max-width: 600px) {
+    .music-hero {
+        padding: 7rem 1rem 3rem;
+    }
+
+    .now-playing-card {
+        max-width: 100%;
+    }
+
+    .card-content {
+        padding: var(--space-md);
+    }
+
+    .track-name {
+        font-size: var(--text-lg);
+    }
+
+    .artist-thumbnail {
+        width: 56px;
+        height: 56px;
+        bottom: -12px;
+        right: 12px;
+    }
+
+    .source-pill span {
+        display: none;
+    }
+
+    .source-pill {
+        padding: 8px 10px;
+    }
+}
