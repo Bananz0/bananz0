@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-M2LBGWGZ');</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+
+    <!-- Favicon (ICO fallback only) -->
+    <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}">
+
+
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ asset_version }}">
+    <link rel="stylesheet" href="{{ '/assets/css/modal.css' | relative_url }}?v={{ asset_version }}">
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <canvas id="particles"></canvas>
+
+    <div class="floating-hero">
+        <div class="floating-inner">
+            <!-- GM Logo Badge (order: 1, using favicon image) -->
+            <div class="static-logo-badge" data-spring="snappy" data-bounce="1">
+                <a href="{{ '/' | relative_url }}">
+                    <img class="logo-img" src="{{ '/logo-40.png' | relative_url }}" alt="GM" width="40" height="40" onerror="this.onerror=null;this.src='{{ '/favicon.ico' | relative_url }}'" />
+                </a>
+            </div>
+
+            <!-- Center Section (order: 2, HAS glass box) -->
+            <div class="header-center-box">
+                <!-- Title Section -->
+                <div class="header-reveal">
+                    <div class="title-group">
+                        <div class="site-title">GLEN MUTHOKA</div>
+                        <div class="site-sub">Embedded Systems • IC Design</div>
+                    </div>
+                    <button class="mini-toggle" aria-label="Toggle Menu" data-spring="snappy" data-bounce="1">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="floating-ctas" data-spring="smooth" data-bounce="1" data-spring-size="false">
+                    <a href="{{ '/projects/' | relative_url }}" class="cta-btn" data-spring="smooth" data-bounce="1">
+                        <span class="desktop-text">PROJECTS</span>
+                        <span class="mobile-text">WORK</span>
+                    </a>
+                    <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cta-btn primary"
+                        download="Glen_Muthoka_CV.pdf" data-spring="smooth" data-bounce="1">
+                        <span class="desktop-text">DOWNLOAD CV</span>
+                        <span class="mobile-text">CV</span>
+                    </a>
+                    <a href="#contact" class="cta-btn" data-spring="smooth" data-bounce="1">
+                        <span class="desktop-text">GET IN TOUCH</span>
+                        <span class="mobile-text">CONTACT</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Social Badges Inline (order: 3, no visual box, desktop only) -->
+            <div class="social-badges-inline" data-spring="snappy" data-bounce="1">
+                <a href="https://github.com/Bananz0" target="_blank" rel="noopener noreferrer"
+                    class="social-badge" data-spring="snappy" data-bounce="1" aria-label="GitHub">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                </a>
+                <a href="https://linkedin.com/in/glenmuthoka" target="_blank" rel="noopener noreferrer"
+                    class="social-badge" data-spring="snappy" data-bounce="1" aria-label="LinkedIn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                    </svg>
+                </a>
+                <a href="https://twitter.com/bananz0" target="_blank" rel="noopener noreferrer"
+                    class="social-badge" data-spring="snappy" data-bounce="1" aria-label="Twitter">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
+                <a href="https://orcid.org/0000-0001-5248-0163" target="_blank" rel="noopener noreferrer"
+                    class="social-badge" data-spring="snappy" data-bounce="1" aria-label="ORCID">
+                    <img class="orcid-img" src="{{ '/orcid.unauth_reversed.32x32.svg' | relative_url }}"
+                        alt="ORCID iD" width="32" height="32" aria-label="ORCID" />
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Badges (mobile bottom positioning) -->
+    <div class="social-badges-mobile" data-spring="snappy" data-bounce="1">
+        <a href="https://github.com/Bananz0" target="_blank" rel="noopener noreferrer"
+            class="social-badge" data-spring="snappy" data-bounce="1" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+        </a>
+        <a href="https://linkedin.com/in/glenmuthoka" target="_blank" rel="noopener noreferrer"
+            class="social-badge" data-spring="snappy" data-bounce="1" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+            </svg>
+        </a>
+        <a href="https://twitter.com/bananz0" target="_blank" rel="noopener noreferrer"
+            class="social-badge" data-spring="snappy" data-bounce="1" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+        </a>
+        <a href="https://orcid.org/0000-0001-5248-0163" target="_blank" rel="noopener noreferrer" class="social-badge"
+            data-spring="snappy" data-bounce="1" aria-label="ORCID">
+            <img class="orcid-img" src="{{ '/assets/icons/orcid.unauth_reversed.32x32.svg' | relative_url }}"
+                alt="ORCID iD" width="32" height="32" aria-label="ORCID" />
+        </a>
+    </div>
+
+    <!-- Page content -->
+    <main>
+        ---
+layout: default
+title: Home
+---
+
+<!-- HERO SECTION -->
+<section id="home" class="hero">
+    <div class="hero-content">
+        <h1 class="glitch" data-text="GLEN MUTHOKA">GLEN MUTHOKA</h1>
+        <p class="tagline">// EMBEDDED SYSTEMS // IC DESIGN // HOMELABBING //</p>
+        <div class="cta-buttons" data-spring="snappy" data-bounce="1">
+            <a href="#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">VIEW PROJECTS</a>
+            <a href="#contact" class="cta-btn" data-spring="snappy" data-bounce="1">GET IN TOUCH</a>
+        </div>
+    </div>
+
+    <!-- 3D IC Chip container removed (Three.js disabled) -->
+</section>
+
+<!-- ABOUT SECTION -->
+<section id="about" class="page-section about-section">
+    <div class="container">
+        <h2 class="section-title fade-in"><span>ABOUT_ME</span></h2>
+
+        <div class="about-grid">
+            <!-- Main Profile Panel -->
+            <div class="holo-panel main-panel fade-in">
+                <div class="panel-header">
+                    <span class="panel-icon"></span>
+                    <h2>PROFILE</h2>
+                </div>
+                <div class="panel-content">
+                    <p class="lead">Final-year <strong>Electrical {{ content }} Electronics Engineering</strong> student at the <strong>University of Southampton</strong>, with focus on embedded systems, IC design, and cybersecurity.</p>
+
+                    <p>My journey spans the entire technology stack; developing <strong>AI-driven optical authentication frameworks</strong> using GPU-accelerated Python, to designing <strong>Ring Oscillator circuits for real-time clock chips at TSMC 65nm</strong>, to developing space-grade software for <strong>lunar CubeSat missions</strong>. I thrive where hardware meets software.</p>
+                </div>
+            </div>
+
+            <!-- Experience Panel -->
+            <div class="holo-panel fade-in">
+                <div class="panel-header">
+                    <span class="panel-icon">💼</span>
+                    <h2>CURRENT_WORK</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="work-item">
+                        <h3>Junior Software Engineer</h3>
+                        <h4>ARTEMIS Small Sat-1 Lunar CubeSat Mission</h4>
+                        <p class="work-period">Sep 2023 → Present</p>
+                        <ul>
+                            <li>Developing <strong>space-grade flight software</strong> in C/C++ following NASA cFS (Core Flight System) architecture for lunar orbit operations</li>
+                            <li>Implemented <strong>real-time telemetry processing</strong> modules with embedded systems constraints (limited memory/power)</li>
+                            <li>Optimized system latency by <strong>6%</strong> through algorithm refinement and buffer management improvements</li>
+                            <li>Enhanced mission reliability by <strong>20%</strong> with comprehensive unit testing, integration testing, and fault injection scenarios</li>
+                            <li>Collaborated with cross-functional team on <strong>CubeSat subsystem integration</strong> (ADCS, comms, power)</li>
+                        </ul>
+                    </div>
+                    <div class="work-item space-grotesk">
+                        <h3>Open Source Contributor</h3>
+                        <h4>Various Projects</h4>
+                        <p class="work-period">2023 → Present</p>
+                        <ul>
+                            <li>Maintained <strong>GalaxyBookEnabler</strong> (430+ stars): PowerShell automation for Samsung ecosystem interoperability on Windows</li>
+                            <li>Developed <strong>eGPU Auto-Enabler</strong>: Hot-plug solution for external GPU management with sub-50ms latency</li>
+                            <li>Built <strong>GramSMC</strong>: macOS kernel extensions using DriverKit for LG Gram hardware control via reverse-engineered EC protocols</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education Panel -->
+            <div class="holo-panel fade-in">
+                <div class="panel-header">
+                    <span class="panel-icon">🎓</span>
+                    <h2>EDUCATION</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="edu-item">
+                        <h3>BEng Electrical {{ content }} Electronics Engineering</h3>
+                        <h4>University of Southampton</h4>
+                        <p class="edu-period">2023 → 2026 (Final Year)</p>
+                        <p><strong>Final Year Project:</strong> AI-Driven Optical Physical Unclonable Function (OPUF) Authentication Framework</p>
+                        <ul>
+                            <li>GPU-accelerated spectral analysis using <strong>CUDA/CuPy</strong> for real-time device authentication</li>
+                            <li>Machine learning pipelines for pattern recognition in optical fingerprints</li>
+                            <li>Novel anti-counterfeiting security framework for hardware authentication</li>
+                        </ul>
+                        <p class="key-modules"><strong>Key Modules:</strong></p>
+                        <ul>
+                            <li><strong>Computer Engineering (ELEC2204):</strong> CPU architecture, pipelining, and processor simulation</li>
+                            <li><strong>Embedded Systems:</strong> Real-time operating systems, ARM Cortex-M programming, bare-metal development</li>
+                            <li><strong>Digital Signal Processing:</strong> FFT/DFT, filter design, spectral analysis in Python/MATLAB</li>
+                            <li><strong>Computer Architecture:</strong> CPU microarchitecture, pipelining, cache optimization, SystemVerilog HDL</li>
+                            <li><strong>Cybersecurity:</strong> Cryptography, network security, hardware security modules</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interests Panel -->
+            <div class="holo-panel fade-in">
+                <div class="panel-header">
+                    <span class="panel-icon">🏠</span>
+                    <h2>INTERESTS {{ content }} HOME LAB</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="interests-grid">
+                        <div class="interest-item">
+                            <span class="interest-icon">📻</span>
+                            <h4>Amateur Radio</h4>
+                        </div>
+                        <div class="interest-item">
+                            <span class="interest-icon">🔒</span>
+                            <h4>IoT Security</h4>
+                        </div>
+                        <div class="interest-item">
+                            <span class="interest-icon">💻</span>
+                            <h4>Open Source</h4>
+                        </div>
+                        <div class="interest-item">
+                            <span class="interest-icon">🖥️</span>
+                            <h4>Homelabbing</h4>
+                        </div>
+                    </div>
+                    <p class="muted-lead">
+                        <strong>Home Lab Stack:</strong> OPNsense, HomeNet, UniFi Network, AdGuard, CCTV, Plex, Sonarr, Radarr, Lidarr, Readarr, homarr, Overseerr, Uptime Kuma, Portainer, Tautulli, Bazarr, Prowlarr, CasaOS, Grafana, Prometheus, balena dashboard, OpenObserve, Cockpit, qBittorrent. Expert in SSH tunneling and Ubuntu Server LTS management.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROJECTS SECTION - ALL PROJECTS -->
+<section id="projects" class="page-section projects-section">
+    <div class="container">
+        <h2 class="section-title fade-in"><span>PROJECTS</span></h2>
+
+        <!-- Featured Projects -->
+        <div class="project-category fade-in">
+            <h3 class="category-label"> FEATURED</h3>
+            <div class="projects-grid">
+
+                <!-- Galaxy Book Enabler -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">WINDOWS</span>
+                        <div class="project-meta">
+                            <span>{{ gbe_repo.language }}</span>
+                            <span></span>
+                            <span>2024-2025</span>
+                        </div>
+                    </div>
+                    <h3>{{ gbe_repo.name }}</h3>
+                    <p>{{ gbe_repo.description }}</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>{{ gbe_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</strong> Downloads</span>
+                        <span class="stat"><strong>{{ gbe_repo.stargazers_count }}+</strong> Stars</span>
+                        <span class="stat"><strong>21</strong> Device Profiles</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">PowerShell 7</span>
+                        <span class="tech-tag">Registry</span>
+                        <span class="tech-tag">WinGet</span>
+                        <span class="tech-tag">Task Scheduler</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ gbe_repo.html_url }}" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span></span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- eGPU Auto-Enabler -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">eGPU</span>
+                        <div class="project-meta">
+                            <span>{{ egpu_repo.language }}</span>
+                            <span></span>
+                            <span>2024-2025</span>
+                        </div>
+                    </div>
+                    <h3>eGPU Auto-Enabler</h3>
+                    <p>{{ egpu_repo.description }}</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>{{ egpu_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</strong> Downloads</span>
+                        <span class="stat"><strong>{{ egpu_repo.stargazers_count }}+</strong> Stars</span>
+                        <span class="stat"><strong>{{ content }}lt;50ms</strong> Latency</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">PowerShell 7</span>
+                        <span class="tech-tag">PnP Utilities</span>
+                        <span class="tech-tag">Power Management</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ egpu_repo.html_url }}" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span></span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- GramSMC + GramControlCenter -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">HACKINTOSH</span>
+                        <div class="project-meta">
+                            <span>{{ gramsmc_repo.language }}</span>
+                            <span></span>
+                            <span>2026</span>
+                        </div>
+                    </div>
+                    <h3>GramSMC + GramControlCenter</h3>
+                    <p>VirtualSMC plugin providing native macOS support for LG Gram 13Z990-R. Custom ACPI tables and DriverKit-based kext using macOS Kernel SDK for hardware control via reverse-engineered embedded controller.</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>{{ gramsmc_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</strong> Downloads</span>
+                        <span class="stat"><strong>{{ gramsmc_repo.stargazers_count }}+</strong> Stars</span>
+                        <span class="stat"><strong>DriverKit</strong> Based</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">DriverKit</span>
+                        <span class="tech-tag">macOS Kernel SDK</span>
+                        <span class="tech-tag">ACPI</span>
+                        <span class="tech-tag">EC Reverse Engineering</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ gramsmc_repo.html_url }}" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span></span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- AI-Driven OPUF -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">FINAL YEAR PROJECT</span>
+                        <div class="project-meta">
+                            <span>Python / CUDA</span>
+                            <span></span>
+                            <span>2025-2026</span>
+                        </div>
+                    </div>
+                    <h3>AI-Driven Optical Authentication Framework</h3>
+                    <p>Novel anti-counterfeiting security framework leveraging Optical Physical Unclonable Functions (OPUFs). GPU-accelerated spectral analysis with machine learning pipelines for device authentication.</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>OPUF</strong> Based</span>
+                        <span class="stat"><strong>CUDA</strong> Accelerated</span>
+                        <span class="stat"><strong>ML</strong> Pipelines</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">CuPy/CUDA</span>
+                        <span class="tech-tag">NumPy</span>
+                        <span class="tech-tag">Scipy</span>
+                        <span class="tech-tag">Spectral Analysis</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ '/projects/' | relative_url }}" class="project-link dim" title="View project details">University Research Project</a>
+                    </div>
+                </div>
+
+                <!-- TSMC 65nm RTC IC Design {{ content }} Testing -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="project-header">
+                        <span class="project-badge">IC DESIGN</span>
+                        <div class="project-meta">
+                            <span>Hardware/Verilog</span>
+                            <span></span>
+                            <span>2023-2025</span>
+                        </div>
+                    </div>
+                    <h3>TSMC 65nm Real-Time Clock: Complete IC Design {{ content }} Test Flow</h3>
+                    <div class="project-stats">
+                        <span class="stat"><strong>65nm</strong> Process</span>
+                        <span class="stat"><strong>0</strong> DRC Errors</span>
+                        <span class="stat"><strong>-15%</strong> Area</span>
+                        <span class="stat"><strong>100%</strong> Test Pass</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Cadence S-Edit</span>
+                        <span class="tech-tag">T-Spice</span>
+                        <span class="tech-tag">L-Edit</span>
+                        <span class="tech-tag">Calibre DRC/LVS</span>
+                        <span class="tech-tag">Verilog</span>
+                        <span class="tech-tag">IC Testing</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="{{ '/projects/' | relative_url }}" class="project-link dim" title="View project details">University Group Project (Team Lead)</a>
+                    </div>
+                </div>
+
+                <!-- WattsApp: Embedded System Management Platform -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                     data-modal-images="/assets/images/projects/wattsapp-dashboard.jpg,/assets/images/projects/wattsapp-circuit.jpg,/assets/images/projects/wattsapp-grafana.jpg"
+                     data-modal-captions="Real-time monitoring dashboard|ATMega644p circuit with sensors|Grafana visualization interface"
+                     data-modal-title="WattsApp: Smart System Management Platform">
+                    <div class="project-header">
+                        <span class="project-badge">EMBEDDED SYSTEMS</span>
+                        <div class="project-meta">
+                            <span>AVR C</span>
+                            <span></span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                    <h3>WattsApp: Smart System Management Platform</h3>
+                    <p>Designed comprehensive embedded system management platform for real-time monitoring and control on AVR ATMega644p microcontroller. Developed bare-metal C firmware implementing sensor polling, data acquisition, and serial communication for telemetry streaming. Integrated InfluxDB time-series database for efficient historical data storage and Grafana dashboards for live system visualization and analytics. Implemented sensor interfaces for temperature (I2C), voltage/current monitoring (ADC), and GPIO control. Achieved sub-millisecond response times with interrupt-driven architecture and optimized data structures. Successfully demonstrated in IC testing coursework for chip validation and system integration.</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong><1ms</strong> Response</span>
+                        <span class="stat"><strong>Real-time</strong> Telemetry</span>
+                        <span class="stat"><strong>I2C/ADC</strong> Sensors</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">AVR C</span>
+                        <span class="tech-tag">ATMega644p</span>
+                        <span class="tech-tag">InfluxDB</span>
+                        <span class="tech-tag">Grafana</span>
+                        <span class="tech-tag">UART</span>
+                        <span class="tech-tag">I2C</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Bananz0/WattsApp" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- MIPSquare++ MIPS Simulator -->
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                     data-modal-images="/assets/images/projects/mipsquare-pipeline.jpg,/assets/images/projects/mipsquare-hazards.jpg"
+                     data-modal-captions="5-stage pipeline architecture diagram|Hazard detection and forwarding logic"
+                     data-modal-title="MIPSquare++: 5-Stage Pipelined MIPS Simulator">
+                    <div class="project-header">
+                        <span class="project-badge">COMPUTER ARCH</span>
+                        <div class="project-meta">
+                            <span>C++</span>
+                            <span></span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                    <h3>MIPSquare++: 5-Stage Pipelined MIPS Simulator</h3>
+                    <p>Comprehensive MIPS CPU simulator implementing realistic 5-stage pipeline (IF/ID/EX/MEM/WB) with intelligent hazard mitigation. Built custom assembly parser with label resolution supporting R-type, I-type, and J-type instructions. Engineered EX/MEM and MEM/WB data forwarding paths to minimize pipeline stalls. Implemented load-use hazard detection with automatic stalling and branch hazard handling with pipeline flushing. Developed showcase program calculating squares 0-200 using odd-number summation optimized for minimal stalls. Achieved near 1 CPI with comprehensive test suite validating RAW hazards, control hazards, and memory operations.</p>
+                    <div class="project-stats">
+                        <span class="stat"><strong>5</strong> Pipeline Stages</span>
+                        <span class="stat"><strong>~1.0</strong> CPI</span>
+                        <span class="stat"><strong>17</strong> Instructions</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">C++23</span>
+                        <span class="tech-tag">CMake</span>
+                        <span class="tech-tag">Data Forwarding</span>
+                        <span class="tech-tag">Hazard Detection</span>
+                        <span class="tech-tag">MIPS ISA</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Bananz0/MIPSquare" class="project-link" target="_blank">
+                            <span>VIEW ON GITHUB</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Open Source (Public) - Auto-generated -->
+        <div class="project-category fade-in open-source-preview">
+            <h3 class="category-label">OPEN SOURCE (PUBLIC)</h3>
+            <p class="section-subtitle centered-override">
+                I maintain <strong>69</strong> repositories across public, private, and forked work.
+                The list below is pulled from public repos only.
+            </p>
+
+            <div class="repo-grid repo-grid-compact">
+                {% for repo in repos_sorted limit: 12 %}
+                <a class="project-card-full repo-card-full repo-card-full-compact" data-spring="default" data-bounce="1" href="{{ repo.html_url }}" target="_blank" rel="noopener">
+                    <div class="project-header">
+                        <div class="project-meta">
+                            <span>★ {{ repo.stargazers_count | default: 0 }}</span>
+                            <span></span>
+                            <span>⑂ {{ repo.forks_count | default: 0 }}</span>
+                        </div>
+                    </div>
+
+                    <h3>{{ repo.name }}</h3>
+                    <p>{{ repo.description }}</p>
+                    {% else %}
+                    <p class="repo-desc-muted">No description provided.</p>
+
+                    <div class="project-stats">
+                        <span class="stat"><strong>{{ repo.download_count | divided_by: 1000.0 | round: 1 }}K</strong> Downloads</span>
+                        <span class="stat"><strong>{{ repo.download_count }}</strong> Downloads</span>
+                        <span class="stat"><strong>★ {{ repo.stargazers_count | default: 0 }}</strong> Stars</span>
+                    </div>
+
+                    <div class="tech-tags">
+                        {% for topic in topics limit: 6 %}
+                        <span class="tech-tag">{{ topic }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="project-links">
+                        <span class="project-link">VIEW ON GITHUB</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="view-all-projects">
+                <a href="{{ '/projects/' | relative_url }}" class="cta-btn primary" data-spring="snappy" data-bounce="1">FULL PROJECT ARCHIVE</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SKILLS SECTION -->
+<section id="skills" class="page-section skills-section">
+    <div class="container">
+        <h2 class="section-title fade-in"><span>TECH_STACK</span></h2>
+
+        <div class="skills-grid">
+            <!-- Hardware {{ content }} Digital Design -->
+            <div class="skill-panel fade-in" data-category="hardware">
+                <div class="panel-glow"></div>
+                <div class="skill-header">
+                    <span class="skill-icon"></span>
+                    <h3>HARDWARE {{ content }} DIGITAL DESIGN</h3>
+                </div>
+                <div class="skill-content">
+                    <div class="skill-group">
+                        <h4>IC Design {{ content }} FPGA</h4>
+                        <div class="skill-tags">
+                            <span class="skill-badge">TSMC 65nm</span>
+                            <span class="skill-badge">Cadence</span>
+                            <span class="skill-badge">SystemVerilog</span>
+                            <span class="skill-badge">Quartus</span>
+                            <span class="skill-badge">Vivado</span>
+                        </div>
+                    </div>
+                    <div class="skill-group">
+                        <h4>Embedded Platforms</h4>
+                        <div class="skill-tags">
+                            <span class="skill-badge">ESP32</span>
+                            <span class="skill-badge">STM32</span>
+                            <span class="skill-badge">Raspberry Pi</span>
+                            <span class="skill-badge">Arduino</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Software Development -->
+            <div class="skill-panel fade-in" data-category="software">
+                <div class="panel-glow"></div>
+                <div class="skill-header">
+                    <span class="skill-icon"></span>
+                    <h3>SOFTWARE DEVELOPMENT</h3>
+                </div>
+                <div class="skill-content">
+                    <div class="skill-group">
+                        <h4>Languages</h4>
+                        <div class="skill-tags">
+                            <span class="skill-badge">C/C++</span>
+                            <span class="skill-badge">Python</span>
+                            <span class="skill-badge">JavaScript</span>
+                            <span class="skill-badge">PowerShell</span>
+                            <span class="skill-badge">Kotlin</span>
+                        </div>
+                    </div>
+                    <div class="skill-group">
+                        <h4>Frameworks</h4>
+                        <div class="skill-tags">
+                            <span class="skill-badge">React.js</span>
+                            <span class="skill-badge">Node.js</span>
+                            <span class="skill-badge">Qt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Infrastructure {{ content }} Security -->
+            <div class="skill-panel fade-in" data-category="infrastructure">
+                <div class="panel-glow"></div>
+                <div class="skill-header">
+                    <span class="skill-icon"></span>
+                    <h3>INFRASTRUCTURE {{ content }} SECURITY</h3>
+                </div>
+                <div class="skill-content">
+                    <div class="skill-group">
+                        <h4>Network {{ content }} DevOps</h4>
+                        <div class="skill-tags">
+                            <span class="skill-badge">OPNsense</span>
+                            <span class="skill-badge">Docker</span>
+                            <span class="skill-badge">Proxmox</span>
+                            <span class="skill-badge">HAProxy</span>
+                        </div>
+                    </div>
+                    <div class="skill-group">
+                        <h4>Monitoring</h4>
+                        <div class="skill-tags">
+                            <span class="skill-badge">InfluxDB</span>
+                            <span class="skill-badge">Grafana</span>
+                            <span class="skill-badge">Suricata</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cert-grid fade-in">
+            <div class="cert-card">
+                <span class="cert-icon"></span>
+                <h4 class="cert-title">IEEE Member</h4>
+                <span class="cert-year">2024</span>
+            </div>
+            <div class="cert-card">
+                <span class="cert-icon"></span>
+                <h4 class="cert-title">ISACA Member</h4>
+                <span class="cert-year">2024</span>
+            </div>
+            <div class="cert-card">
+                <span class="cert-icon"></span>
+                <h4 class="cert-title">RAeS AMRAeS</h4>
+                <span class="cert-year">2024</span>
+            </div>
+            <div class="cert-card">
+                <span class="cert-icon"></span>
+                <h4 class="cert-title">Amateur Radio</h4>
+                <span class="cert-year">2025</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT SECTION -->
+<section id="contact" class="page-section contact-section">
+    <div class="container">
+        <h2 class="section-title fade-in"><span>GET_IN_TOUCH</span></h2>
+
+        <div class="contact-grid">
+            <!-- Terminal-Style Contact Form -->
+            <div class="contact-form-container fade-in">
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                        <span class="terminal-title">contact_form.sh</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line-typing">
+                            <span class="terminal-prompt">user@glenmuthoka:~$</span> ./send_message.sh
+                        </div>
+
+                        <form id="contact-form" class="terminal-form" action="https://formspree.io/f/mldaokke" method="POST">
+                            <input type="hidden" name="_subject" value="New contact from glenmuthoka.com" />
+                            <div class="form-group">
+                                <label class="terminal-label" for="contact-name">
+                                    <span class="terminal-prompt">{{ content }}gt;</span> Enter your name:
+                                </label>
+                                <input id="contact-name" type="text" name="name" autocomplete="name" class="terminal-input" placeholder="John Doe" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="terminal-label" for="contact-email">
+                                    <span class="terminal-prompt">{{ content }}gt;</span> Enter your email:
+                                </label>
+                                <input id="contact-email" type="email" name="email" autocomplete="email" class="terminal-input" placeholder="john@example.com" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="terminal-label" for="contact-message">
+                                    <span class="terminal-prompt">{{ content }}gt;</span> Your message:
+                                </label>
+                                <textarea id="contact-message" name="message" autocomplete="on" class="terminal-textarea" rows="5" placeholder="Tell me about your project..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="cta-btn primary" data-spring="snappy" data-bounce="1">SEND MESSAGE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Info Cards -->
+            <div class="contact-info-section">
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="contact-icon"></div>
+                    <h3>EMAIL</h3>
+                    <a href="mailto:theglenmuthoka@gmail.com" class="contact-link">theglenmuthoka@gmail.com</a>
+                </div>
+
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="contact-icon"></div>
+                    <h3>LINKEDIN</h3>
+                    <a href="https://linkedin.com/in/glenmuthoka" target="_blank" class="contact-link">/in/glen-muthoka</a>
+                </div>
+
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="contact-icon"></div>
+                    <h3>GITHUB</h3>
+                    <a href="https://github.com/Bananz0" target="_blank" class="contact-link">github.com/Bananz0</a>
+                </div>
+
+                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
+                    <div class="contact-icon"></div>
+                    <h3>LOCATION</h3>
+                    <span class="contact-text">Southampton, UK  From Kenya</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Availability Status -->
+        <div class="availability-section fade-in" data-spring="smooth" data-bounce="1">
+            <div class="availability-card" data-spring="smooth" data-bounce="1">
+                <div class="status-indicator">
+                    <span class="status-dot active"></span>
+                    <span class="status-text">CURRENTLY AVAILABLE FOR OPPORTUNITIES</span>
+                </div>
+                <div class="availability-info">
+                    <div class="info-item">
+                        <span class="icon"></span>
+                        <span>Response Time: <strong>{{ content }}lt; 24 hours</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon"></span>
+                        <span>Focus: <strong>Embedded Systems, IC Design, Full-Stack</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon"></span>
+                        <span>Time Zone: <strong>GMT/BST</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CV Download -->
+        <div class="cv-section fade-in" data-spring="smooth" data-bounce="1">
+            <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cv-download-btn" download="Glen_Muthoka_CV.pdf" data-spring="smooth" data-bounce="1">
+                <span class="cv-icon"></span>
+                <span class="cv-text">
+                    <strong>DOWNLOAD CV</strong>
+                    <small>PDF  Updated Nov 2025</small>
+                </span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- INLINE STYLES FOR SINGLE PAGE SECTIONS -->
+<!-- Styles moved to assets/css/main.css -->
+
+<!-- Three.js chip script removed -->
+    </main>
+
+    <!-- Project Modal -->
+    <div id="project-modal" class="project-modal" data-spring="smooth" data-bounce="1">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" data-spring="smooth" data-bounce="1">
+            <button class="modal-close" aria-label="Close modal" data-spring="snappy" data-bounce="1">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-gallery">
+                    <button class="gallery-nav gallery-prev" aria-label="Previous image" data-spring="snappy"
+                        data-bounce="1">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="gallery-container">
+                        <img id="modal-image" src="" alt="" />
+                        <div class="gallery-caption" id="modal-caption"></div>
+                    </div>
+                    <button class="gallery-nav gallery-next" aria-label="Next image" data-spring="snappy"
+                        data-bounce="1">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div class="gallery-indicators" id="gallery-indicators"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>GLEN MUTHOKA</h3>
+                <p>Embedded Systems // Digital Design // Homelabbing</p>
+            </div>
+            <div class="footer-section">
+                <h3>LINKS</h3>
+                <a href="https://github.com/Bananz0" target="_blank">GitHub</a>
+                <a href="https://linkedin.com/in/glenmuthoka" target="_blank">LinkedIn</a>
+                <a href="https://twitter.com/bananz0" target="_blank">Twitter</a>
+            </div>
+            <div class="footer-section">
+                <h3>CONTACT</h3>
+                <a href="mailto:theglenmuthoka@gmail.com">theglenmuthoka@gmail.com</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {{ 'now' | date: "%Y" }} Glen Muthoka. All systems operational.</p>
+        </div>
+    </footer>
+
+    <script src="{{ '/assets/js/spring.js' | relative_url }}?v={{ asset_version }}"></script>
+    <script src="{{ '/assets/js/modal.js' | relative_url }}?v={{ asset_version }}"></script>
+    <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ asset_version }}" defer></script>
+</body>
+
+</html>

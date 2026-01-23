@@ -505,6 +505,14 @@ let lastScroll = 0;
 let ticking = false;
 let autoCollapseTimer = null;
 let manuallyExpanded = false; // Track if user manually expanded the bar
+let heroHeight = 500; // Default fallback
+
+// Function to calculate and cache hero height
+function updateHeroHeight() {
+    if (heroSection) {
+        heroHeight = heroSection.offsetHeight * 0.6;
+    }
+}
 
 // Handle Mini-Mode Toggle Click
 if (floatingInner && miniToggle) {
@@ -609,7 +617,6 @@ function startAutoCollapseTimer() {
                 // Only remove the highlight when the user is inside the hero area.
                 if (miniToggle) {
                     const currentScroll = window.pageYOffset;
-                    const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
                     if (currentScroll <= heroHeight) {
                         miniToggle.classList.remove('highlight');
                     }
@@ -632,7 +639,6 @@ function updateFloatingHero() {
     const isScrollingUp = scrollDelta < -10;
     const isScrollingDown = scrollDelta > 2;
 
-    const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
     const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
 
     if (currentScroll > heroHeight) {
@@ -751,6 +757,13 @@ function handleScroll() {
 if (floatingInner) {
     floatingInner.classList.add('compact');
 }
+
+// Throttled resize handler for hero height
+let heroResizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(heroResizeTimeout);
+    heroResizeTimeout = setTimeout(updateHeroHeight, 150);
+}, { passive: true });
 
 // OPTIMIZED: Passive scroll listener for better performance
 window.addEventListener('scroll', handleScroll, { passive: true });
@@ -1404,6 +1417,7 @@ initActiveNavHighlight();
 // PAGE LOAD ANIMATION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    updateHeroHeight(); // Cache initial hero height
     document.body.classList.add('loaded');
 
     // Trigger initial animations after a short delay
