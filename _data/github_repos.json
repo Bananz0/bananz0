@@ -9,9 +9,9 @@
     "hidden": false,
     "stargazers_count": 455,
     "forks_count": 37,
-    "open_issues_count": 11,
-    "download_count": 10171,
-    "score": 80271,
+    "open_issues_count": 8,
+    "download_count": 10198,
+    "score": 80298,
     "pushed_at": "2026-01-10T05:23:02Z",
     "created_at": "2023-11-05T09:51:09Z",
     "topics": [
@@ -48,8 +48,8 @@
     "stargazers_count": 3,
     "forks_count": 0,
     "open_issues_count": 0,
-    "download_count": 128,
-    "score": 578,
+    "download_count": 129,
+    "score": 579,
     "pushed_at": "2022-05-24T21:01:34Z",
     "created_at": "2022-05-24T14:09:07Z",
     "topics": []
@@ -127,7 +127,7 @@
     "open_issues_count": 2,
     "download_count": 0,
     "score": 150,
-    "pushed_at": "2026-02-06T11:56:53Z",
+    "pushed_at": "2026-02-08T03:32:38Z",
     "created_at": "2025-11-13T00:26:20Z",
     "topics": []
   },
@@ -322,11 +322,11 @@
     "topics": []
   },
   {
-    "name": "GramSMC",
-    "full_name": "Bananz0/GramSMC",
-    "html_url": "https://github.com/Bananz0/GramSMC",
-    "description": "A VirtualSMC plugin provides native macOS support for the LG Gram 13Z990-R",
-    "language": "ASL",
+    "name": "BluetoothDeviceCacheFix",
+    "full_name": "Bananz0/BluetoothDeviceCacheFix",
+    "html_url": "https://github.com/Bananz0/BluetoothDeviceCacheFix",
+    "description": null,
+    "language": "PowerShell",
     "fork": false,
     "hidden": false,
     "stargazers_count": 0,
@@ -334,8 +334,8 @@
     "open_issues_count": 0,
     "download_count": 0,
     "score": 0,
-    "pushed_at": "2026-01-04T15:41:03Z",
-    "created_at": "2026-01-01T03:18:44Z",
+    "pushed_at": "2026-01-04T19:34:58Z",
+    "created_at": "2026-01-04T19:25:00Z",
     "topics": []
   },
   {
@@ -396,6 +396,23 @@
     "topics": []
   },
   {
+    "name": "GramSMC",
+    "full_name": "Bananz0/GramSMC",
+    "html_url": "https://github.com/Bananz0/GramSMC",
+    "description": "A VirtualSMC plugin provides native macOS support for the LG Gram 13Z990-R",
+    "language": "ASL",
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 0,
+    "pushed_at": "2026-02-08T02:32:47Z",
+    "created_at": "2026-01-01T03:18:44Z",
+    "topics": []
+  },
+  {
     "name": "DisplayAssistant",
     "full_name": "Bananz0/DisplayAssistant",
     "html_url": "https://github.com/Bananz0/DisplayAssistant",
@@ -410,23 +427,6 @@
     "score": 0,
     "pushed_at": "2025-10-05T10:58:58Z",
     "created_at": "2025-10-05T10:58:58Z",
-    "topics": []
-  },
-  {
-    "name": "BluetoothDeviceCacheFix",
-    "full_name": "Bananz0/BluetoothDeviceCacheFix",
-    "html_url": "https://github.com/Bananz0/BluetoothDeviceCacheFix",
-    "description": null,
-    "language": "PowerShell",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2026-01-04T19:34:58Z",
-    "created_at": "2026-01-04T19:25:00Z",
     "topics": []
   },
   {
