@@ -45,11 +45,16 @@ Final-year Electrical \& Electronics Engineering student at the University of So
 
 \section{Technical Projects}
 
-\subsection{Hardware \& Digital Design}
+\subsection{Embedded Systems, Firmware \& Digital Design}
 
 \cvitem{QuantumID: Deep Spectral Fingerprinting Neural Network}{Sep 2025--Jun 2026\\
 \textbf{Role:} Lead Developer \& Researcher (Final Year Thesis) | \textbf{Stack:} Python 3.10, PyTorch, NumPy, SciPy, Pandas, scikit-learn\\
 Built an Optical Physical Unclonable Function (OPUF) authentication system from excitation-emission matrix (EEM) fluorescence spectra using a custom convolutional autoencoder. Designed a physics-aware preprocessing pipeline with universal regridding, hybrid normalization, and 50x physics-based augmentation for low-data regimes. Implemented a two-stage curriculum (reconstruction then contrastive separation) to produce a 1536-D latent fingerprint and a 1536-bit hash with high entropy and zero collisions across samples. Achieved 0.966 reconstruction fidelity, strong latent separation, and sub-50ms inference for real-time authentication.}
+
+\cvitem{GramSMC \& Gram Control Panel: macOS Hardware Control Suite}{2026\\
+\textbf{Platform:} macOS (Hackintosh) | \textbf{Tools:} DriverKit, macOS Kernel SDK, Objective-C, ACPI/ASL, C++\\
+Developed a comprehensive hardware control suite for LG Gram 13Z990-R laptops on macOS, comprising a VirtualSMC kernel plugin and a native configuration utility. Engineered custom ACPI tables (SSDT) for hardware device mapping and implemented a DriverKit-based kernel extension using the macOS Kernel SDK for modern user-space driver architecture. Reverse-engineered LG embedded controller (EC) protocols to enable native keyboard backlight control, advanced battery management, and real-time thermal monitoring. Developed Gram Control Panel, an Objective-C based macOS application for hardware status visualization and fan profile management. Achieved native integration with the macOS System Management Controller (SMC) framework with zero kernel panics in 1,000+ hours of testing.\\
+\faGithub~\href{https://github.com/Bananz0/GramSMC}{github.com/Bananz0/GramSMC}}
 
 \cvitem{TSMC 65nm Real-Time Clock Design: Ring Oscillator IC Fabrication Flow}{Sep 2023--Jun 2024\\
 \textbf{Role:} Team Lead (6-member team) | \textbf{Tools:} S-Edit, T-Spice, L-Edit, Calibre DRC/LVS\\
@@ -60,22 +65,27 @@ Led complete integrated circuit design from RTL to GDSII tape-out for TSMC 65nm 
 Designed parametrized Finite Impulse Response digital filter with notch filtering capabilities for real-time stereo audio processing. Implemented 4-state FSM controller achieving 19-cycle latency (950ns at 50MHz) from ADC input to DAC output. Developed custom MATLAB scripts for optimal FIR coefficient generation and verification. Successfully processed dual-channel 48kHz audio with -40dB notch depth at configurable frequencies. Synthesized design utilized 2,847 logic elements (5\% FPGA utilization).\\
 \faGithub~\href{https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA}{github.com/Bananz0/16-Stage-FIR-Notch-Filter}}
 
-\cvitem{MIPSquare++: 5-Stage Pipelined MIPS Processor Simulator}{Apr 2025--Jun 2025\\
-\textbf{Language:} C++ (C++23) | \textbf{Tools:} CMake, CLion, Git\\
-Developed comprehensive MIPS CPU simulator implementing realistic 5-stage pipeline architecture (Fetch, Decode, Execute, Memory, Write-Back) with full hazard detection and mitigation. Implemented custom MIPS assembly parser with label resolution supporting R-type (add, sub, and, or, slt, sll, srl, sra, jr), I-type (addi, lw, sw, beq, bne), and J-type (j, jal) instructions. Engineered intelligent data forwarding between EX/MEM and MEM/WB stages to minimize pipeline stalls. Developed load-use hazard detection with automatic pipeline stalling and branch hazard handling with pipeline flushing. Created comprehensive test suite including RAW hazard tests, control hazard tests, and showcase program (calculating squares 0-200 using odd number summation) optimized for minimal stalls. Achieved near 1 CPI with proper forwarding implementation. System featured separate instruction/data memory, 32-register MIPS register file, and configurable debug output for all pipeline stages.\\
-\faGithub~\href{https://github.com/Bananz0/MIPSquare}{github.com/Bananz0/MIPSquare}}
-
 \cvitem{WattsApp: Embedded Smart System Management Platform}{Jan 2025--Mar 2025\\
 \textbf{MCU:} AVR ATMega644p | \textbf{Stack:} Embedded C, InfluxDB, Grafana | \textbf{Protocols:} UART, I2C\\
 Designed comprehensive embedded system management platform for real-time monitoring and control on AVR ATMega644p microcontroller. Developed bare-metal C firmware implementing sensor polling, data acquisition, and serial communication for telemetry streaming. Integrated InfluxDB time-series database for efficient historical data storage and Grafana dashboards for live system visualization and analytics. Implemented sensor interfaces for temperature (I2C), voltage/current monitoring (ADC), and GPIO control. Achieved sub-millisecond response times with interrupt-driven architecture and optimized data structures. System demonstrated in D2 IC Design coursework with successful chip testing and system integration demonstration.\\
 \faGithub~\href{https://github.com/Bananz0/WattsApp}{github.com/Bananz0/WattsApp}}
 
-\subsection{Software Development}
+\subsection{System Software \& Tools}
 
-\cvitem{GramSMC \& Gram Control Panel: macOS Hardware Control Suite}{2026\\
-\textbf{Platform:} macOS (Hackintosh) | \textbf{Tools:} DriverKit, macOS Kernel SDK, Objective-C, ACPI/ASL, C++\\
-Developed a comprehensive hardware control suite for LG Gram 13Z990-R laptops on macOS, comprising a VirtualSMC kernel plugin and a native configuration utility. Engineered custom ACPI tables (SSDT) for hardware device mapping and implemented a DriverKit-based kernel extension using the macOS Kernel SDK for modern user-space driver architecture. Reverse-engineered LG embedded controller (EC) protocols to enable native keyboard backlight control, advanced battery management, and real-time thermal monitoring. Developed Gram Control Panel, an Objective-C based macOS application for hardware status visualization and fan profile management. Achieved native integration with the macOS System Management Controller (SMC) framework with zero kernel panics in 1,000+ hours of testing.\\
-\faGithub~\href{https://github.com/Bananz0/GramSMC}{github.com/Bananz0/GramSMC}}
+\cvitem{MIPSquare++: 5-Stage Pipelined MIPS Processor Simulator}{Apr 2025--Jun 2025\\
+\textbf{Language:} C++ (C++23) | \textbf{Tools:} CMake, CLion, Git\\
+Developed comprehensive MIPS CPU simulator implementing realistic 5-stage pipeline architecture (Fetch, Decode, Execute, Memory, Write-Back) with full hazard detection and mitigation. Implemented custom MIPS assembly parser with label resolution supporting R-type (add, sub, and, or, slt, sll, srl, sra, jr), I-type (addi, lw, sw, beq, bne), and J-type (j, jal) instructions. Engineered intelligent data forwarding between EX/MEM and MEM/WB stages to minimize pipeline stalls. Developed load-use hazard detection with automatic pipeline stalling and branch hazard handling with pipeline flushing. Created comprehensive test suite including RAW hazard tests, control hazard tests, and showcase program (calculating squares 0-200 using odd number summation) optimized for minimal stalls. Achieved near 1 CPI with proper forwarding implementation. System featured separate instruction/data memory, 32-register MIPS register file, and configurable debug output for all pipeline stages.\\
+\faGithub~\href{https://github.com/Bananz0/MIPSquare}{github.com/Bananz0/MIPSquare}}
+
+\cvitem{Galaxy Book Enabler}{2024--Present\\
+\textbf{Language:} PowerShell | \textbf{Downloads:} 8,300+ | \textbf{Stars:} 350+\\
+Developed professional-grade Windows tool that spoofs PCs as Samsung Galaxy Books, unlocking the Samsung ecosystem including Quick Share, Multi Control, Samsung Notes, and 20+ exclusive applications. Implemented 21 authentic Galaxy Book hardware profiles with registry manipulation, automatic elevation via gsudo, and smart package management through WinGet. Features auto-update checker, System Support Engine integration, and seamless migration between versions.\\
+\faGithub~\href{https://github.com/Bananz0/GalaxyBookEnabler}{github.com/Bananz0/GalaxyBookEnabler}}
+
+\cvitem{eGPU Auto-Enabler}{2024--Present\\
+\textbf{Language:} PowerShell | \textbf{Technologies:} PnP Utilities, Power Management APIs\\
+Created background service that automatically re-enables external GPUs after hot-plugging on Windows, eliminating manual Device Manager intervention. Implemented automatic PnP device monitoring with 2-second polling, custom power plan switching for optimal eGPU performance, and crash recovery with runtime state preservation. Features Windows toast notifications for all events, 500KB rotating logs, and daily auto-update verification. Achieved 99.9\% reliability with <50ms detection latency.\\
+\faGithub~\href{https://github.com/Bananz0/eGPUae}{github.com/Bananz0/eGPUae}}
 
 \cvitem{WinStream: Windows to AirPlay Audio Bridge}{Jun 2024--Present\\
 \textbf{Language:} C\#/.NET | \textbf{Technologies:} Virtual Audio Drivers, AirPlay Protocol\\
@@ -101,18 +111,6 @@ Built comprehensive educational tool for control systems analysis and design. Im
 \textbf{Framework:} Qt (C++) | \textbf{Platform:} Raspberry Pi | \textbf{Protocol:} Custom Serial\\
 Developed collaborative whiteboard application with custom serial communication protocol over GPIO. Implemented efficient data serialization for real-time drawing synchronization between multiple Raspberry Pi devices. Achieved <100ms update latency through optimized protocol design and threading architecture. System supports up to 4 concurrent users with automatic conflict resolution.\\
 \faGithub~\href{https://github.com/Bananz0/PiBoard}{github.com/Bananz0/PiBoard}}
-
-\subsection{Open Source \& Personal Tools}
-
-\cvitem{Galaxy Book Enabler}{2024--Present\\
-\textbf{Language:} PowerShell | \textbf{Downloads:} 8,300+ | \textbf{Stars:} 350+\\
-Developed professional-grade Windows tool that spoofs PCs as Samsung Galaxy Books, unlocking the Samsung ecosystem including Quick Share, Multi Control, Samsung Notes, and 20+ exclusive applications. Implemented 21 authentic Galaxy Book hardware profiles with registry manipulation, automatic elevation via gsudo, and smart package management through WinGet. Features auto-update checker, System Support Engine integration, and seamless migration between versions.\\
-\faGithub~\href{https://github.com/Bananz0/GalaxyBookEnabler}{github.com/Bananz0/GalaxyBookEnabler}}
-
-\cvitem{eGPU Auto-Enabler}{2024--Present\\
-\textbf{Language:} PowerShell | \textbf{Technologies:} PnP Utilities, Power Management APIs\\
-Created background service that automatically re-enables external GPUs after hot-plugging on Windows, eliminating manual Device Manager intervention. Implemented automatic PnP device monitoring with 2-second polling, custom power plan switching for optimal eGPU performance, and crash recovery with runtime state preservation. Features Windows toast notifications for all events, 500KB rotating logs, and daily auto-update verification. Achieved 99.9\% reliability with <50ms detection latency.\\
-\faGithub~\href{https://github.com/Bananz0/eGPUae}{github.com/Bananz0/eGPUae}}
 
 \cvitem{MIPSquare: MIPS Assembly Simulator}{2024\\
 \textbf{Language:} C++ | \textbf{Platform:} Cross-platform CLI\\
