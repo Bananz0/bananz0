@@ -132,9 +132,9 @@ Architected and deployed production-grade home network infrastructure including:
 \end{itemize}
 Achieved 99.8\% uptime over 12-month period with zero security incidents. Infrastructure serves 8 concurrent users with average response times <50ms.}
 
-\cvitem{GramSMC: macOS Hardware Control via Kernel Extension}{2026\\
-\textbf{Platform:} macOS (Hackintosh) | \textbf{Tools:} DriverKit, macOS Kernel SDK, ACPI/ASL, C++\\
-Developed VirtualSMC plugin enabling native hardware control for LG Gram 13Z990-R running macOS. Engineered custom ACPI tables (SSDT) defining hardware device interfaces and embedded controller (EC) field mappings. Implemented DriverKit-based kernel extension using macOS Kernel SDK for user-space driver architecture, replacing deprecated kext model. Reverse-engineered LG embedded controller protocol through ACPI disassembly, I/O port monitoring, and register mapping to enable keyboard backlight control, battery management, thermal sensors, and fan control. Achieved native macOS integration with System Management Controller (SMC) framework, providing temperature/voltage/fan data to monitoring tools. Zero kernel panics in 1000+ hours of testing.\\
+\cvitem{GramSMC \& Gram Control Panel: macOS Hardware Control Suite}{2026\\
+\textbf{Platform:} macOS (Hackintosh) | \textbf{Tools:} DriverKit, macOS Kernel SDK, Objective-C, ACPI/ASL, C++\\
+Developed a comprehensive hardware control suite for LG Gram 13Z990-R laptops on macOS, comprising a VirtualSMC kernel plugin and a native configuration utility. Engineered custom ACPI tables (SSDT) for hardware device mapping and implemented a DriverKit-based kernel extension using the macOS Kernel SDK for modern user-space driver architecture. Reverse-engineered LG embedded controller (EC) protocols to enable native keyboard backlight control, advanced battery management, and real-time thermal monitoring. Developed Gram Control Panel, an Objective-C based macOS application for hardware status visualization and fan profile management. Achieved native integration with the macOS System Management Controller (SMC) framework with zero kernel panics in 1,000+ hours of testing.\\
 \faGithub~\href{https://github.com/Bananz0/GramSMC}{github.com/Bananz0/GramSMC}}
 
 \cvitem{Hackintosh Systems Engineering}{2023--Present\\
