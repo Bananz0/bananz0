@@ -30,6 +30,7 @@ const CONFIG = {
 const state = {
     currentTrack: null,
     activeSource: null,
+    isLoading: true,
     sources: {
         lastfm: { connected: false, playing: false, track: null },
         spotify: { connected: false, playing: false, track: null },
@@ -38,6 +39,8 @@ const state = {
     artistCache: new Map(), // Cache artist images
     currentColors: null, // Extracted colors from current track
 };
+
+let hasLoadedOnce = false;
 
 // ==========================================
 // DOM Elements
@@ -318,6 +321,19 @@ function updateUI() {
     updateSourceIndicators();
     updateNowPlayingCard(activeTrack, !!activeTrack);
     updateRecentTracks();
+
+    const hasAnyData = !!(
+        state.sources.lastfm.connected ||
+        state.sources.spotify.connected ||
+        state.sources.lastfm.track ||
+        state.sources.spotify.track ||
+        state.recentTracks.length
+    );
+
+    if (hasAnyData && !hasLoadedOnce) {
+        setLoadingState(false);
+        hasLoadedOnce = true;
+    }
 }
 
 function updateSourceIndicators() {
@@ -357,6 +373,10 @@ function updateSourceIndicators() {
 }
 
 function updateNowPlayingCard(track, isPlaying) {
+    if (state.isLoading && !track && state.recentTracks.length === 0) {
+        return;
+    }
+
     if (track) {
         elements.trackName.textContent = track.name;
         elements.artistName.textContent = track.artist;
@@ -364,31 +384,33 @@ function updateNowPlayingCard(track, isPlaying) {
 
         // Album art
         if (track.image) {
-            elements.albumArt.src = track.image;
-            elements.albumArt.onload = () => elements.albumArt.classList.add('loaded');
-            elements.albumArt.onerror = () => elements.albumArt.classList.remove('loaded');
+            setImageIfChanged(elements.albumArt, track.image, () => {
+                elements.albumArt.classList.add('loaded');
+            }, () => {
+                elements.albumArt.classList.remove('loaded');
+            });
         } else {
+            setImageIfChanged(elements.albumArt, '');
             elements.albumArt.classList.remove('loaded');
         }
 
         // Artist image (thumbnail and backdrop)
         if (track.artistImage) {
-            elements.artistThumbnail.src = track.artistImage;
-            elements.artistThumbnail.onload = () => {
+            setImageIfChanged(elements.artistThumbnail, track.artistImage, () => {
                 elements.artistThumbnailContainer.classList.add('loaded');
-            };
+            });
 
-            elements.artistBackdrop.style.backgroundImage = `url(${track.artistImage})`;
+            setBackgroundIfChanged(elements.artistBackdrop, track.artistImage);
             elements.artistBackdrop.classList.add('loaded');
 
             // Immersive Background (Fullscreen)
             if (elements.immersiveBg) {
-                elements.immersiveBg.style.backgroundImage = `url(${track.artistImage})`;
+                setBackgroundIfChanged(elements.immersiveBg, track.artistImage);
             }
         } else {
             elements.artistThumbnailContainer.classList.remove('loaded');
             elements.artistBackdrop.classList.remove('loaded');
-            if (elements.immersiveBg) elements.immersiveBg.style.backgroundImage = '';
+            if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
         }
 
         elements.playingIndicator.classList.add('active');
@@ -418,8 +440,9 @@ function updateNowPlayingCard(track, isPlaying) {
             elements.artistName.textContent = lastTrack.artist;
 
             if (lastTrack.image) {
-                elements.albumArt.src = lastTrack.image;
-                elements.albumArt.onload = () => elements.albumArt.classList.add('loaded');
+                setImageIfChanged(elements.albumArt, lastTrack.image, () => {
+                    elements.albumArt.classList.add('loaded');
+                });
             }
 
             const timeAgo = lastTrack.date ? getTimeAgo(lastTrack.date) : 'recently';
@@ -440,12 +463,13 @@ function updateNowPlayingCard(track, isPlaying) {
                             });
                         }
                         if (spotifyData.artistImage) {
-                            elements.artistThumbnail.src = spotifyData.artistImage;
-                            elements.artistThumbnailContainer.classList.add('loaded');
-                            elements.artistBackdrop.style.backgroundImage = `url(${spotifyData.artistImage})`;
+                            setImageIfChanged(elements.artistThumbnail, spotifyData.artistImage, () => {
+                                elements.artistThumbnailContainer.classList.add('loaded');
+                            });
+                            setBackgroundIfChanged(elements.artistBackdrop, spotifyData.artistImage);
                             elements.artistBackdrop.classList.add('loaded');
                             if (elements.immersiveBg) {
-                                elements.immersiveBg.style.backgroundImage = `url(${spotifyData.artistImage})`;
+                                setBackgroundIfChanged(elements.immersiveBg, spotifyData.artistImage);
                             }
                         }
                         updateSourceIndicators();
@@ -464,6 +488,10 @@ function updateNowPlayingCard(track, isPlaying) {
 
 function updateRecentTracks() {
     if (!elements.recentTracksList) return;
+
+    if (state.isLoading && state.recentTracks.length === 0) {
+        return;
+    }
 
     elements.recentTracksList.innerHTML = '';
 
@@ -586,7 +614,7 @@ function applyDynamicColors(colors) {
     `;
 
     // Apply to artist backdrop
-    if (elements.artistBackdrop) {
+    if (elements.artistBackdrop && !elements.artistBackdrop.dataset.bg) {
         elements.artistBackdrop.style.background = gradientBlur;
         elements.artistBackdrop.classList.add('loaded');
     }
@@ -641,7 +669,7 @@ function applyDynamicColors(colors) {
     }
 
     // Apply to Social Badges & Home Icon (Main Site Elements) with enhanced glow
-    const badges = document.querySelectorAll('.social-badge, .static-logo-badge a');
+    const badges = document.querySelectorAll('.social-badge, .static-logo-badge a, .nav-hub .hub-main, .nav-hub .hub-btn');
     badges.forEach(badge => {
         badge.style.setProperty('--dynamic-border-color', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
         badge.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
@@ -763,6 +791,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    setLoadingState(true);
+
     // Start the polling
     startPolling();
 
@@ -791,6 +821,80 @@ document.addEventListener('DOMContentLoaded', () => {
     // Log configuration status
     console.log('Music page initialized', {
         lastfm: CONFIG.lastfm.apiKey ? 'configured' : 'missing',
-        spotify: CONFIG.spotify.clientId ? 'configured' : 'missing (artist images will be unavailable)',
+        spotify: CONFIG.spotify.workerUrl ? 'configured' : 'missing (artist images will be unavailable)',
     });
 });
+
+function setLoadingState(isLoading) {
+    state.isLoading = isLoading;
+    if (!elements.musicHero) return;
+
+    elements.musicHero.classList.toggle('is-loading', isLoading);
+
+    if (isLoading) {
+        elements.trackName.textContent = 'Loading...';
+        elements.artistName.textContent = 'Connecting to sources';
+        elements.albumName.textContent = '';
+        elements.listeningStatus.textContent = 'Fetching now playing...';
+        elements.listeningStatus.classList.remove('now-playing');
+        elements.playingIndicator.classList.remove('active');
+
+        if (elements.recentTracksList) {
+            elements.recentTracksList.innerHTML = '';
+            for (let i = 0; i < 4; i += 1) {
+                const li = document.createElement('li');
+                li.className = 'loading-item';
+                li.innerHTML = `
+                    <div class="track-thumb"></div>
+                    <div class="track-details">
+                        <div class="name">Loading</div>
+                        <div class="artist">Loading</div>
+                    </div>
+                    <span class="track-time">...</span>
+                `;
+                elements.recentTracksList.appendChild(li);
+            }
+        }
+    }
+}
+
+function setImageIfChanged(imgEl, url, onLoad, onError) {
+    if (!imgEl) return false;
+
+    const nextUrl = url || '';
+    const currentUrl = imgEl.dataset.src || '';
+
+    if (nextUrl === currentUrl) {
+        return false;
+    }
+
+    imgEl.dataset.src = nextUrl;
+
+    if (!nextUrl) {
+        imgEl.removeAttribute('src');
+        if (typeof onError === 'function') {
+            onError();
+        }
+        return true;
+    }
+
+    imgEl.onload = typeof onLoad === 'function' ? onLoad : null;
+    imgEl.onerror = typeof onError === 'function' ? onError : null;
+    imgEl.src = nextUrl;
+    return true;
+}
+
+function setBackgroundIfChanged(el, url) {
+    if (!el) return false;
+
+    const nextUrl = url || '';
+    const currentUrl = el.dataset.bg || '';
+
+    if (nextUrl === currentUrl) {
+        return false;
+    }
+
+    el.dataset.bg = nextUrl;
+    el.style.backgroundImage = nextUrl ? `url(${nextUrl})` : '';
+    return true;
+}

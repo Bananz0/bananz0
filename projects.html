@@ -4,10 +4,14 @@ title: Projects
 permalink: /projects/
 ---
 
+{% assign public_repo_count = site.data.github_repos | where_exp: "r", "r.hidden != true" | size %}
+{% assign repo_stats = site.data.github_repo_stats %}
+{% assign total_repo_count = repo_stats.total_count | default: public_repo_count %}
+
 <section class="projects-hero">
     <div class="container projects-container-wide">
         <h1 class="glitch fade-in" data-text="PROJECTS">PROJECTS</h1>
-        <p class="hero-subtitle fade-in">69 REPOSITORIES ACROSS PUBLIC, PRIVATE, AND FORKED WORK. THIS PAGE LISTS ONLY PUBLIC REPOS THAT LOOK ACTIVELY MAINTAINED.</p>
+        <p class="hero-subtitle fade-in">{{ total_repo_count }} REPOSITORIES ACROSS PUBLIC, PRIVATE, AND FORKED WORK. THIS PAGE LISTS ONLY PUBLIC REPOS THAT LOOK ACTIVELY MAINTAINED.</p>
         <div class="projects-hero-cta fade-in" data-spring="snappy" data-bounce="1">
             <a href="{{ '/' | relative_url }}#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">FEATURED HIGHLIGHTS</a>
             <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" data-spring="snappy" data-bounce="1" target="_blank" rel="noopener">GITHUB PROFILE</a>

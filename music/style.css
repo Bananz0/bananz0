@@ -207,14 +207,7 @@
     transform: translateZ(0);
 }
 
-.now-playing-card:hover {
-    border-color: rgba(245, 158, 11, 0.25);
-    box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.6),
-        0 8px 30px rgba(245, 158, 11, 0.1),
-        0 0 60px var(--dynamic-glow-color, rgba(245, 158, 11, 0.25));
-    transform: translateY(-4px);
-}
+/* Card should remain static on hover for the music page */
 
 /* Artist Backdrop (blurred background) */
 .artist-backdrop {
@@ -427,11 +420,57 @@
 }
 
 /* ==========================================
+   Loading States
+   ========================================== */
+@keyframes loadingPulse {
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 0.9;
+    }
+}
+
+.music-hero.is-loading .album-art-placeholder,
+.music-hero.is-loading .recent-tracks li.loading-item {
+    animation: loadingPulse 1.6s ease-in-out infinite;
+}
+
+.music-hero.is-loading .playing-indicator {
+    opacity: 0;
+}
+
+.recent-tracks li.loading-item {
+    background: rgba(18, 18, 18, 0.35);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.recent-tracks li.loading-item .track-thumb {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(6, 182, 212, 0.12));
+    border-radius: var(--radius-sm);
+}
+
+.recent-tracks li.loading-item .track-details .name,
+.recent-tracks li.loading-item .track-details .artist,
+.recent-tracks li.loading-item .track-time {
+    color: transparent;
+}
+
+/* ==========================================
    Recent Tracks
    ========================================== */
 .recent-tracks {
     width: 100%;
     max-width: 420px;
+    background: rgba(18, 18, 18, 0.4);
+    border: 1px solid var(--dynamic-border, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-xl);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.25));
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
 }
 
 .recent-tracks h3 {
@@ -585,7 +624,7 @@
         -webkit-backdrop-filter: blur(20px) saturate(150%);
         backdrop-filter: blur(20px) saturate(150%);
         border: 1px solid var(--dynamic-border, rgba(255, 255, 255, 0.08));
-        box-shadow: var(--dynamic-shadow, 0 20px 60px rgba(0, 0, 0, 0.3));
+        box-shadow: var(--dynamic-shadow, 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.25)));
         border-radius: var(--radius-xl);
         padding: var(--space-lg);
         width: 100%;

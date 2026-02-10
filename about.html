@@ -3,41 +3,20 @@ layout: default
 title: About
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About</title>
-    <meta http-equiv="refresh" content="0; url=/index.html#about" />
-    <link rel="canonical" href="/index.html#about" />
-    <script>
-        // JS fallback in case meta refresh is blocked
-        (function () {
-            var target = '/index.html#about';
+<div class="deprecated-redirect">
+    <p>Redirecting to <a href="/#about">About</a>...</p>
+</div>
+<script>
+    (function () {
+        var target = '/#about';
+        if (window.location.hash !== '#about') {
             try { window.location.replace(target); } catch (e) { window.location.href = target; }
-        })();
-    </script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-            padding: 2rem;
-            color: #ccc;
-            background: #0b0b12;
         }
-
-        a {
-            color: #6cf;
-        }
-    </style>
-</head>
-
-<body>
-    <p>Redirecting to <a href="/index.html#about">About</a></p>
-</body>
-
-</html>
+    })();
+</script>
+<noscript>
+    <p><a href="/#about">Go to About</a></p>
+</noscript>
 
 <section class="about-hero">
     <div class="container">
@@ -246,7 +225,7 @@ title: About
     }
 
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: var(--text-lg);
         color: var(--text-secondary);
         letter-spacing: 3px;
         margin-top: 1rem;
@@ -303,8 +282,8 @@ title: About
     }
 
     .panel-header h2 {
-        color: var(--cyber-blue);
-        font-size: 1.5rem;
+        color: var(--neon-cyan);
+        font-size: var(--text-xl);
         text-transform: uppercase;
         letter-spacing: 3px;
         margin: 0;
@@ -316,13 +295,13 @@ title: About
     }
 
     .panel-content .lead {
-        font-size: 1.1rem;
+        font-size: var(--text-lg);
         color: var(--text-primary);
         margin-bottom: 1.5rem;
     }
 
     .panel-content strong {
-        color: var(--cyber-pink);
+        color: var(--neon-amber);
     }
 
     .work-item,
@@ -338,14 +317,14 @@ title: About
 
     .work-item h4,
     .edu-item h4 {
-        color: var(--cyber-purple);
+        color: var(--neon-teal);
         margin-bottom: 0.3rem;
     }
 
     .work-period,
     .edu-period {
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-sm);
         margin-bottom: 1rem;
     }
 
@@ -364,7 +343,7 @@ title: About
         content: '';
         position: absolute;
         left: 0;
-        color: var(--cyber-pink);
+        color: var(--neon-amber);
         font-weight: bold;
     }
 

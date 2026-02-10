@@ -3,40 +3,20 @@ layout: default
 title: Contact
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact</title>
-    <meta http-equiv="refresh" content="0; url=/index.html#contact" />
-    <link rel="canonical" href="/index.html#contact" />
-    <script>
-        (function () {
-            var target = '/index.html#contact';
+<div class="deprecated-redirect">
+    <p>Redirecting to <a href="/#contact">Contact</a>...</p>
+</div>
+<script>
+    (function () {
+        var target = '/#contact';
+        if (window.location.hash !== '#contact') {
             try { window.location.replace(target); } catch (e) { window.location.href = target; }
-        })();
-    </script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-            padding: 2rem;
-            color: #ccc;
-            background: #0b0b12;
         }
-
-        a {
-            color: #6cf;
-        }
-    </style>
-</head>
-
-<body>
-    <p>Redirecting to <a href="/index.html#contact">Contact</a></p>
-</body>
-
-</html>
+    })();
+</script>
+<noscript>
+    <p><a href="/#contact">Go to Contact</a></p>
+</noscript>
 
 <section class="contact-hero">
     <div class="container">
@@ -287,7 +267,7 @@ title: Contact
         display: flex;
         gap: 0.5rem;
         align-items: center;
-        border-bottom: 1px solid var(--cyber-blue);
+        border-bottom: 1px solid var(--neon-cyan);
     }
 
     .terminal-btn {
@@ -311,7 +291,7 @@ title: Contact
     .terminal-title {
         margin-left: auto;
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-sm);
     }
 
     .terminal-body {
@@ -322,11 +302,11 @@ title: Contact
     .terminal-line-typing {
         color: #00ff00;
         margin-bottom: 1.5rem;
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
     }
 
     .terminal-prompt {
-        color: var(--cyber-pink);
+        color: var(--neon-amber);
         margin-right: 0.5rem;
     }
 
@@ -344,17 +324,17 @@ title: Contact
 
     .terminal-label {
         color: #00ff00;
-        font-size: 0.95rem;
+        font-size: var(--text-sm);
     }
 
     .terminal-input,
     .terminal-textarea {
         background: rgba(0, 217, 255, 0.05);
-        border: 1px solid var(--cyber-blue);
+        border: 1px solid var(--neon-cyan);
         color: var(--text-primary);
         padding: 0.8rem;
-        font-family: 'Courier New', monospace;
-        font-size: 0.95rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: var(--text-sm);
         border-radius: 4px;
         transition: all 0.3s;
     }
@@ -362,7 +342,7 @@ title: Contact
     .terminal-input:focus,
     .terminal-textarea:focus {
         outline: none;
-        border-color: var(--cyber-pink);
+        border-color: var(--neon-amber);
         box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
         background: rgba(255, 0, 110, 0.05);
     }
@@ -392,7 +372,7 @@ title: Contact
     }
 
     .contact-card:hover {
-        border-color: var(--cyber-pink);
+        border-color: var(--neon-amber);
         transform: translateY(-5px);
         box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
     }
@@ -403,29 +383,29 @@ title: Contact
     }
 
     .contact-card h3 {
-        color: var(--cyber-blue);
-        font-size: 1.1rem;
+        color: var(--neon-cyan);
+        font-size: var(--text-base);
         margin-bottom: 0.5rem;
         text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
     }
 
     .contact-card p {
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-sm);
         margin-bottom: 1rem;
     }
 
     .contact-link {
         display: inline-block;
-        color: var(--cyber-pink);
+        color: var(--neon-amber);
         text-decoration: none;
         font-weight: bold;
         transition: all 0.3s;
     }
 
     .contact-link:hover {
-        color: var(--cyber-blue);
-        text-shadow: 0 0 10px var(--cyber-blue);
+        color: var(--neon-cyan);
+        text-shadow: 0 0 10px var(--neon-cyan);
     }
 
     .contact-text {
@@ -440,7 +420,7 @@ title: Contact
 
     .availability-card {
         background: var(--card-bg);
-        border: 2px solid var(--cyber-purple);
+        border: 2px solid var(--neon-teal);
         border-radius: 8px;
         padding: 2rem;
         box-shadow: 0 10px 30px rgba(181, 55, 242, 0.2);
@@ -484,7 +464,7 @@ title: Contact
     .status-text {
         color: var(--text-primary);
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: var(--text-base);
         letter-spacing: 2px;
     }
 

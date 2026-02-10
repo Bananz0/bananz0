@@ -1,10 +1,12 @@
 param(
   [string]$User = "Bananz0",
   [string]$OutFile = "$PSScriptRoot\..\_data\github_repos.json",
+  [string]$StatsOutFile = "$PSScriptRoot\..\_data\github_repo_stats.json",
   [int]$PerPage = 100,
   [string]$Token = $env:GITHUB_TOKEN,
   [switch]$IncludeForks,
-  [switch]$IncludeArchived
+  [switch]$IncludeArchived,
+  [switch]$IncludePrivate
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,7 +14,7 @@ $ErrorActionPreference = "Stop"
 # Manual hide list (kept in the JSON as `hidden: true` so the site can filter)
 $HiddenRepoNames = @(
   "bananz0",
-  "p2"
+  "p2",
   "p3",
   "p4",
   "p5",
@@ -102,7 +104,11 @@ $all = @()
 $page = 1
 
 while ($true) {
-  $url = "https://api.github.com/users/$User/repos?per_page=$PerPage&page=$page&sort=pushed"
+  if ($IncludePrivate.IsPresent -and $Token) {
+    $url = "https://api.github.com/user/repos?per_page=$PerPage&page=$page&visibility=all&affiliation=owner&sort=pushed"
+  } else {
+    $url = "https://api.github.com/users/$User/repos?per_page=$PerPage&page=$page&sort=pushed"
+  }
   $repos = Invoke-GitHubApi -Url $url
   if (-not $repos -or $repos.Count -eq 0) { break }
   $all += $repos
@@ -183,3 +189,14 @@ if (-not (Test-Path $targetDir)) { New-Item -ItemType Directory -Path $targetDir
 $normalized | ConvertTo-Json -Depth 6 | Out-File -FilePath $OutFile -Encoding utf8
 
 Write-Host "Wrote $($normalized.Count) repos to $OutFile"
+
+$stats = [pscustomobject]@{
+  total_count = $all.Count
+  public_count = ($all | Where-Object { $_.private -eq $false }).Count
+  private_count = ($all | Where-Object { $_.private -eq $true }).Count
+  fork_count = ($all | Where-Object { $_.fork -eq $true }).Count
+  filtered_public_count = $normalized.Count
+}
+
+$stats | ConvertTo-Json -Depth 3 | Out-File -FilePath $StatsOutFile -Encoding utf8
+Write-Host "Wrote repo stats to $StatsOutFile"
