@@ -138,24 +138,24 @@
 .social-badge,
 .static-logo-badge a {
     transition: all var(--spring-snappy);
-    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.12));
+    border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), 0.12));
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
-                0 0 15px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
+                0 0 15px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.15));
 }
 
 .social-badge:hover,
 .static-logo-badge a:hover {
-    border-color: var(--dynamic-border-color-bright, rgba(245, 158, 11, 0.5));
+    border-color: var(--dynamic-border-color-bright, rgba(var(--neon-gold-rgb), 0.5));
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 
-                0 0 30px var(--dynamic-glow-color, rgba(245, 158, 11, 0.35)),
-                0 0 50px var(--dynamic-glow-color, rgba(245, 158, 11, 0.2));
+                0 0 30px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.35)),
+                0 0 50px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.2));
     transform: translateY(-2px) scale(1.05);
 }
 
 /* Enhanced Header Center Box Glow */
 .header-center-box {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
-                0 0 20px var(--dynamic-glow-color, rgba(245, 158, 11, 0.1));
+                0 0 20px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.1));
     transition: all var(--spring-smooth);
 }
 

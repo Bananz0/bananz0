@@ -16,22 +16,22 @@
 
 .music-hero ::-webkit-scrollbar-track,
 .recent-tracks ::-webkit-scrollbar-track {
-    background: rgba(18, 18, 18, 0.3);
+    background: rgba(var(--bg-tertiary-rgb), 0.3);
     border-radius: var(--radius-md);
 }
 
 .music-hero ::-webkit-scrollbar-thumb,
 .recent-tracks ::-webkit-scrollbar-thumb {
-    background: var(--dynamic-scrollbar-color, rgba(245, 158, 11, 0.5));
+    background: var(--dynamic-scrollbar-color, rgba(var(--neon-gold-rgb), 0.5));
     border-radius: var(--radius-md);
-    box-shadow: 0 0 10px var(--dynamic-glow-color, rgba(245, 158, 11, 0.3));
+    box-shadow: 0 0 10px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.3));
     transition: all var(--spring-snappy);
 }
 
 .music-hero ::-webkit-scrollbar-thumb:hover,
 .recent-tracks ::-webkit-scrollbar-thumb:hover {
-    background: var(--dynamic-scrollbar-color-bright, rgba(245, 158, 11, 0.8));
-    box-shadow: 0 0 15px var(--dynamic-glow-color, rgba(245, 158, 11, 0.5));
+    background: var(--dynamic-scrollbar-color-bright, rgba(var(--neon-gold-rgb), 0.8));
+    box-shadow: 0 0 15px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.5));
 }
 
 .music-hero {
@@ -82,10 +82,10 @@
     gap: 8px;
     padding: 10px 16px;
     /* Glassmorphism - matches .social-badge from main.css */
-    background: rgba(18, 18, 18, 0.5);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid rgba(245, 158, 11, 0.12);
+    background: var(--bg-glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 1px solid rgba(var(--neon-gold-rgb), var(--glass-border-opacity));
     border-radius: var(--radius-md);
     font-size: 0.8rem;
     font-weight: 500;
@@ -93,13 +93,13 @@
     transition: all var(--spring-snappy);
     /* Match header element opacity and shadow */
     opacity: 1;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(245, 158, 11, 0.06);
+    box-shadow: var(--drop-shadow-deep), var(--drop-shadow-subtle);
 }
 
 .source-pill:hover {
-    background: rgba(18, 18, 18, 0.8);
-    border-color: rgba(245, 158, 11, 0.4);
-    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.15);
+    background: var(--bg-card);
+    border-color: var(--border-color-hover);
+    box-shadow: 0 8px 30px rgba(var(--neon-gold-rgb), 0.15);
     transform: translateY(-2px);
 }
 
@@ -129,29 +129,29 @@
 
 /* Source-specific active colors */
 .source-pill[data-source="lastfm"].active {
-    border-color: rgba(185, 0, 0, 0.5);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 
-                0 0 25px rgba(185, 0, 0, 0.4),
-                0 0 40px rgba(185, 0, 0, 0.2);
+    border-color: rgba(var(--netflix-red-rgb), 0.5);
+    box-shadow: var(--drop-shadow-deep), 
+                0 0 25px rgba(var(--netflix-red-rgb), 0.4),
+                0 0 40px rgba(var(--netflix-red-rgb), 0.2);
 }
 
 .source-pill[data-source="lastfm"].active .status-dot {
-    background: #b90000;
-    box-shadow: 0 0 15px rgba(185, 0, 0, 0.9),
-                0 0 25px rgba(185, 0, 0, 0.6);
+    background: var(--netflix-red);
+    box-shadow: 0 0 15px rgba(var(--netflix-red-rgb), 0.9),
+                0 0 25px rgba(var(--netflix-red-rgb), 0.6);
 }
 
 .source-pill[data-source="spotify"].active {
-    border-color: rgba(29, 185, 84, 0.5);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 
-                0 0 25px rgba(29, 185, 84, 0.4),
-                0 0 40px rgba(29, 185, 84, 0.2);
+    border-color: rgba(var(--spotify-green-rgb), 0.5);
+    box-shadow: var(--drop-shadow-deep), 
+                0 0 25px rgba(var(--spotify-green-rgb), 0.4),
+                0 0 40px rgba(var(--spotify-green-rgb), 0.2);
 }
 
 .source-pill[data-source="spotify"].active .status-dot {
-    background: #1DB954;
-    box-shadow: 0 0 15px rgba(29, 185, 84, 0.9),
-                0 0 25px rgba(29, 185, 84, 0.6);
+    background: var(--spotify-green);
+    box-shadow: 0 0 15px rgba(var(--spotify-green-rgb), 0.9),
+                0 0 25px rgba(var(--spotify-green-rgb), 0.6);
 }
 
 
@@ -159,12 +159,12 @@
 /* Connected but not playing state */
 .source-pill.connected {
     opacity: 0.85;
-    border-color: rgba(6, 182, 212, 0.3);
+    border-color: rgba(var(--neon-cyan-rgb), 0.3);
 }
 
 .source-pill.connected .status-dot {
     background: var(--neon-cyan);
-    box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
+    box-shadow: 0 0 6px rgba(var(--neon-cyan-rgb), 0.5);
 }
 
 /* Spotify connected = GREEN (it's providing enrichment data) */
@@ -197,15 +197,15 @@
 .now-playing-card {
     position: relative;
     width: 100%;
-    background: rgba(18, 18, 18, 0.45);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.12));
+    background: rgba(var(--bg-tertiary-rgb), 0.45);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
     border-radius: var(--radius-xl);
     overflow: hidden;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
+        0 0 40px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.15));
     transition: all var(--spring-smooth);
     /* Promote to layer to avoid re-rendering backdrop filter on child animation */
     transform: translateZ(0);
@@ -272,7 +272,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(6, 182, 212, 0.1));
+    background: linear-gradient(135deg, rgba(var(--neon-gold-rgb), 0.1), rgba(var(--neon-cyan-rgb), 0.1));
     transition: opacity var(--spring-smooth);
 }
 
@@ -298,7 +298,7 @@
     border-radius: 50%;
     overflow: hidden;
     background: var(--bg-secondary);
-    border: 3px solid rgba(18, 18, 18, 0.9);
+    border: 3px solid rgba(var(--bg-tertiary-rgb), 0.9);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     opacity: 0;
     transform: scale(0.8);
@@ -448,12 +448,12 @@
 }
 
 .recent-tracks li.loading-item {
-    background: rgba(18, 18, 18, 0.35);
-    border-color: rgba(245, 158, 11, 0.1);
+    background: rgba(var(--bg-tertiary-rgb), 0.35);
+    border-color: rgba(var(--neon-gold-rgb), 0.1);
 }
 
 .recent-tracks li.loading-item .track-thumb {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    background: linear-gradient(135deg, rgba(var(--neon-gold-rgb), 0.2), rgba(var(--neon-gold-rgb), 0.05));
     border-radius: var(--radius-sm);
 }
 
@@ -471,14 +471,14 @@
     overflow: hidden;
     width: 100%;
     padding: var(--space-lg);
-    background: rgba(18, 18, 18, 0.45);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.12));
+    background: rgba(var(--bg-tertiary-rgb), 0.45);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
     border-radius: var(--radius-xl);
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
+        0 0 40px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.15));
     transition: all var(--spring-smooth);
 }
 
@@ -509,8 +509,8 @@
     text-transform: uppercase;
     padding: 3px 10px;
     border-radius: 999px;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.2);
+    background: rgba(var(--neon-gold-rgb), 0.1);
+    border: 1px solid rgba(var(--neon-gold-rgb), 0.2);
     color: var(--text-muted);
     font-weight: 600;
     opacity: 0.8;
@@ -539,8 +539,8 @@
 }
 
 .recent-tracks li:hover {
-    background: rgba(18, 18, 18, 0.6);
-    border-color: rgba(245, 158, 11, 0.15);
+    background: rgba(var(--bg-tertiary-rgb), 0.6);
+    border-color: rgba(var(--neon-gold-rgb), 0.15);
 }
 
 .recent-tracks .track-thumb {
@@ -590,15 +590,15 @@
     max-width: calc(480px * 2 + var(--space-2xl));
     margin: 0 auto;
     
-    background: rgba(18, 18, 18, 0.45);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.14));
+    background: rgba(var(--bg-tertiary-rgb), 0.45);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
+        0 0 40px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.15));
     transition: all var(--spring-smooth);
 }
 
@@ -631,8 +631,8 @@
     text-transform: uppercase;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(6, 182, 212, 0.15);
-    border: 1px solid rgba(6, 182, 212, 0.35);
+    background: rgba(var(--neon-cyan-rgb), 0.15);
+    border: 1px solid rgba(var(--neon-cyan-rgb), 0.35);
     color: var(--neon-cyan);
     font-weight: 600;
 }
@@ -674,7 +674,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, rgba(18, 18, 18, 0.2), rgba(245, 158, 11, 0.08), rgba(18, 18, 18, 0.2));
+    background: linear-gradient(120deg, rgba(var(--bg-tertiary-rgb), 0.2), rgba(var(--neon-gold-rgb), 0.08), rgba(var(--bg-tertiary-rgb), 0.2));
     border-radius: var(--radius-lg);
     animation: aiLoadingPulse 1.8s ease-in-out infinite;
 }
