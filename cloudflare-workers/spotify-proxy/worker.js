@@ -120,16 +120,36 @@ async function handleAiSummary(request, env, corsHeaders) {
         artist: String(track?.artist || '').trim() || 'Unknown',
     }));
 
-    const trackLines = tracks.map((track, index) => `${index + 1}. ${track.name} - ${track.artist}`).join('\n');
+    const summaryTracks = tracks.slice(0, 50); // Use up to 50 tracks for classification
+    // Still take a subset for the prompt text to avoid hitting token limits even if they are freeish
+    // But since user asked for "revert to initial" 15/50 logic, we will pass them all if possible. 
+    // Groq limits are high. Let's pass all 50.
+    const trackLines = summaryTracks.map((track, index) => `${index + 1}. ${track.name} - ${track.artist}`).join('\n');
+
+    let moodClass = { label: 'unknown', description: 'mixed vibes' };
+    try {
+        const token = await getAccessToken(env);
+        if (token) {
+            // Only classify based on first 15 to save Spotify API calls latency
+            const classificationTracks = summaryTracks.slice(0, 15);
+            const trackIds = await resolveTrackIds(token, classificationTracks);
+            const features = trackIds.length ? await getAudioFeatures(token, trackIds) : [];
+            if (features.length) {
+                moodClass = classifyMood(features);
+            }
+        }
+    } catch (error) {
+        console.error('Spotify audio features failed, falling back to LLM-only mode', error);
+    }
 
     const messages = [
         {
             role: 'system',
-            content: 'You write a cute-ish one-line quote summarizing a music listening session. Keep it concise, warm, and lyrical. Return only the line of text without quotation marks or extra formatting. Avoid hashtags and avoid mentioning the model or Groq.'
+            content: 'you write one-line music session summaries about a person named "glen". write in lower-case, casual, witty tone with clever music-related puns or commentary on his taste. use the person name "glen" in every summary. weave in actual track titles or artist names from the provided list to make the puns deeply personal. Example styles:\n- "glen definitely missed the 80s because they called and he answered"\n- "glen is currently the main character in a indie movie with a top-tier soundtrack"\n- "glen is speed-running his favorite albums like he\'s late for a flight"\n- "glen\'s music taste is so eclectic even the algorithm is taking notes"\nreturn only the summary sentence with no quotes, no hashtags, no emojis. use the mood classification as a vibe check. keep it under 20 words.'
         },
         {
             role: 'user',
-            content: `Mode: ${mode}\nTrack count: ${trackCount}\nTracks (oldest to newest):\n${trackLines}`
+            content: `Mode: ${mode}\nTrack count: ${trackCount}\nMood: ${moodClass.label} (${moodClass.description})\nTracks:\n${trackLines}\n\nGenerate summary:`
         }
     ];
 
@@ -195,6 +215,94 @@ async function callGroqStream(messages, env) {
         status: 503,
         error: 'All summary models are busy. Try again later.',
     };
+}
+
+async function resolveTrackIds(token, tracks) {
+    const results = await Promise.all(tracks.map(track => searchTrackId(token, track.name, track.artist)));
+    return results.filter(Boolean);
+}
+
+async function searchTrackId(token, trackName, artistName) {
+    try {
+        const query = `track:${trackName} artist:${artistName}`;
+        const response = await fetch(
+            `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
+            {
+                headers: { 'Authorization': `Bearer ${token}` },
+            }
+        );
+
+        if (!response.ok) {
+            return null;
+        }
+
+        const data = await response.json();
+        const track = data.tracks?.items?.[0];
+        return track?.id || extractSpotifyIdFromUrl(track?.external_urls?.spotify);
+    } catch (error) {
+        console.error('Track id search error:', error);
+        return null;
+    }
+}
+
+async function getAudioFeatures(token, trackIds) {
+    const ids = trackIds.slice(0, 100).join(',');
+    if (!ids) return [];
+
+    const response = await fetch(`https://api.spotify.com/v1/audio-features?ids=${encodeURIComponent(ids)}`,
+        {
+            headers: { 'Authorization': `Bearer ${token}` },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(`Spotify audio features failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data?.audio_features)
+        ? data.audio_features.filter(Boolean)
+        : [];
+}
+
+function classifyMood(features) {
+    if (!features.length) {
+        return { label: 'unknown', description: 'mixed vibes' };
+    }
+
+    const avg = (key) => features.reduce((sum, item) => sum + (item[key] ?? 0), 0) / features.length;
+    const valence = avg('valence');
+    const energy = avg('energy');
+    const danceability = avg('danceability');
+    const acousticness = avg('acousticness');
+
+    if (valence < 0.35 && energy < 0.5) {
+        return { label: 'melancholic-calm', description: 'sad and slow' };
+    }
+    if (valence < 0.35 && energy >= 0.5) {
+        return { label: 'melancholic-intense', description: 'sad but intense' };
+    }
+    if (energy > 0.75 && danceability > 0.7) {
+        return { label: 'high-energy-dance', description: 'dance floor vibes' };
+    }
+    if (energy > 0.7 && acousticness < 0.3) {
+        return { label: 'rock-aggressive', description: 'rock and punchy' };
+    }
+    if (acousticness > 0.6) {
+        return { label: 'acoustic-chill', description: 'mellow and organic' };
+    }
+    if (valence > 0.7) {
+        return { label: 'upbeat-happy', description: 'cheerful and bright' };
+    }
+
+    return { label: 'eclectic', description: 'genre-spanning' };
+}
+
+function extractSpotifyIdFromUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    const parts = url.split('/track/');
+    if (parts.length < 2) return null;
+    return parts[1].split('?')[0];
 }
 
 // ==========================================
@@ -373,6 +481,7 @@ async function searchTrack(token, trackName, artistName) {
                 albumImage: track.album?.images?.[0]?.url || null,
                 artistImage: artistResult.artistImage,
                 spotifyUrl: track.external_urls?.spotify,
+                spotifyId: track.id || extractSpotifyIdFromUrl(track.external_urls?.spotify),
                 trackName: track.name,
                 artistName: track.artists?.[0]?.name,
                 albumName: track.album?.name,

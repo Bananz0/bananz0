@@ -805,7 +805,10 @@ body.badge-morph-to-desktop .social-badges-inline {
 /* Morph transition cleanup: prevent flashes and fighting animations */
 .nav-hub.setup-morph,
 .social-badges-mobile.setup-morph,
-.social-badges-inline.setup-morph {
+.social-badges-inline.setup-morph,
+.now-playing-card.setup-morph,
+.recent-tracks.setup-morph,
+.ai-summary-card.setup-morph {
     transition: none !important;
 }
 

@@ -3,6 +3,10 @@
    Integrated with main site theme
    ========================================== */
 
+:root {
+    --card-width-desktop: 480px;
+}
+
 /* Custom Scrollbar with Dynamic Colors */
 .music-hero ::-webkit-scrollbar,
 .recent-tracks ::-webkit-scrollbar {
@@ -59,20 +63,6 @@
     width: 100%;
     align-items: center;
     justify-content: center;
-}
-
-@media (min-width: 900px) {
-    .split-content-row {
-        flex-direction: row;
-        align-items: stretch;
-        gap: var(--space-2xl);
-    }
-
-    .now-playing-card,
-    .recent-tracks {
-        flex: 1;
-        max-width: 480px;
-    }
 }
 
 /* ==========================================
@@ -207,16 +197,14 @@
 .now-playing-card {
     position: relative;
     width: 100%;
-    max-width: 420px;
-    background: rgba(18, 18, 18, 0.5);
+    background: rgba(18, 18, 18, 0.45);
     -webkit-backdrop-filter: blur(20px) saturate(150%);
     backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid rgba(245, 158, 11, 0.12);
+    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.12));
     border-radius: var(--radius-xl);
     overflow: hidden;
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.5),
-        0 4px 20px rgba(245, 158, 11, 0.05),
+        0 20px 60px rgba(0, 0, 0, 0.4),
         0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
     transition: all var(--spring-smooth);
     /* Promote to layer to avoid re-rendering backdrop filter on child animation */
@@ -231,9 +219,10 @@
     inset: 0;
     background-size: cover;
     background-position: center;
-    filter: blur(40px) brightness(0.4);
+    background-attachment: fixed;
+    filter: blur(50px) brightness(0.35) saturate(1.1);
     opacity: 0;
-    transition: opacity var(--spring-smooth);
+    transition: opacity var(--spring-smooth), background-image 1s ease-in-out;
     z-index: 0;
     /* Hardware acceleration for the massive blur */
     transform: translateZ(0);
@@ -460,11 +449,11 @@
 
 .recent-tracks li.loading-item {
     background: rgba(18, 18, 18, 0.35);
-    border-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(245, 158, 11, 0.1);
 }
 
 .recent-tracks li.loading-item .track-thumb {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(6, 182, 212, 0.12));
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
     border-radius: var(--radius-sm);
 }
 
@@ -478,25 +467,53 @@
    Recent Tracks
    ========================================== */
 .recent-tracks {
+    position: relative;
+    overflow: hidden;
     width: 100%;
-    max-width: 420px;
-    background: rgba(18, 18, 18, 0.4);
-    border: 1px solid var(--dynamic-border, rgba(255, 255, 255, 0.08));
+    padding: var(--space-lg);
+    background: rgba(18, 18, 18, 0.45);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.12));
     border-radius: var(--radius-xl);
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.25));
-    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
+    transition: all var(--spring-smooth);
 }
 
-.recent-tracks h3 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.recent-tracks-header,
+.recent-tracks ul {
+    position: relative;
+    z-index: 1;
+}
+
+.recent-tracks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: var(--space-md);
-    text-align: center;
+}
+
+.recent-tracks-title {
+    font-size: var(--text-sm);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.recent-tracks-badge {
+    font-size: 0.65rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--text-muted);
+    font-weight: 600;
+    opacity: 0.8;
 }
 
 .recent-tracks ul {
@@ -506,6 +523,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+    width: 100%;
 }
 
 .recent-tracks li {
@@ -513,10 +531,11 @@
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-sm) var(--space-md);
-    background: rgba(18, 18, 18, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-md);
     transition: all var(--spring-snappy);
+    width: 100%;
 }
 
 .recent-tracks li:hover {
@@ -564,18 +583,31 @@
    AI Summary Card
    ========================================== */
 .ai-summary-card {
+    position: relative;
+    overflow: hidden;
     width: 100%;
-    max-width: 1000px;
+    /* Max width matches the two cards above (480px * 2) + gap (var(--space-2xl)) */
+    max-width: calc(480px * 2 + var(--space-2xl));
+    margin: 0 auto;
+    
     background: rgba(18, 18, 18, 0.45);
-    border: 1px solid rgba(245, 158, 11, 0.14);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid var(--dynamic-border-color, rgba(245, 158, 11, 0.14));
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.35),
-        0 0 30px var(--dynamic-glow-color, rgba(245, 158, 11, 0.18));
-    backdrop-filter: blur(22px) saturate(150%);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.15));
     transition: all var(--spring-smooth);
+}
+
+/* Header, Body, Footer need to be relative to stay above backdrop */
+.ai-summary-header,
+.ai-summary-body,
+.ai-summary-footer {
+    position: relative;
+    z-index: 1;
 }
 
 .ai-summary-header {
@@ -677,6 +709,27 @@
     opacity: 0.75;
 }
 
+@media (max-width: 900px) {
+    .artist-backdrop {
+        background-attachment: scroll;
+    }
+
+    .ai-summary-card,
+    .recent-tracks {
+        max-width: 420px;
+        padding: var(--space-md);
+    }
+
+    .ai-summary-body {
+        min-height: 56px;
+    }
+
+    .ai-summary-text {
+        font-size: 0.95rem;
+        line-height: 1.55;
+    }
+}
+
 .ai-char {
     display: inline-block;
     opacity: 0;
@@ -737,89 +790,12 @@
     transform: scale(1.1) translateZ(0);
 }
 
-/* ==========================================
-   Responsive Desktop Layout */
-@media (min-width: 1024px) {
-    .split-content-row {
-        flex-direction: row;
-        align-items: stretch;
-        /* Forces equal height */
-        justify-content: center;
-        gap: 3rem;
-    }
-
-    /* Left Column: Now Playing */
-    .now-playing-card {
-        flex: 1;
-        max-width: 500px;
-        display: flex;
-        flex-direction: column;
-        /* Make artist thumbnail bigger on desktop */
-    }
-
-    .card-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .album-art-section {
-        flex: 0 0 auto;
-    }
-
-    .track-info {
-        flex: 0 0 auto;
-    }
-
-    .track-meta {
-        margin-top: auto;
-        /* Pushes meta to bottom if extra space */
-    }
-
-    .artist-thumbnail {
-        width: 100px;
-        height: 100px;
-        bottom: -25px;
-        right: 25px;
-    }
-
-    /* Right Column: Recently Played */
-    .recent-tracks {
-        flex: 1;
-        max-width: 500px;
-        background: rgba(18, 18, 18, 0.4);
-        -webkit-backdrop-filter: blur(20px) saturate(150%);
-        backdrop-filter: blur(20px) saturate(150%);
-        border: 1px solid var(--dynamic-border, rgba(255, 255, 255, 0.08));
-        box-shadow: var(--dynamic-shadow, 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--dynamic-glow-color, rgba(245, 158, 11, 0.25)));
-        border-radius: var(--radius-xl);
-        padding: var(--space-lg);
-        width: 100%;
-        margin-top: 0;
-        /* Reset margin */
-        transition: border-color 0.5s ease, box-shadow 0.5s ease;
-        /* Allow stretch */
-        display: flex;
-        flex-direction: column;
-    }
-
-    .recent-tracks ul {
-        flex: 1;
-        /* Fill available space */
-    }
-
-    .recent-tracks h3 {
-        text-align: left;
-        margin-left: var(--space-xs);
-        margin-bottom: var(--space-lg);
-    }
-}
-
 /* Mobile adjustments */
-@media (max-width: 1023px) {
-    .recent-tracks {
+@media (max-width: 899px) {
+    .now-playing-card, 
+    .recent-tracks, 
+    .ai-summary-card {
         max-width: 420px;
-        /* Simplify mobile recent tracks to avoid too much glass nesting */
     }
 }
 
@@ -865,5 +841,51 @@
     .source-pill svg {
         width: 18px;
         height: 18px;
+    }
+}
+
+/* ==========================================
+   Desktop Layout Consolidation & Morph Points
+   ========================================== */
+@media (min-width: 900px) {
+    .split-content-row {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: center;
+        gap: var(--space-2xl);
+    }
+
+    /* Column Consistency */
+    .now-playing-card, 
+    .recent-tracks {
+        flex: 1;
+        max-width: var(--card-width-desktop);
+        width: 100%;
+        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-content, .recent-tracks {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Fixed alignment for AI Card: card1.width + card2.width + gap */
+    .ai-summary-card {
+        max-width: calc(var(--card-width-desktop) * 2 + var(--space-2xl));
+        margin: 0 auto;
+    }
+
+    .artist-thumbnail {
+        width: 100px;
+        height: 100px;
+        bottom: -25px;
+        right: 25px;
+    }
+
+    .recent-tracks-header {
+        margin-bottom: var(--space-lg);
     }
 }

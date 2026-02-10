@@ -72,20 +72,25 @@ title: Now Playing
 
             <!-- Right: Scrobble History -->
             <div class="recent-tracks" id="recent-tracks">
-                <h3>Recently Played</h3>
+                <div class="artist-backdrop" id="recent-backdrop"></div>
+                <div class="recent-tracks-header">
+                    <span class="recent-tracks-title">Recently Played</span>
+                    <span class="recent-tracks-badge">History</span>
+                </div>
                 <ul id="recent-tracks-list"></ul>
             </div>
         </div>
 
         <!-- AI Summary Card -->
         <div class="ai-summary-card" id="ai-summary-card" data-spring="smooth" data-bounce="1">
+            <div class="artist-backdrop" id="ai-backdrop"></div>
             <div class="ai-summary-header">
                 <span class="ai-summary-title">Session recap</span>
                 <span class="ai-summary-badge">AI</span>
             </div>
             <div class="ai-summary-body" aria-live="polite">
                 <p class="ai-summary-text" id="ai-summary-text"></p>
-                <div class="ai-summary-loading" id="ai-summary-loading">Generating a recap...</div>
+                <div class="ai-summary-loading" id="ai-summary-loading">Reading Glen's musical mind...</div>
             </div>
             <div class="ai-summary-footer">
                 <span class="ai-summary-powered">Powered by</span>

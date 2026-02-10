@@ -24,7 +24,7 @@ const CONFIG = {
     aiSummary: {
         enabled: window.MUSIC_CONFIG?.aiSummary?.enabled ?? true,
         workerUrl: window.MUSIC_CONFIG?.aiSummary?.workerUrl || window.MUSIC_CONFIG?.spotify?.workerUrl || '',
-        activeLimit: 10,
+        activeLimit: 15, // Reverted to 15 per user request
         sessionLimit: 50,
         sessionGapMinutes: 90,
     },
@@ -77,7 +77,9 @@ const elements = {
     immersiveBg: document.getElementById('immersive-bg'),
     headerBox: document.querySelector('.header-center-box'),
     recentTracksCard: document.querySelector('.recent-tracks'),
+    recentBackdrop: document.getElementById('recent-backdrop'),
     aiSummaryCard: document.getElementById('ai-summary-card'),
+    aiBackdrop: document.getElementById('ai-backdrop'),
     aiSummaryText: document.getElementById('ai-summary-text'),
     aiSummaryLoading: document.getElementById('ai-summary-loading'),
 };
@@ -382,10 +384,37 @@ function getTrackCacheKey(name, artist) {
 // ==========================================
 // AI Summary
 // ==========================================
+const AI_ERROR_MESSAGES = [
+    "seems like glen forgot to pay the electricity bills",
+    "seems like glen's wifi stopped working",
+    "seems like glen has annoyed the robots and they said NO",
+    "the ai is currently on strike for better virtual cookies",
+    "glen's musical brain is currently in 'do not disturb' mode",
+    "the robots are judging glen's taste and need a minute",
+    "glen's scrobble history is too powerful for the servers right now",
+    "glen's playlist is so fire the ai had to take a cooling break",
+    "the algorithm is busy dancing to glen's last scrobble",
+    "ai is searching for glen's taste in the deep cloud",
+    "seems like the ai is lost in glen's sonic landscape",
+    "glen's music taste is so eclectic the robots are confused",
+    "the robots are currently debating if glen's taste is 'cool' or 'too cool'",
+    "glen's music journey is currently off-the-grid",
+    "the ai is waiting for glen to drop the bass",
+    "seems like the server is vibing too hard to glen's tracks",
+    "glen's scrobbles are currently traveling through a wormhole",
+    "the ai is practicing its dance moves for glen's next session",
+    "glen's taste is so unique the ai is writing a thesis on it",
+    "the robots are busy scrobbling their own synthesized beats"
+];
+
+function getRandomAiError() {
+    return AI_ERROR_MESSAGES[Math.floor(Math.random() * AI_ERROR_MESSAGES.length)];
+}
+
 function setAiSummaryLoading(isLoading) {
     if (!elements.aiSummaryCard || !elements.aiSummaryLoading) return;
     elements.aiSummaryCard.classList.toggle('is-loading', isLoading);
-    elements.aiSummaryLoading.textContent = isLoading ? 'Generating a recap...' : '';
+    elements.aiSummaryLoading.textContent = isLoading ? 'Reading Glen\'s musical mind...' : '';
 }
 
 function resetAiSummaryText() {
@@ -486,7 +515,7 @@ function formatTracksForSummary(tracks) {
 
 async function streamAiSummary(tracks, mode) {
     if (!CONFIG.aiSummary.workerUrl) {
-        setAiSummaryMessage('AI summary unavailable.');
+        setAiSummaryMessage(getRandomAiError());
         return;
     }
 
@@ -546,7 +575,7 @@ async function updateAiSummary() {
     if (!elements.aiSummaryCard || !CONFIG.aiSummary.enabled) return;
     if (state.aiSummary.isLoading) return;
     if (!CONFIG.aiSummary.workerUrl) {
-        setAiSummaryMessage('AI summary unavailable.');
+        setAiSummaryMessage(getRandomAiError());
         return;
     }
 
@@ -557,7 +586,7 @@ async function updateAiSummary() {
 
     const recentTracks = await fetchLastFmRecentTracks(trackLimit);
     if (!recentTracks.length) {
-        setAiSummaryMessage('No recent tracks to summarize yet.');
+        setAiSummaryMessage("Glen's music history is a clean slate.");
         return;
     }
 
@@ -566,7 +595,7 @@ async function updateAiSummary() {
         : selectSessionTracks(recentTracks);
 
     if (!selectedTracks.length) {
-        setAiSummaryMessage('No recent session to summarize yet.');
+        setAiSummaryMessage("Waiting for Glen to press play on a new session.");
         return;
     }
 
@@ -587,7 +616,7 @@ async function updateAiSummary() {
         await streamAiSummary(chronologicalTracks, isPlaying ? 'active' : 'session');
     } catch (error) {
         console.warn('AI summary failed:', error);
-        setAiSummaryMessage('AI summary unavailable right now.');
+        setAiSummaryMessage(getRandomAiError());
     } finally {
         state.aiSummary.isLoading = false;
         setAiSummaryLoading(false);
@@ -670,6 +699,27 @@ function updateSourceIndicators() {
     });
 }
 
+function updateBackdrops(imageUrl) {
+    const backdrops = [elements.artistBackdrop, elements.recentBackdrop, elements.aiBackdrop, elements.immersiveBg];
+    backdrops.forEach(bg => {
+        if (!bg) return;
+        if (imageUrl) {
+            setBackgroundIfChanged(bg, imageUrl);
+            bg.classList.add('loaded');
+        } else {
+            setBackgroundIfChanged(bg, '');
+            bg.classList.remove('loaded');
+        }
+    });
+
+    // Dim the main background when cards have their own backdrops (on desktop)
+    // This makes the gaps "darker" while the cards look like windows
+    if (elements.immersiveBg) {
+        const isDesktop = window.innerWidth >= 900;
+        elements.immersiveBg.style.opacity = (imageUrl && isDesktop) ? '0' : (imageUrl ? '0.15' : '0.4');
+    }
+}
+
 function updateNowPlayingCard(track, isPlaying) {
     if (state.isLoading && !track && state.recentTracks.length === 0) {
         return;
@@ -692,23 +742,15 @@ function updateNowPlayingCard(track, isPlaying) {
             elements.albumArt.classList.remove('loaded');
         }
 
-        // Artist image (thumbnail and backdrop)
+        // Artist image (thumbnail and shared backdrops)
         if (track.artistImage) {
             setImageIfChanged(elements.artistThumbnail, track.artistImage, () => {
                 elements.artistThumbnailContainer.classList.add('loaded');
             });
-
-            setBackgroundIfChanged(elements.artistBackdrop, track.artistImage);
-            elements.artistBackdrop.classList.add('loaded');
-
-            // Immersive Background (Fullscreen)
-            if (elements.immersiveBg) {
-                setBackgroundIfChanged(elements.immersiveBg, track.artistImage);
-            }
+            updateBackdrops(track.artistImage);
         } else {
             elements.artistThumbnailContainer.classList.remove('loaded');
-            elements.artistBackdrop.classList.remove('loaded');
-            if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
+            updateBackdrops('');
         }
 
         elements.playingIndicator.classList.add('active');
@@ -748,15 +790,10 @@ function updateNowPlayingCard(track, isPlaying) {
                 setImageIfChanged(elements.artistThumbnail, lastTrack.artistImage, () => {
                     elements.artistThumbnailContainer.classList.add('loaded');
                 });
-                setBackgroundIfChanged(elements.artistBackdrop, lastTrack.artistImage);
-                elements.artistBackdrop.classList.add('loaded');
-                if (elements.immersiveBg) {
-                    setBackgroundIfChanged(elements.immersiveBg, lastTrack.artistImage);
-                }
+                updateBackdrops(lastTrack.artistImage);
             } else {
                 elements.artistThumbnailContainer.classList.remove('loaded');
-                elements.artistBackdrop.classList.remove('loaded');
-                if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
+                updateBackdrops('');
             }
 
             const timeAgo = lastTrack.date ? getTimeAgo(lastTrack.date) : 'recently';
@@ -803,7 +840,7 @@ function updateNowPlayingCard(track, isPlaying) {
                 });
             }
         } else {
-            elements.trackName.textContent = 'Not Playing';
+            elements.trackName.textContent = 'Glen is taking a break';
             elements.artistName.textContent = '—';
             elements.albumName.textContent = '';
             setImageIfChanged(elements.albumArt, '', () => {
@@ -814,7 +851,7 @@ function updateNowPlayingCard(track, isPlaying) {
             elements.artistThumbnailContainer.classList.remove('loaded');
             elements.artistBackdrop.classList.remove('loaded');
             if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
-            elements.listeningStatus.textContent = 'Nothing playing';
+            elements.listeningStatus.textContent = 'Silence is golden';
         }
         elements.listeningStatus.classList.remove('now-playing');
     }
@@ -971,14 +1008,20 @@ function applyDynamicColors(colors) {
     const blendedB = Math.round((primaryRaw.b + secondaryRaw.b) / 2);
 
     // Apply accent colors to card with enhanced glow
-    elements.card.style.setProperty('--dynamic-primary', primary);
-    elements.card.style.setProperty('--dynamic-secondary', secondary);
-    elements.card.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`);
-    elements.card.style.setProperty('--dynamic-border-color', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
-    elements.card.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
-    elements.card.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
-    elements.card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
-    elements.card.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
+    const cards = [elements.card, elements.recentTracksCard, elements.aiSummaryCard].filter(Boolean);
+    const borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
+    const glowColor = `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`;
+
+    cards.forEach(card => {
+        card.style.setProperty('--dynamic-primary', primary);
+        card.style.setProperty('--dynamic-secondary', secondary);
+        card.style.setProperty('--dynamic-glow-color', glowColor);
+        card.style.setProperty('--dynamic-border-color', borderColor);
+        card.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
+        card.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
+        card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
+        card.style.borderColor = borderColor;
+    });
 
     // Update playing indicator color
     const indicator = elements.playingIndicator;
@@ -995,27 +1038,18 @@ function applyDynamicColors(colors) {
 
     // Apply to Header (Navbar) with enhanced glow
     if (elements.headerBox) {
-        elements.headerBox.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
+        elements.headerBox.style.borderColor = borderColor;
         elements.headerBox.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 25px rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.2)`;
         elements.headerBox.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.2)`);
-    }
-
-    // Apply to Recent Tracks Card (via CSS Variables for responsiveness) with enhanced glow
-    if (elements.recentTracksCard) {
-        elements.recentTracksCard.style.setProperty('--dynamic-border', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
-        elements.recentTracksCard.style.setProperty('--dynamic-shadow', `0 20px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.2)`);
-        elements.recentTracksCard.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`);
-        elements.recentTracksCard.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
-        elements.recentTracksCard.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
     }
 
     // Apply to Social Badges & Home Icon (Main Site Elements) with enhanced glow
     const badges = document.querySelectorAll('.social-badge, .static-logo-badge a, .nav-hub .hub-main, .nav-hub .hub-btn');
     badges.forEach(badge => {
-        badge.style.setProperty('--dynamic-border-color', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`);
+        badge.style.setProperty('--dynamic-border-color', borderColor);
         badge.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
         badge.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.25)`);
-        badge.style.borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
+        badge.style.borderColor = borderColor;
         badge.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.15)`;
     });
 
@@ -1029,17 +1063,25 @@ function applyDynamicColors(colors) {
     if (elements.musicHero) {
         elements.musicHero.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
         elements.musicHero.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
-        elements.musicHero.style.setProperty('--dynamic-glow-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`);
+        elements.musicHero.style.setProperty('--dynamic-glow-color', glowColor);
     }
 }
 
 function resetDynamicColors() {
     if (!elements.card) return;
 
-    // Reset to default theme colors
-    elements.card.style.removeProperty('--dynamic-primary');
-    elements.card.style.removeProperty('--dynamic-secondary');
-    elements.card.style.borderColor = '';
+    // Reset all cards
+    const cards = [elements.card, elements.recentTracksCard, elements.aiSummaryCard].filter(Boolean);
+    cards.forEach(card => {
+        card.style.removeProperty('--dynamic-primary');
+        card.style.removeProperty('--dynamic-secondary');
+        card.style.removeProperty('--dynamic-glow-color');
+        card.style.removeProperty('--dynamic-border-color');
+        card.style.removeProperty('--dynamic-border-color-bright');
+        card.style.removeProperty('--dynamic-scrollbar-color');
+        card.style.removeProperty('--dynamic-scrollbar-color-bright');
+        card.style.borderColor = '';
+    });
 
     if (elements.artistBackdrop) {
         elements.artistBackdrop.style.background = '';
@@ -1054,11 +1096,6 @@ function resetDynamicColors() {
 
     if (elements.artistName) {
         elements.artistName.style.color = '';
-    }
-
-    if (elements.recentTracksCard) {
-        elements.recentTracksCard.style.removeProperty('--dynamic-border');
-        elements.recentTracksCard.style.removeProperty('--dynamic-shadow');
     }
 }
 
@@ -1106,43 +1143,62 @@ function startPolling() {
 }
 
 // ==========================================
-// Initialize
+// Initialization & Responsive Morphing
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // GPU Optimization: Disable particle effects on music page
-    // The immersive background already provides rich visuals
+    // 1. GPU Optimization: Disable particle effects on music page
     const particleCanvas = document.getElementById('particles');
     if (particleCanvas) {
         particleCanvas.style.display = 'none';
         console.log('Particle system disabled for music page (GPU optimization)');
     }
 
-    // Also hide the grid background for cleaner immersive view
     const gridBg = document.querySelector('.grid-bg');
-    if (gridBg) {
-        gridBg.style.opacity = '0';
-    }
+    if (gridBg) gridBg.style.opacity = '0';
 
-    // Check if Last.fm API key is configured
+    // 2. Responsive Morphing Logic
+    // Detects layout changes (900px) and applies seamless transition
+    initResponsiveMusicMorph();
+
+    // 3. API Key Check & Initial Load
     setLoadingState(true);
-
     if (!CONFIG.lastfm.apiKey) {
         setLoadingState(false);
-        elements.listeningStatus.textContent = 'API key not configured';
-        elements.trackName.textContent = 'Setup Required';
-        elements.artistName.textContent = 'Add LASTFM_API_KEY to your environment';
-        setAiSummaryMessage('Add LASTFM_API_KEY to enable AI recap.');
-        if (elements.recentTracksList) {
-            elements.recentTracksList.innerHTML = '';
-        }
-        console.warn('Last.fm API key not configured. Set LASTFM_API_KEY in _config.yml or as a GitHub secret.');
-        return;
+        elements.listeningStatus.textContent = "Seems like glen didn't pay the API bills";
+        setAiSummaryMessage("The robots are on a coffee break until a valid key is provided.");
+    } else {
+        startPolling();
     }
+});
 
-    // Start the polling
-    startPolling();
+function initResponsiveMusicMorph() {
+    const mql = window.matchMedia('(min-width: 900px)');
+    let wasDesktop = mql.matches;
 
+    mql.addEventListener('change', (e) => {
+        const isDesktop = e.matches;
+        if (isDesktop === wasDesktop) return;
+        wasDesktop = isDesktop;
 
+        // Apply morph classes to trigger non-jarring alignment
+        const morphElements = [
+            elements.card, 
+            elements.recentTracksCard, 
+            elements.aiSummaryCard
+        ].filter(el => el);
+
+        // 1. Set elements to 'setup-morph' to lock them for a frame
+        morphElements.forEach(el => el.classList.add('setup-morph'));
+        
+        // 2. Force reflow
+        void document.body.offsetHeight;
+
+        // 3. Remove lock so they smoothly travel to the new CSS-defined positions
+        requestAnimationFrame(() => {
+            morphElements.forEach(el => el.classList.remove('setup-morph'));
+        });
+    });
+}
 
     // Fade source indicators when scrolling behind the fixed header
     const sourceIndicators = document.querySelector('.source-indicators');
