@@ -171,8 +171,15 @@ title: Home
 
                 {% assign gbe_repo = site.data.github_repos | where: "name", "GalaxyBookEnabler" | first %}
                 {% if gbe_repo %}
+                {% assign gbe_preview = site.data.project_previews[gbe_repo.name] %}
                 <!-- Galaxy Book Enabler -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                    data-project-link="{{ gbe_repo.html_url }}" data-project-link-target="_blank"
+                    {% if gbe_preview %}data-modal-images="{{ gbe_preview.images | join: ',' }}"
+                    data-modal-captions="{{ gbe_preview.captions | join: '|' }}"
+                    data-modal-title="{{ gbe_preview.title | default: gbe_repo.name }}"
+                    {% if gbe_preview.iframe %}data-modal-iframe="{{ gbe_preview.iframe }}"{% endif %}
+                    {% if gbe_preview.iframe_caption %}data-modal-iframe-caption="{{ gbe_preview.iframe_caption }}"{% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">WINDOWS</span>
                         <div class="project-meta">
@@ -208,8 +215,15 @@ title: Home
 
                 {% assign egpu_repo = site.data.github_repos | where: "name", "eGPUae" | first %}
                 {% if egpu_repo %}
+                {% assign egpu_preview = site.data.project_previews[egpu_repo.name] %}
                 <!-- eGPU Auto-Enabler -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                    data-project-link="{{ egpu_repo.html_url }}" data-project-link-target="_blank"
+                    {% if egpu_preview %}data-modal-images="{{ egpu_preview.images | join: ',' }}"
+                    data-modal-captions="{{ egpu_preview.captions | join: '|' }}"
+                    data-modal-title="{{ egpu_preview.title | default: egpu_repo.name }}"
+                    {% if egpu_preview.iframe %}data-modal-iframe="{{ egpu_preview.iframe }}"{% endif %}
+                    {% if egpu_preview.iframe_caption %}data-modal-iframe-caption="{{ egpu_preview.iframe_caption }}"{% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">eGPU</span>
                         <div class="project-meta">
@@ -244,8 +258,15 @@ title: Home
 
                 {% assign gramsmc_repo = site.data.github_repos | where: "name", "GramSMC" | first %}
                 {% if gramsmc_repo %}
+                {% assign gramsmc_preview = site.data.project_previews[gramsmc_repo.name] %}
                 <!-- GramSMC + GramControlCenter -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
+                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                    data-project-link="{{ gramsmc_repo.html_url }}" data-project-link-target="_blank"
+                    {% if gramsmc_preview %}data-modal-images="{{ gramsmc_preview.images | join: ',' }}"
+                    data-modal-captions="{{ gramsmc_preview.captions | join: '|' }}"
+                    data-modal-title="{{ gramsmc_preview.title | default: gramsmc_repo.name }}"
+                    {% if gramsmc_preview.iframe %}data-modal-iframe="{{ gramsmc_preview.iframe }}"{% endif %}
+                    {% if gramsmc_preview.iframe_caption %}data-modal-iframe-caption="{{ gramsmc_preview.iframe_caption }}"{% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">HACKINTOSH</span>
                         <div class="project-meta">
@@ -353,6 +374,7 @@ title: Home
 
                 <!-- WattsApp: Embedded System Management Platform -->
                 <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                    data-project-link="https://github.com/Bananz0/WattsApp" data-project-link-target="_blank"
                     data-modal-images="/assets/images/projects/wattsapp-dashboard.jpg,/assets/images/projects/wattsapp-circuit.jpg,/assets/images/projects/wattsapp-grafana.jpg"
                     data-modal-captions="Real-time monitoring dashboard|ATMega644p circuit with sensors|Grafana visualization interface"
                     data-modal-title="WattsApp: Smart System Management Platform">
@@ -397,6 +419,7 @@ title: Home
 
                 <!-- MIPSquare++ MIPS Simulator -->
                 <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
+                    data-project-link="https://github.com/Bananz0/MIPSquare" data-project-link-target="_blank"
                     data-modal-images="/assets/images/projects/mipsquare-pipeline.jpg,/assets/images/projects/mipsquare-hazards.jpg"
                     data-modal-captions="5-stage pipeline architecture diagram|Hazard detection and forwarding logic"
                     data-modal-title="MIPSquare++: 5-Stage Pipelined MIPS Simulator">
@@ -452,8 +475,14 @@ title: Home
             {% assign repos_sorted = repos | sort_natural: 'score' | reverse %}
             <div class="repo-grid repo-grid-compact">
                 {% for repo in repos_sorted limit: 12 %}
-                <a class="project-card-full repo-card-full repo-card-full-compact" data-spring="default" data-bounce="1"
-                    href="{{ repo.html_url }}" target="_blank" rel="noopener">
+                {% assign preview = site.data.project_previews[repo.name] %}
+                <div class="project-card-full repo-card-full repo-card-full-compact" data-spring="default" data-bounce="1"
+                    data-project-link="{{ repo.html_url }}" data-project-link-target="_blank"
+                    {% if preview %}data-modal-images="{{ preview.images | join: ',' }}"
+                    data-modal-captions="{{ preview.captions | join: '|' }}"
+                    data-modal-title="{{ preview.title | default: repo.name }}"
+                    {% if preview.iframe %}data-modal-iframe="{{ preview.iframe }}"{% endif %}
+                    {% if preview.iframe_caption %}data-modal-iframe-caption="{{ preview.iframe_caption }}"{% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif
                             %}</span>
@@ -493,9 +522,9 @@ title: Home
                     </div>
 
                     <div class="project-links">
-                        <span class="project-link">VIEW ON GITHUB</span>
+                        <a class="project-link" href="{{ repo.html_url }}" target="_blank" rel="noopener">VIEW ON GITHUB</a>
                     </div>
-                </a>
+                </div>
                 {% endfor %}
             </div>
             {% endif %}

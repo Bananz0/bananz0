@@ -126,6 +126,21 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
+.modal-iframe {
+    width: min(100%, 1000px);
+    max-height: 60vh;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    background: #000;
+    display: none;
+}
+
+.modal-iframe.active {
+    display: block;
+}
+
 .gallery-caption {
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;

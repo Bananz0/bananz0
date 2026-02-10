@@ -32,7 +32,14 @@ permalink: /projects/
 
         <div class="repo-grid fade-in">
             {% for repo in repos_sorted %}
-            <a class="project-card-full repo-card-full" data-spring="default" data-bounce="1" href="{{ repo.html_url }}" target="_blank" rel="noopener">
+            {% assign preview = site.data.project_previews[repo.name] %}
+            <div class="project-card-full repo-card-full" data-spring="default" data-bounce="1"
+                data-project-link="{{ repo.html_url }}" data-project-link-target="_blank"
+                {% if preview %}data-modal-images="{{ preview.images | join: ',' }}"
+                data-modal-captions="{{ preview.captions | join: '|' }}"
+                data-modal-title="{{ preview.title | default: repo.name }}"
+                {% if preview.iframe %}data-modal-iframe="{{ preview.iframe }}"{% endif %}
+                {% if preview.iframe_caption %}data-modal-iframe-caption="{{ preview.iframe_caption }}"{% endif %}{% endif %}>
                 <div class="project-header">
                     <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif %}</span>
                     <div class="project-meta">
@@ -73,9 +80,9 @@ permalink: /projects/
                 </div>
 
                 <div class="project-links">
-                    <span class="project-link">VIEW ON GITHUB</span>
+                    <a class="project-link" href="{{ repo.html_url }}" target="_blank" rel="noopener">VIEW ON GITHUB</a>
                 </div>
-            </a>
+            </div>
             {% endfor %}
         </div>
 

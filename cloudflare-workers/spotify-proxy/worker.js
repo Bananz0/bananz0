@@ -8,6 +8,7 @@
  * - GET /?type=spotify&artist=<name> → { artistImage: "url" }
  * - GET /?type=spotify&track=<name>&artist=<name> → { albumImage: "url", artistImage: "url" }
  * - GET /?type=lastfm&user=<username>&method=<method> → Last.fm API response
+ * - POST /?type=summary → Groq streamed summary
  */
 
 // In-memory token cache (persists across requests within same isolate)
@@ -30,7 +31,7 @@ export default {
         // CORS headers
         const corsHeaders = {
             'Access-Control-Allow-Origin': allowedOrigin,
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS, POST',
             'Access-Control-Allow-Headers': 'Content-Type',
             'Content-Type': 'application/json',
         };
@@ -43,7 +44,9 @@ export default {
         const type = url.searchParams.get('type') || 'spotify'; // Default to spotify for backward compat
 
         try {
-            if (type === 'lastfm') {
+            if (type === 'summary') {
+                return await handleAiSummary(request, env, corsHeaders);
+            } else if (type === 'lastfm') {
                 return await handleLastFm(url, env, corsHeaders);
             } else {
                 return await handleSpotify(url, env, corsHeaders);
@@ -57,6 +60,142 @@ export default {
         }
     }
 };
+
+// ==========================================
+// AI SUMMARY (GROQ)
+// ==========================================
+const SUMMARY_MODEL_PRIORITY = [
+    'llama-3.3-70b-versatile',
+    'meta-llama/llama-4-maverick-17b-128e-instruct',
+    'qwen/qwen3-32b',
+    'openai/gpt-oss-120b',
+    'moonshotai/kimi-k2-instruct',
+    'groq/compound',
+    'groq/compound-mini',
+    'llama-3.1-8b-instant',
+    'meta-llama/llama-4-scout-17b-16e-instruct',
+    'openai/gpt-oss-20b',
+    'moonshotai/kimi-k2-instruct-0905',
+    'allam-2-7b',
+    'canopylabs/orpheus-v1-english',
+];
+
+async function handleAiSummary(request, env, corsHeaders) {
+    if (request.method !== 'POST') {
+        return new Response(
+            JSON.stringify({ error: 'Method not allowed' }),
+            { status: 405, headers: corsHeaders }
+        );
+    }
+
+    if (!env.GROQ_API_KEY) {
+        return new Response(
+            JSON.stringify({ error: 'Configuration Error: GROQ_API_KEY is missing' }),
+            { status: 503, headers: corsHeaders }
+        );
+    }
+
+    let payload;
+    try {
+        payload = await request.json();
+    } catch (error) {
+        return new Response(
+            JSON.stringify({ error: 'Invalid JSON body' }),
+            { status: 400, headers: corsHeaders }
+        );
+    }
+
+    const rawTracks = Array.isArray(payload?.tracks) ? payload.tracks : [];
+    if (!rawTracks.length) {
+        return new Response(
+            JSON.stringify({ error: 'Missing tracks payload' }),
+            { status: 400, headers: corsHeaders }
+        );
+    }
+
+    const mode = payload?.mode === 'active' ? 'active' : 'session';
+    const trackCount = Number(payload?.trackCount) || rawTracks.length;
+    const tracks = rawTracks.slice(0, 50).map(track => ({
+        name: String(track?.name || '').trim() || 'Unknown',
+        artist: String(track?.artist || '').trim() || 'Unknown',
+    }));
+
+    const trackLines = tracks.map((track, index) => `${index + 1}. ${track.name} - ${track.artist}`).join('\n');
+
+    const messages = [
+        {
+            role: 'system',
+            content: 'You write a cute-ish one-line quote summarizing a music listening session. Keep it concise, warm, and lyrical. Return only the line of text without quotation marks or extra formatting. Avoid hashtags and avoid mentioning the model or Groq.'
+        },
+        {
+            role: 'user',
+            content: `Mode: ${mode}\nTrack count: ${trackCount}\nTracks (oldest to newest):\n${trackLines}`
+        }
+    ];
+
+    const groqResult = await callGroqStream(messages, env);
+    if (!groqResult.response) {
+        return new Response(
+            JSON.stringify({ error: groqResult.error || 'AI summary failed' }),
+            { status: groqResult.status || 502, headers: corsHeaders }
+        );
+    }
+
+    const headers = {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'Access-Control-Expose-Headers': 'X-Model-Used',
+        'X-Model-Used': groqResult.model,
+    };
+
+    return new Response(groqResult.response.body, {
+        status: groqResult.response.status,
+        headers,
+    });
+}
+
+async function callGroqStream(messages, env) {
+    for (const model of SUMMARY_MODEL_PRIORITY) {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${env.GROQ_API_KEY}`,
+            },
+            body: JSON.stringify({
+                model,
+                temperature: 0.7,
+                max_tokens: 120,
+                stream: true,
+                messages,
+            }),
+        });
+
+        if (response.ok) {
+            return { response, model };
+        }
+
+        if (response.status === 429 || response.status >= 500) {
+            continue;
+        }
+
+        const errorText = await response.text();
+        return {
+            response: null,
+            model,
+            status: response.status,
+            error: errorText || 'Groq API error',
+        };
+    }
+
+    return {
+        response: null,
+        model: null,
+        status: 503,
+        error: 'All summary models are busy. Try again later.',
+    };
+}
 
 // ==========================================
 // LAST.FM HANDLER

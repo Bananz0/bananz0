@@ -204,8 +204,11 @@ class SpringAnimation {
                 }
                 const t = `${anim.duration}ms ${anim.timingFunction}`;
                 // Apply to common properties used in this site.
-                // Allow opt-out of size property animation via `data-spring-size="false"`
-                const includeSize = el.getAttribute('data-spring-size') !== 'false';
+                // Allow opt-out of size property animation via `data-spring-size="false"`.
+                const sizeAttr = el.getAttribute('data-spring-size');
+                const className = typeof el.className === 'string' ? el.className : (el.className?.baseVal || '');
+                const isCardLike = /(card|panel|tile|pill|badge)/i.test(className);
+                const includeSize = sizeAttr === 'true' ? true : sizeAttr === 'false' ? false : !isCardLike;
                 // By default include max-width/max-height but avoid animating explicit width/height
                 // for elements that manage layout (e.g., .floating-ctas) to prevent layout shifts.
                 const props = [

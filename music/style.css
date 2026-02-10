@@ -31,11 +31,11 @@
 }
 
 .music-hero {
-    min-height: calc(100vh - 200px);
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8rem 2rem 4rem;
+    padding: 120px 2rem;
     position: relative;
     z-index: 1;
 }
@@ -45,10 +45,11 @@
     flex-direction: column;
     align-items: center;
     gap: var(--space-xl);
-    max-width: 1200px;
+    max-width: 1100px;
     width: 100%;
     position: relative;
     z-index: 2;
+    margin: 0 auto;
 }
 
 .split-content-row {
@@ -57,6 +58,21 @@
     gap: var(--space-xl);
     width: 100%;
     align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 900px) {
+    .split-content-row {
+        flex-direction: row;
+        align-items: stretch;
+        gap: var(--space-2xl);
+    }
+
+    .now-playing-card,
+    .recent-tracks {
+        flex: 1;
+        max-width: 480px;
+    }
 }
 
 /* ==========================================
@@ -545,6 +561,157 @@
 }
 
 /* ==========================================
+   AI Summary Card
+   ========================================== */
+.ai-summary-card {
+    width: 100%;
+    max-width: 1000px;
+    background: rgba(18, 18, 18, 0.45);
+    border: 1px solid rgba(245, 158, 11, 0.14);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35),
+        0 0 30px var(--dynamic-glow-color, rgba(245, 158, 11, 0.18));
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    transition: all var(--spring-smooth);
+}
+
+.ai-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+
+.ai-summary-title {
+    font-size: var(--text-sm);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.ai-summary-badge {
+    font-size: 0.65rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    color: var(--neon-cyan);
+    font-weight: 600;
+}
+
+.ai-summary-body {
+    min-height: 72px;
+    position: relative;
+}
+
+.ai-summary-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.ai-summary-text::before,
+.ai-summary-text::after {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.ai-summary-text::before {
+    content: '" ';
+}
+
+.ai-summary-text::after {
+    content: ' "';
+}
+
+.ai-summary-loading {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    opacity: 0.8;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(120deg, rgba(18, 18, 18, 0.2), rgba(245, 158, 11, 0.08), rgba(18, 18, 18, 0.2));
+    border-radius: var(--radius-lg);
+    animation: aiLoadingPulse 1.8s ease-in-out infinite;
+}
+
+.ai-summary-card.is-loading .ai-summary-text {
+    opacity: 0;
+}
+
+.ai-summary-card.is-loading .ai-summary-text::before,
+.ai-summary-card.is-loading .ai-summary-text::after {
+    content: '';
+}
+
+.ai-summary-card:not(.is-loading) .ai-summary-loading {
+    display: none;
+}
+
+.ai-summary-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--space-md);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.groq-logo {
+    width: 56px;
+    height: 18px;
+    opacity: 0.75;
+}
+
+.ai-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+    animation: aiCharPop 0.32s ease-out forwards;
+}
+
+@keyframes aiCharPop {
+    0% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.96);
+    }
+    70% {
+        opacity: 1;
+        transform: translateY(0) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes aiLoadingPulse {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+/* ==========================================
    Responsive
    ========================================== */
 /* ==========================================
@@ -658,11 +825,16 @@
 
 @media (max-width: 600px) {
     .music-hero {
-        padding: 7rem 1rem 3rem;
+        min-height: 100vh;
+        padding: 7rem 1.25rem;
     }
 
     .now-playing-card {
-        max-width: 420px;
+        width: min(100%, 360px);
+    }
+
+    .recent-tracks {
+        width: min(100%, 360px);
     }
 
     .card-content {
@@ -670,7 +842,7 @@
     }
 
     .track-name {
-        font-size: var(--text-lg);
+        font-size: var(--text-xl);
     }
 
     .artist-thumbnail {
@@ -685,6 +857,13 @@
     }
 
     .source-pill {
-        padding: 8px 10px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 10px 12px;
+    }
+
+    .source-pill svg {
+        width: 18px;
+        height: 18px;
     }
 }

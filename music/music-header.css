@@ -3,40 +3,72 @@
    Override main site floating header for music page
    ========================================== */
 
-/* Hide work-related CTAs */
+/* Hide work-related CTAs but allow space/transitions if needed */
 .floating-ctas {
     display: none !important;
+    max-height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
 }
 
 /* Hide the chevron toggle */
 .mini-toggle {
     display: none !important;
+    max-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
 }
 
-/* Customize header text - replace original content */
-.site-title {
-    font-size: 0 !important;
-    line-height: 0;
+/* Replace header contents with a music-only label */
+.header-reveal {
+    display: none !important;
 }
 
-.site-title::before {
+.header-center-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: auto;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+
+.header-center-box::before {
     content: "Music";
-    font-size: var(--text-xl);
-    line-height: var(--leading-tight);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    color: var(--text-primary);
     display: block;
+    white-space: nowrap;
 }
 
-.site-sub {
-    font-size: 0 !important;
-    line-height: 0;
-}
-
-.site-sub::before {
-    content: "A collection of my favorite tunes";
-    font-size: var(--text-sm);
-    line-height: var(--leading-normal);
+.header-center-box::after {
+    content: "";
+    display: none;
+    font-size: 0.75rem;
+    line-height: 1.2;
     color: var(--text-muted);
-    display: block;
+    white-space: nowrap;
+    text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .header-center-box::after {
+        content: "A collection of my favourites tunes";
+        display: block;
+    }
 }
 
 /* Ensure header stays compact and doesn't try to expand */
@@ -51,17 +83,55 @@
 
 /* Adjust center box to not expect CTAs */
 .header-center-box {
-    padding: var(--space-sm) var(--space-lg);
-}
-
-.header-reveal {
-    flex-direction: column;
+    padding: 0 18px;
+    min-height: var(--badge-size-lg);
+    display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    justify-content: center;
 }
 
-.title-group {
-    text-align: center;
+@media (max-width: 900px) {
+    .header-center-box {
+        min-height: var(--badge-size-md);
+    }
+}
+
+@media (max-width: 600px) {
+    .header-center-box {
+        padding: 8px 14px;
+        min-height: var(--badge-size-sm);
+    }
+
+    .header-center-box::before {
+        font-size: 1.05rem;
+    }
+
+    .header-center-box::after {
+        font-size: 0.75rem;
+    }
+}
+
+/* Keep the music header compact even when the bar expands on scroll */
+.floating-inner.expanded .header-center-box,
+.floating-inner.mini-expanded .header-center-box {
+    padding: 6px 14px;
+    min-height: var(--badge-size-lg);
+    justify-content: center;
+    gap: 6px;
+}
+
+@media (max-width: 900px) {
+    .floating-inner.expanded .header-center-box,
+    .floating-inner.mini-expanded .header-center-box {
+        min-height: var(--badge-size-md);
+    }
+}
+
+@media (max-width: 600px) {
+    .floating-inner.expanded .header-center-box,
+    .floating-inner.mini-expanded .header-center-box {
+        min-height: var(--badge-size-sm);
+    }
 }
 
 /* Dynamic Glow for Social Badges & Logo */
@@ -87,4 +157,17 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
                 0 0 20px var(--dynamic-glow-color, rgba(245, 158, 11, 0.1));
     transition: all var(--spring-smooth);
+}
+
+/* Keep the music page focused by hiding footer CTAs */
+.site-footer .footer-section:nth-child(2),
+.site-footer .footer-section:nth-child(3) {
+    display: none;
+}
+
+.site-footer .footer-content {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+    max-width: 520px;
 }

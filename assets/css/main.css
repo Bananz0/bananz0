@@ -130,17 +130,17 @@
     /* ============================================= */
 
     /* Unified Badge Sizing - Consistent across GM logo and social badges */
-    --badge-size-lg: 48px;
-    /* Desktop (>870px) */
-    --badge-size-md: 44px;
-    /* Tablet (720-870px) */
-    --badge-size-sm: 36px;
+    --badge-size-lg: 64px;
+    /* Desktop (>900px) */
+    --badge-size-md: 56px;
+    /* Tablet (720-900px) */
+    --badge-size-sm: 48px;
     /* Mobile (<500px) */
-    --badge-icon-lg: 20px;
+    --badge-icon-lg: 32px;
     /* Icon size at desktop */
-    --badge-icon-md: 18px;
+    --badge-icon-md: 28px;
     /* Icon size at tablet */
-    --badge-icon-sm: 16px;
+    --badge-icon-sm: 24px;
     /* Icon size at mobile */
     --badge-gap: var(--space-sm);
     /* 8px gap between badges */
@@ -439,7 +439,7 @@ nav.scrolled {
 
 .nav-links {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
     list-style: none;
     align-items: center;
 }
@@ -609,6 +609,10 @@ nav.scrolled {
     text-decoration: none;
     position: relative;
     z-index: 2;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     /* Spring-bouncy transitions for size changes and interactions */
     transition:
         width var(--spring-bouncy),
@@ -774,45 +778,35 @@ nav.scrolled {
     /* will-change: transform; */
 }
 
-/* Switch social badges to bottom corner only on phones (below 600px) */
-@media (max-width: 600px) {
+/* Breakpoint morph helper: keep bottom badges visible during exit animation */
+body.badge-morph-to-desktop .nav-hub {
+    position: fixed;
+    z-index: 10003;
+    top: auto;
+    bottom: var(--space-md);
+    left: var(--space-md);
+    right: auto;
+    order: -999;
+}
 
-    /* Fade out inline badges in place with scale */
-    .social-badges-inline {
-        opacity: 0;
-        transform: scale(0.8);
-        pointer-events: none;
-        transition: opacity var(--spring-smooth), transform var(--spring-smooth);
-    }
+body.badge-morph-to-desktop .social-badges-mobile {
+    display: flex;
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    pointer-events: none;
+}
 
-    /* Fade in mobile badges in place */
-    .social-badges-mobile {
-        display: flex;
-        opacity: 1;
-        transform: scale(1);
-        transition: opacity var(--spring-smooth), transform var(--spring-smooth);
-    }
+body.badge-morph-to-desktop .social-badges-inline {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0) scale(0.9);
+    pointer-events: none;
+}
 
-    /* Consistent mobile sizing for both badge types */
-    .social-badge,
-    .nav-hub .hub-main {
-        width: var(--badge-size-sm);
-        height: var(--badge-size-sm);
-    }
-
-    .social-badge svg {
-        width: var(--badge-icon-sm);
-        height: var(--badge-icon-sm);
-    }
-
-    .social-badge img {
-        width: var(--badge-icon-sm);
-        height: var(--badge-icon-sm);
-    }
-
-    .logo-text {
-        font-size: 0.9rem;
-    }
+/* Morph transition cleanup: prevent flashes and fighting animations */
+.nav-hub.setup-morph,
+.social-badges-mobile.setup-morph,
+.social-badges-inline.setup-morph {
+    transition: none !important;
 }
 
 .social-badge {
@@ -865,35 +859,6 @@ nav.scrolled {
     display: block;
 }
 
-@media (max-width: 720px) {
-    .social-badges {
-        top: var(--space-md);
-        right: var(--space-md);
-        gap: var(--badge-gap);
-    }
-
-    /* Unified sizing for both GM badge and social badges */
-    .social-badge,
-    .nav-hub .hub-main {
-        width: var(--badge-size-md);
-        height: var(--badge-size-md);
-    }
-
-    .social-badge svg {
-        width: var(--badge-icon-md);
-        height: var(--badge-icon-md);
-    }
-
-    .social-badge img {
-        width: var(--badge-icon-md);
-        height: var(--badge-icon-md);
-    }
-
-    .logo-text {
-        font-size: 1rem;
-    }
-}
-
 /* Small utility classes moved from inline styles */
 .orcid-img {
     display: block;
@@ -938,13 +903,14 @@ nav.scrolled {
 }
 
 .floating-inner {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     align-items: center;
     /* Ensure vertical centering */
     justify-content: center;
     /* Keep items grouped together in center */
-    width: min(95%, 1400px);
+    width: max-content;
+    max-width: min(95vw, 1400px);
     gap: var(--header-element-gap);
     /* Remove glass styling - it's now on .header-center-box */
     background: none;
@@ -957,9 +923,8 @@ nav.scrolled {
         gap var(--spring-bouncy),
         padding var(--spring-bouncy),
         top var(--spring-smooth),
-        width var(--spring-bouncy),
         min-height var(--spring-bouncy);
-    will-change: gap, padding, width, min-height;
+    will-change: gap, padding, min-height;
 }
 
 /* Center Box - Has Glass Styling */
@@ -967,7 +932,7 @@ nav.scrolled {
     order: 2;
     flex: 0 1 auto;
     min-width: 0;
-    min-height: 48px;
+    min-height: var(--badge-size-lg);
     /* Match GM logo height for alignment */
 
     /* Glass box styling - ONLY on center section */
@@ -986,15 +951,12 @@ nav.scrolled {
     /* Spring-bouncy for bouncy size animation on expand/collapse */
     transition:
         padding var(--spring-bouncy),
-        max-width var(--spring-bouncy),
-        min-width var(--spring-bouncy),
-        width var(--spring-bouncy),
-        min-height var(--spring-bouncy),
-        flex-direction var(--spring-smooth),
+        width var(--spring-smooth),
+        min-height var(--spring-smooth),
         background var(--spring-smooth),
         box-shadow var(--spring-smooth),
         border-color var(--spring-smooth);
-    will-change: padding, max-width, min-width, min-height, flex-direction;
+    will-change: padding, min-height, width;
 }
 
 /* Header Reveal Container */
@@ -1009,8 +971,8 @@ nav.scrolled {
     min-width: 0;
     /* Match the parent pill height so children truly center vertically */
     height: 100%;
-    transition: gap var(--spring-smooth), width var(--spring-smooth);
-    will-change: gap, width;
+    transition: gap var(--spring-smooth);
+    will-change: gap;
 }
 
 /* Title Group Container */
@@ -1018,8 +980,8 @@ nav.scrolled {
     display: flex;
     flex-direction: row;
     align-items: center;
-    /* Center title and chevron */
-    gap: var(--space-lg);
+    /* Spacing handled by sub-title margin to allow gapless collapse */
+    gap: 0;
     flex-shrink: 0;
     width: auto;
     /* Ensure title group occupies full header height for perfect centering */
@@ -1029,7 +991,7 @@ nav.scrolled {
 }
 
 /* Make clickable in mini mode */
-@media (max-width: 870px),
+@media (max-width: 900px),
 (max-height: 660px) {
 
     .title-group,
@@ -1063,7 +1025,7 @@ nav.scrolled {
 .floating-inner .site-sub {
     color: var(--text-muted);
     font-size: 0.85rem;
-    margin: 0;
+    margin: 0 0 0 var(--space-lg);
     opacity: 0.9;
     white-space: nowrap;
     line-height: 1.2;
@@ -1077,14 +1039,15 @@ nav.scrolled {
     transition:
         opacity var(--spring-smooth),
         max-width var(--spring-smooth),
-        max-height var(--spring-smooth);
-    will-change: opacity, max-width, max-height;
+        max-height var(--spring-smooth),
+        margin var(--spring-smooth);
+    will-change: opacity, max-width, max-height, margin;
 }
 
 /* Mini-mode Toggle Button (Mobile/Mini only) */
 .mini-toggle {
-    display: flex;
-    /* Always display but control visibility with opacity for smooth animation */
+    display: none;
+    /* Hide on desktop, only used below 900px */
     opacity: 0;
     pointer-events: none;
     background: rgba(255, 255, 255, 0.03);
@@ -1167,28 +1130,27 @@ nav.scrolled {
     overflow: hidden;
     /* Prevent interaction and layout space */
 
-    /* Spring-bouncy transitions for both expand and collapse */
+    /* Spring-smooth for layout containers, bouncy for elements inside */
     transition:
-        max-width var(--spring-bouncy),
-        max-height var(--spring-bouncy),
-        margin-left var(--spring-bouncy),
-        margin-top var(--spring-bouncy),
-        opacity var(--spring-bouncy),
-        transform var(--spring-bouncy);
+        max-width var(--spring-smooth),
+        max-height var(--spring-smooth),
+        margin-left var(--spring-smooth),
+        margin-top var(--spring-smooth),
+        opacity var(--spring-snappy),
+        transform var(--spring-snappy);
     will-change: max-width, max-height, opacity, transform;
 }
 
 .floating-ctas.visible {
     /* Expanded State */
-    max-width: 500px;
-    max-height: 300px;
-    /* Allow enough height for stacked buttons */
+    max-width: 320px;
+    max-height: 56px;
+    /* Balanced height for single-row desktop buttons */
     opacity: 1;
     pointer-events: auto;
     transform: scale(1);
     margin-left: var(--space-lg);
     /* visibility handled by class and pointer-events */
-    pointer-events: auto;
 }
 
 /* Scale buttons to fit in floating header */
@@ -1217,53 +1179,125 @@ nav.scrolled {
     display: inline;
 }
 
-@media (max-width: 900px) {
+/* TABLET & MOBILE OPTIMIZATIONS */
 
-    /* Scale both GM badge and social badges uniformly on smaller screens */
-    .social-badge,
-    .nav-hub .hub-main {
-        width: var(--badge-size-md);
-        height: var(--badge-size-md);
-    }
-
-    .social-badge svg {
-        width: var(--badge-icon-md);
-        height: var(--badge-icon-md);
-    }
-
-    /* Scale hub buttons with medium badge size on smaller viewports */
-    .nav-hub .hub-btn {
-        width: var(--badge-size-md);
-        height: var(--badge-size-md);
-    }
-
-    .nav-hub .hub-btn svg,
-    .nav-hub .hub-btn-img,
-    .nav-hub .hub-btn img {
-        width: calc(var(--badge-size-md) * 0.6);
-        height: calc(var(--badge-size-md) * 0.6);
+/* Hide tagline below 1266px with spring animation */
+@media (max-width: 1266px) {
+    .floating-inner .site-sub {
+        max-width: 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
     }
 }
 
-/* MINI MODE (< 870px) - Horizontal layout with flanking badges */
-@media (max-width: 870px) {
+/* Switch to compact layout earlier to prevent tablet overflow (< 1024px) */
+@media (max-width: 1024px) {
+    .floating-hero {
+        top: var(--space-md);
+        width: min(96%, 100%);
+        max-width: 100%;
+    }
+
+    .header-center-box {
+        max-width: 500px;
+    }
+
+    .floating-inner {
+        /* Don't change padding here to avoid height jump */
+        gap: var(--header-element-gap);
+        /* Keep icons close to center box - no space-between jump */
+        width: max-content;
+        max-width: calc(100vw - (var(--space-md) * 2));
+    }
+
+    .floating-inner .site-title {
+        font-size: 0.95rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: 0;
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 100%;
+        text-align: left;
+    }
+
+    .floating-ctas {
+        margin-left: 0 !important;
+        /* Reset margin */
+        gap: var(--space-xs);
+        max-width: 0;
+    }
+
+    .floating-ctas.visible {
+        max-width: 280px;
+        margin-left: 0 !important;
+        flex-shrink: 0;
+        /* Stay neighboring the pill - unified grouping */
+    }
+
+    .floating-ctas .cta-btn {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        gap: 0;
+        min-width: unset;
+    }
+
+    /* Use Compact Text */
+    .desktop-text {
+        display: none;
+    }
+
+    .mobile-text {
+        display: inline;
+    }
+}
+
+/* MINI MODE (< 900px) - Horizontal layout with flanking badges */
+@media (max-width: 900px) {
     .floating-hero {
         top: var(--space-md);
         width: 100%;
         padding: 0 var(--space-md);
     }
 
+    /* Scale both GM badge and social badges uniformly on smaller screens */
+    .social-badge,
+    .nav-hub .hub-main,
+    .nav-hub .hub-btn {
+        width: var(--badge-size-md);
+        height: var(--badge-size-md);
+    }
+
+    .social-badge svg,
+    .nav-hub .hub-btn svg,
+    .nav-hub .hub-btn-img,
+    .nav-hub .hub-btn img {
+        width: var(--badge-icon-md);
+        height: var(--badge-icon-md);
+    }
+
+    /* Scaling for hero section buttons on home page */
+    .cta-buttons .cta-btn {
+        padding: 0.85rem 1.7rem;
+        font-size: 0.85rem;
+    }
+
+    .glitch {
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
+    }
+
     .floating-inner {
         display: flex;
         flex-direction: row;
         align-items: center;
-        /* Center elements vertically */
         justify-content: center;
-        /* Center the layout - icons stay close to center box */
-        width: 100%;
-        max-width: 100%;
+        width: max-content;
+        max-width: calc(100vw - (var(--space-md) * 2));
         gap: var(--header-element-gap);
-        /* Keep consistent gap - no jarring jump */
     }
 
     /* Nav hub stays at left in row */
@@ -1280,49 +1314,54 @@ nav.scrolled {
     .header-center-box {
         order: 2;
         flex: 0 1 auto;
-        max-width: 600px;
+        max-width: 500px;
         width: auto;
+        margin: 0;
+        min-height: var(--badge-size-md);
         flex-direction: column;
         align-items: center;
-        /* Remove vertical padding so children sit on the visual center
-           of the pill. Keep horizontal padding for the pill shape. */
+        /* Remove vertical padding for visual centering in pill */
         padding: 0 var(--space-lg);
-        /* Equal padding all around */
     }
 
     .header-reveal {
         display: flex;
         flex-direction: row;
         align-items: center;
-        /* Center title and toggle vertically */
         justify-content: center;
-        width: 100%;
+        width: auto;
         gap: var(--space-sm);
         height: auto;
+        min-height: 28px;
     }
 
     .title-group {
         display: flex;
         flex-direction: row;
         align-items: center;
-        /* Center title and chevron */
         gap: var(--space-xs);
+        height: 28px;
     }
 
     .floating-inner .site-title {
         font-size: 0.95rem;
         text-align: center;
-        line-height: 1.2;
-    }
-
-    /* Compact-specific: reduce the header pill vertical padding so the
-       center box aligns with the icon sizes and doesn't add extra height */
-    .floating-inner.compact .header-center-box {
-        padding: 0 8px;
+        line-height: 1;
+        height: var(--badge-size-md); 
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    /* Compact-specific: reduce the header pill vertical padding */
+    .floating-inner.compact .header-center-box {
+        padding: 0 var(--space-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
         min-height: inherit;
+        flex-shrink: 0;
     }
 
     /* When expanded give the center box its normal padding */
@@ -1330,6 +1369,7 @@ nav.scrolled {
     .floating-inner.mini-expanded .header-center-box {
         justify-content: flex-start;
         padding: 18px var(--space-lg) var(--space-sm) var(--space-lg);
+        min-height: var(--badge-size-md); /* Keep stable with compact state */
     }
 
     /* Ensure title/sub don't add vertical margins */
@@ -1339,79 +1379,47 @@ nav.scrolled {
         line-height: 1.2;
     }
 
-    /* Add horizontal padding to the title inside the compact mini pill so
-       "GLEN MUTHOKA" doesn't touch the pill edges when unexpanded. */
+    /* Add horizontal padding to the title inside the compact mini pill */
     .floating-inner.compact .header-center-box .site-title {
         padding: 0 10px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    /* Ensure compact mini bar height matches icon sizes so icons and
-       header pill align perfectly when unexpanded */
+    /* Sync vertical alignment of header pill with icon sizes */
     .floating-inner.compact {
         align-items: center;
-        min-height: 48px;
-        padding: 6px var(--space-sm);
+        min-height: var(--badge-size-md);
+        padding: 0 var(--space-sm);
         justify-content: center;
     }
 
-    /* Ensure the header center box remains visually centered on the page
-       when compact by allowing it to auto-margin. This prevents slight
-       visual offsets when left and right badges are present. */
-    .floating-inner.compact .header-center-box {
-        margin: 0 auto;
-    }
-
-    @media (max-width: 720px) {
-        .floating-inner.compact {
-            min-height: 40px;
-            padding: 4px var(--space-xs);
-        }
-    }
-
-    @media (max-width: 600px) {
-        .floating-inner.compact {
-            min-height: 36px;
-            padding: 4px var(--space-xs);
-        }
-    }
-
-    /* When in mini-mode (compact) on small tablets/large phones (601-870px)
-       hide the CTA group so it doesn't push the header content vertically.
-       Mobile <=600px continues to use the stacked CTAs controlled elsewhere. */
-    @media (min-width: 601px) and (max-width: 870px) {
+    /* Tablet-specific CTA handling */
+    @media (min-width: 601px) and (max-width: 900px) {
         .floating-inner.compact .floating-ctas {
-            display: none !important;
-            max-height: 0 !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
+            max-height: 0;
+            margin-top: 0;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        /* When the mini bar is expanded manually, force CTAs to display */
+        /* Group expansion properties */
         .floating-inner.mini-expanded .floating-ctas,
         .floating-inner.expanded .floating-ctas {
-            display: flex !important;
-            max-height: 300px !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-            transform: scale(1) !important;
+            max-height: 155px;
+            margin-top: var(--space-sm);
+            opacity: 1;
         }
     }
 
     .mini-toggle {
+        display: flex; /* Restore for tablet/mobile */
         opacity: 1;
         pointer-events: auto;
         margin: 0 0 0 var(--space-xs);
         align-self: center;
-        /* Center toggle vertically - fades in smoothly */
     }
 
-
-    /* Remove compact-mode nudges — let flexbox center elements naturally.
-       Previous translateY nudges pushed the title/chevron outside the pill. */
     .floating-inner.compact .site-title {
         transform: none;
     }
@@ -1426,7 +1434,6 @@ nav.scrolled {
         max-width: 100%;
         flex-direction: column;
         align-items: center;
-        /* Ensure CTA group centers vertically in the header pill */
         align-self: center;
         gap: var(--space-xs);
         margin-left: 0 !important;
@@ -1435,12 +1442,11 @@ nav.scrolled {
         opacity: 0;
         overflow: hidden;
         transform: scale(0.95);
-        /* Use spring-bouncy for all transitions for consistent bounce */
         transition:
             max-height var(--spring-bouncy),
             margin-top var(--spring-bouncy),
-            opacity var(--spring-bouncy),
-            transform var(--spring-bouncy);
+            opacity var(--spring-snappy),
+            transform var(--spring-snappy);
     }
 
     .floating-ctas.visible {
@@ -1452,105 +1458,48 @@ nav.scrolled {
 
     .floating-ctas .cta-btn {
         width: 100%;
-        padding: 0.65em 0.9em;
-        font-size: 0.85rem;
+        padding: 0.75em 1.05em;
+        font-size: 0.9rem;
     }
 
     /* Override expanded state padding to prevent jumps */
     .floating-inner.expanded,
     .floating-inner.mini-expanded {
         padding: 0;
-        min-height: 0;
-    }
-}
-
-/* TABLET & MOBILE OPTIMIZATIONS (< 1024px) */
-/* Switch to compact layout earlier to prevent tablet overflow */
-/* Reduced top offset jump - make it smoother */
-@media (max-width: 1024px) {
-    .floating-hero {
-        top: var(--space-md);
-        width: min(96%, 100%);
-        max-width: 100%;
-    }
-
-    .floating-inner {
-        /* Don't change padding here to avoid height jump */
-        gap: var(--header-element-gap);
-        /* Keep icons close to center box - no space-between jump */
-        width: 100%;
-    }
-
-    .floating-inner .site-title {
-        font-size: 0.95rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        margin: 0;
-        flex: 1 1 auto;
-        min-width: 0;
-        max-width: 100%;
-        text-align: left;
-    }
-
-    .floating-ctas {
-        margin-left: 0 !important;
-        /* Reset margin */
-        gap: var(--space-xs);
-        max-width: 0;
-    }
-
-    .floating-ctas.visible {
-        max-width: 350px;
-        margin-left: auto;
-        flex-shrink: 0;
-        /* Push to right */
-    }
-
-    .floating-ctas .cta-btn {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        gap: 0;
-        min-width: unset;
-    }
-
-    /* Use Compact Text */
-    .desktop-text {
-        display: none;
-    }
-
-    .mobile-text {
-        display: inline;
-    }
-}
-
-/* Hide tagline below 1266px with spring animation */
-@media (max-width: 1266px) {
-    .floating-inner .site-sub {
-        max-width: 0;
-        max-height: 0;
-        opacity: 0;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        visibility: hidden;
-    }
-}
-
-/* Show compact button text only when tagline is hidden (below 1024px) */
-@media (max-width: 1024px) {
-    .desktop-text {
-        display: none;
-    }
-
-    .mobile-text {
-        display: inline;
+        min-height: var(--badge-size-md);
     }
 }
 
 /* PHONE OPTIMIZATIONS (< 600px) */
-/* Move GM badge to bottom-left corner on phones */
 @media (max-width: 600px) {
+    /* Social Badge Toggle: Swap inline for mobile corner ones */
+    .social-badges-inline {
+        opacity: 0;
+        transform: translate3d(24px, 0, 0) scale(0.85);
+        pointer-events: none;
+        transition: opacity var(--spring-smooth), transform var(--spring-smooth);
+    }
+
+    .social-badges-mobile {
+        display: flex;
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity var(--spring-smooth), transform var(--spring-smooth);
+    }
+
+    /* Global Social Badge Scaling */
+    .social-badge {
+        width: var(--badge-size-sm);
+        height: var(--badge-size-sm);
+        background: rgba(18, 18, 18, 0.8);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .social-badge svg,
+    .social-badge img {
+        width: var(--badge-icon-sm);
+        height: var(--badge-icon-sm);
+    }
 
     /* On mobile, secondary buttons expand upwards when at bottom */
     .nav-hub .hub-secondary {
@@ -1558,7 +1507,6 @@ nav.scrolled {
         top: auto;
         bottom: calc(var(--badge-size-sm) + 8px);
         transform: translateY(10px);
-        /* Reversed direction */
     }
 
     .nav-hub:hover .hub-secondary,
@@ -1567,7 +1515,6 @@ nav.scrolled {
         transform: translateY(0);
     }
 
-    /* Expand hover area upwards on mobile */
     .nav-hub::after {
         top: -200px;
         bottom: -8px;
@@ -1577,7 +1524,7 @@ nav.scrolled {
         top: -250px;
     }
 
-    /* Move nav hub to bottom corner on phones - spring animation */
+    /* Move nav hub to bottom corner on phones */
     .nav-hub {
         position: fixed;
         z-index: 10003;
@@ -1585,18 +1532,15 @@ nav.scrolled {
         bottom: var(--space-md);
         left: var(--space-md);
         order: -999;
-        /* Spring animation for smooth entrance from above */
         transition:
             bottom var(--spring-bouncy),
             left var(--spring-bouncy),
             top var(--spring-bouncy),
             opacity var(--spring-bouncy),
             transform var(--spring-bouncy);
-        /* Animate in from above with bounce */
-        animation: gmBadgeSlideIn var(--spring-bouncy) forwards;
     }
 
-    /* Use small badge sizes for hub buttons on phones */
+    .nav-hub .hub-main,
     .nav-hub .hub-btn {
         width: var(--badge-size-sm);
         height: var(--badge-size-sm);
@@ -1605,112 +1549,84 @@ nav.scrolled {
     .nav-hub .hub-btn svg,
     .nav-hub .hub-btn-img,
     .nav-hub .hub-btn img {
-        width: calc(var(--badge-size-sm) * 0.6);
-        height: calc(var(--badge-size-sm) * 0.6);
+        width: var(--badge-icon-sm);
+        height: var(--badge-icon-sm);
     }
 
-    /* GM Badge slide-in animation from header position */
-    @keyframes gmBadgeSlideIn {
-        0% {
-            opacity: 0;
-            transform: translateY(-60px) scale(0.8);
-        }
-
-        100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+    .floating-hero {
+        position: fixed;
+        top: var(--space-md);
+        width: 100%;
+        left: 0;
+        right: 0;
+        padding: 0 var(--space-md);
+        transform: none;
     }
 
     .floating-inner {
         flex-direction: column;
-        /* NO background - glass effect is ONLY on .header-center-box */
         background: none;
         align-items: center;
-        /* Center the compact header */
-        justify-content: center;
-        cursor: pointer;
-        /* Minimal padding for compact size */
+        justify-content: flex-start;
         padding: 0;
-        /* Allow width to shrink to content */
         width: auto;
         min-width: 0;
     }
 
-    /* Compact header-center-box - only covers text and chevron */
+    /* Header Center Box (The Pill) */
     .header-center-box {
-        /* Tight, minimal padding for compact mini mode */
-        padding: 6px 16px !important;
-        flex-direction: row !important;
+        padding: 4px 16px;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        /* Allow to shrink to content width */
-        width: auto !important;
+        width: auto;
         min-width: 0;
         max-width: none;
-        /* Compact height */
-        min-height: auto !important;
-        height: auto !important;
-        /* Ensure glass pill wraps content */
-        flex-wrap: nowrap;
-        /* Ensure visible content */
-        overflow: visible;
+        min-height: var(--badge-size-sm);
         background: rgba(18, 18, 18, 0.48);
-        /* Reinforce background */
-        /* Spring-bouncy transitions for mobile expand/collapse */
-        /* !important to override specificity issues with other !important rules */
+        overflow: visible;
         transition:
             padding var(--spring-bouncy),
             width var(--spring-bouncy),
-            min-width var(--spring-bouncy),
             min-height var(--spring-bouncy),
-            flex-direction var(--spring-smooth),
             background var(--spring-smooth),
             box-shadow var(--spring-smooth),
-            border-color var(--spring-smooth) !important;
+            border-color var(--spring-smooth);
     }
 
     .header-reveal {
-        display: flex !important;
-        /* Force flex */
-        flex-direction: row !important;
+        display: flex;
+        flex-direction: row;
         align-items: center;
-        /* Center title and toggle vertically */
-        width: auto !important;
-        height: auto !important;
         justify-content: center;
+        width: auto;
+        height: auto;
         gap: var(--space-sm);
-        visibility: visible !important;
-        /* Override any hidden state */
-        margin: 0 !important;
-        /* Reset margins */
+        visibility: visible;
+        margin: 0;
     }
 
     .title-group {
-        display: flex !important;
-        flex-direction: row !important;
+        display: flex;
+        flex-direction: row;
         align-items: center;
-        /* Center title and chevron */
         gap: var(--space-xs);
-        width: auto !important;
-        height: 28px !important;
-        /* Force match toggle height */
-        margin: 0 !important;
+        width: auto;
+        height: 28px;
+        margin: 0;
     }
 
     .floating-inner .site-title {
         font-size: 0.95rem;
         text-align: center;
         white-space: nowrap;
-        margin: 0 !important;
-        padding: 0 !important;
-        /* Fix vertical alignment */
-        line-height: normal !important;
+        margin: 0;
+        padding: 0;
+        line-height: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100% !important;
-        align-self: center;
+        height: 100%;
     }
 
     .floating-inner .site-sub {
@@ -1723,180 +1639,84 @@ nav.scrolled {
         display: flex;
         margin: 0 0 0 var(--space-xs);
         align-self: center;
-        /* Ensure visible and actionable in mini mode */
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        /* Fix vertical centering */
+        opacity: 1;
+        pointer-events: auto;
         height: 28px;
         width: 28px;
     }
 
-    /* Expanded state: expand the center box for CTAs */
+    /* Expanded State Logic */
     .floating-inner.expanded .header-center-box,
     .floating-inner.mini-expanded .header-center-box {
-        flex-direction: column !important;
-        padding: 16px 20px !important;
-        width: auto;
+        padding: 16px 20px;
         min-width: 220px;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        /* Spring-bouncy transitions for collapse animation */
-        transition:
-            padding var(--spring-bouncy),
-            width var(--spring-bouncy),
-            min-width var(--spring-bouncy),
-            min-height var(--spring-bouncy),
-            flex-direction var(--spring-smooth),
-            background var(--spring-smooth),
-            box-shadow var(--spring-smooth),
-            border-color var(--spring-smooth) !important;
+        min-height: var(--badge-size-sm); /* Match compact mobile size */
+        justify-content: flex-start;
     }
 
-    /* Ensure title stays centered in expanded mode */
     .floating-inner.expanded .header-reveal,
     .floating-inner.mini-expanded .header-reveal {
-        width: 100% !important;
-        justify-content: center !important;
+        width: 100%;
+        justify-content: center;
         margin-bottom: 8px;
     }
 
-    /* Force visibility in mini mode if expanded */
-    .floating-inner.mini-expanded .floating-ctas {
-        visibility: visible;
-        max-height: 200px;
-        opacity: 1;
-        pointer-events: auto;
-        margin-top: 8px;
-        transform: translateY(0);
-        width: 100%;
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-    }
-
-    /* Hide CTAs completely in compact mode to prevent layout shift */
-    .floating-inner:not(.expanded):not(.mini-expanded) .floating-ctas {
-        display: none !important;
-    }
-
-    /* Mobile Animation: Height instead of Width */
+    /* CTAs Stacked for Mobile */
     .floating-ctas {
-        margin-left: 0 !important;
         width: 100%;
-        max-width: 100%;
-        /* Override desktop restriction */
         flex-direction: column;
-        /* Stack buttons vertically for top-to-bottom morph */
         align-items: center;
-
-        /* Start collapsed vertically */
         max-height: 0;
-        margin-top: 0;
         opacity: 0;
+        margin-top: 0;
         transform: translateY(-10px);
-        transform-origin: top center;
-
-        /* New transitions for mobile properties (spring-bouncy for bounce) */
         transition:
             max-height var(--spring-bouncy),
             margin-top var(--spring-bouncy),
-            opacity var(--spring-bouncy),
-            transform var(--spring-bouncy),
-            padding var(--spring-bouncy),
-            height var(--spring-bouncy),
-            flex-direction var(--spring-smooth) !important;
+            opacity var(--spring-snappy),
+            transform var(--spring-snappy);
     }
 
+    .floating-inner.mini-expanded .floating-ctas,
+    .floating-inner.expanded .floating-ctas,
     .floating-ctas.visible {
-        /* Expand vertically */
-        max-height: 150px;
-        /* Allow vertical stacking */
+        max-height: 250px;
+        opacity: 1;
         margin-top: 8px;
-        /* Gap logic moved here */
-        opacity: 1;
         transform: translateY(0);
-        justify-content: center;
-        gap: 6px;
-        /* Space between stacked buttons */
-        visibility: visible;
+        pointer-events: auto;
+        display: flex;
+        gap: 8px;
     }
 
-    /* Button entry morph: slide each button down from the top with stagger */
-    .floating-ctas .cta-btn {
-        transform: translateY(-10px);
-        opacity: 0;
-        transition: transform var(--spring-bouncy), opacity var(--spring-bouncy);
-        transform-origin: top center;
-    }
-
-    .floating-ctas.visible .cta-btn {
-        transform: translateY(0);
-        opacity: 1;
-    }
-
-    .floating-ctas.visible .cta-btn:nth-child(1) {
-        transition-delay: 0ms;
-    }
-
-    .floating-ctas.visible .cta-btn:nth-child(2) {
-        transition-delay: 50ms;
-    }
-
-    .floating-ctas.visible .cta-btn:nth-child(3) {
-        transition-delay: 100ms;
-    }
-
-    /* Reset delays when CTAs are hidden to avoid stuck transitions */
-    .floating-ctas:not(.visible) .cta-btn {
-        transition-delay: 0ms !important;
-    }
-
-    /* Social Badges and Logo adjustments for Mobile */
-    .social-badges {
-        z-index: 10002;
-        top: auto;
-        bottom: var(--space-md);
-        right: var(--space-md);
-        flex-direction: column;
-        gap: var(--space-xs);
-    }
-
-    .social-badge {
-        width: var(--badge-size-sm);
-        height: var(--badge-size-sm);
-        background: rgba(18, 18, 18, 0.8);
-        border-color: rgba(245, 158, 11, 0.3);
-    }
-
-    .social-badge svg {
-        width: var(--badge-icon-sm);
-        height: var(--badge-icon-sm);
-    }
-
-    /* Stacked CTA buttons on mobile */
     .floating-ctas .cta-btn {
         width: 100%;
-        padding: 0.7em 0.9em;
-        font-size: 0.8rem;
-        transition: all var(--spring-snappy);
+        min-height: 44px;
+        padding: 1rem 1.4em;
+        font-size: 1rem;
     }
 
-    .nav-hub .hub-main {
-        width: var(--badge-size-sm);
-        height: var(--badge-size-sm);
+    /* Hero Page UI Scaling */
+    .glitch {
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
     }
 
-    .logo-text {
-        font-size: 0.9rem;
+    .cta-buttons .cta-btn {
+        padding: 0.8rem 1.6rem;
+        font-size: 0.85rem;
     }
 
-    /* Ensure compact mini-mode visually centers content vertically
-       by centering along the main axis (column layout). Keep expanded
-       state stretching for button layout. */
+    .tagline {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Compact state vertical centering */
     .floating-inner.compact {
-        align-items: center;
+        min-height: var(--badge-size-sm);
+        padding: 0;
         justify-content: center;
+        align-items: center;
     }
 
     .floating-inner.mini-expanded,
@@ -1955,14 +1775,14 @@ nav.scrolled {
 .glitch::before {
     left: 3px;
     text-shadow: -3px 0 var(--neon-gold);
-    clip: rect(24px, 550px, 90px, 0);
+    clip: rect(24px, 2000px, 90px, 0);
     animation: glitch-anim-1 3s infinite linear alternate-reverse;
 }
 
 .glitch::after {
     left: -3px;
     text-shadow: 3px 0 var(--neon-cyan);
-    clip: rect(85px, 550px, 140px, 0);
+    clip: rect(85px, 2000px, 140px, 0);
     animation: glitch-anim-2 2s infinite linear alternate-reverse;
 }
 
@@ -2166,7 +1986,7 @@ nav.scrolled {
 }
 
 .container {
-    max-width: 1800px;
+    max-width: var(--container-lg);
     margin: 0 auto;
     padding: 0 var(--space-xl);
 }
@@ -2198,7 +2018,12 @@ nav.scrolled {
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
     text-align: center;
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
     position: relative;
     overflow: hidden;
 
@@ -2393,6 +2218,30 @@ nav.scrolled {
     }
 }
 
+@media (min-width: 1400px) {
+
+    .projects-section .projects-grid,
+    .open-source-section .repo-grid {
+        max-width: 1600px;
+    }
+}
+
+@media (min-width: 1800px) {
+
+    .projects-section .projects-grid,
+    .open-source-section .repo-grid {
+        max-width: 2000px;
+    }
+}
+
+@media (min-width: 2400px) {
+
+    .projects-section .projects-grid,
+    .open-source-section .repo-grid {
+        max-width: 2400px;
+    }
+}
+
 /* Adaptive “pyramid” behavior:
    - Cards auto-wrap into as many columns as fit
    - Last row is centered automatically via justify-content:center
@@ -2445,13 +2294,29 @@ nav.scrolled {
     border: 1px solid rgba(0, 245, 255, 0.2);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     width: 100%;
     text-decoration: none;
+}
+
+.project-card-full[data-project-link],
+.project-card-full[data-modal-images],
+.project-card-full[data-modal-iframe] {
+    cursor: pointer;
+}
+
+.project-card-full:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.6);
+    outline-offset: 4px;
 }
 
 .project-card-full::before {
@@ -2593,6 +2458,7 @@ nav.scrolled {
     cursor: pointer;
     /* show pointer on hover for anchors and spans */
     outline: none;
+    text-decoration: none;
 }
 
 .project-card-full:hover .project-link {
@@ -2658,7 +2524,12 @@ a.repo-card-full .repo-desc-muted,
     padding: var(--space-lg);
     text-decoration: none;
     color: var(--text-primary);
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
     position: relative;
     overflow: hidden;
     text-align: center;
@@ -2789,7 +2660,12 @@ a.repo-card-full .repo-desc-muted,
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
     position: relative;
     overflow: hidden;
 
@@ -2998,7 +2874,12 @@ a.repo-card-full .repo-desc-muted,
     height: 100%;
     position: relative;
     overflow: hidden;
-    transition: all var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
 }
 
 /* Liquid reflection effect */
@@ -3584,8 +3465,28 @@ a.repo-card-full .repo-desc-muted,
         display: flex;
     }
 
+    .hero {
+        min-height: 82vh;
+        padding: 7rem 1.5rem 6rem;
+    }
+
     .glitch {
-        font-size: clamp(2rem, 12vw, 3.5rem);
+        font-size: clamp(2.6rem, 10vw, 4.6rem);
+    }
+
+    .tagline {
+        font-size: clamp(1rem, 3.2vw, 1.35rem);
+        letter-spacing: 1.5px;
+    }
+
+    .cta-buttons {
+        gap: 1rem;
+        margin-top: 2.25rem;
+    }
+
+    .cta-btn {
+        font-size: 1.05rem;
+        padding: 1.1rem 2.2rem;
     }
 
     .stats-grid {
@@ -3779,7 +3680,12 @@ a.repo-card-full .repo-desc-muted,
     padding: var(--space-xl);
     position: relative;
     overflow: hidden;
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
 
     text-align: center;
 }
@@ -3944,7 +3850,12 @@ a.repo-card-full .repo-desc-muted,
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     text-align: center;
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
 }
 
 .cert-card:hover {
@@ -4056,7 +3967,12 @@ a.repo-card-full .repo-desc-muted,
     margin-bottom: var(--space-xl);
     position: relative;
     overflow: hidden;
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
     text-align: left;
 }
 
@@ -4262,7 +4178,12 @@ a.repo-card-full .repo-desc-muted,
     background: rgba(251, 191, 36, 0.05);
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-lg);
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
 }
 
 .interest-item:hover {
@@ -4434,7 +4355,7 @@ a.repo-card-full .repo-desc-muted,
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--space-xl);
     padding: var(--space-3xl) var(--space-xl);
-    max-width: 1800px;
+    max-width: var(--container-lg);
     margin: 0 auto;
 }
 
@@ -4547,7 +4468,12 @@ a.repo-card-full .repo-desc-muted,
     padding: var(--space-xl);
     border: 1px solid rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-xl);
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
 }
 
 .tech-card:hover {
@@ -4781,67 +4707,9 @@ body {
         padding-left: 1rem;
         padding-right: 1rem;
     }
-
-    .floating-hero {
-        width: 100%;
-        left: 0;
-        right: 0;
-        transform: none;
-    }
 }
 
-/* Fix overlap for narrow portrait-ish viewports (e.g., 540x720) */
-@media (max-width: 600px) and (min-width: 501px) {
-
-    /* Move social badges and logo to bottom corners to avoid top-bar collisions */
-    .social-badges {
-        z-index: 10002;
-        top: auto;
-        bottom: var(--space-md);
-        right: var(--space-md);
-        flex-direction: column;
-        gap: var(--space-xs);
-    }
-
-    /* GM badge moves to bottom-left at 600px via @media (max-width: 600px) rule */
-    /* Social badges also move at 600px - keeping them consistent */
-
-    /* Slightly reduce floating header footprint */
-    .floating-hero {
-        top: calc(var(--space-md) + 4px);
-        width: min(90%, 720px);
-    }
-
-    .floating-inner {
-        padding: var(--space-xs) var(--space-sm);
-    }
-}
-
-/* Compact vs Expanded states applied by JS */
-.floating-inner.compact {
-    padding: var(--space-xs) var(--space-md);
-    /* Use consistent height across all breakpoints */
-}
-
-.floating-inner.expanded {
-    padding: var(--space-sm) var(--space-xl);
-    /* Use consistent height across all breakpoints */
-}
-
-/* When expanded, give CTAs more breathing room */
-.floating-inner.expanded .floating-ctas {
-    gap: var(--space-md);
-}
-
-/* Ensure site title and subtitle vertically center with buttons */
-.floating-inner .site-title,
-.floating-inner .site-sub {
-    display: inline-flex;
-    align-items: center;
-}
-
-/* Moved from index.html */
-/* Single Page Layout Overrides */
+/* Page Section Layouts */
 .page-section {
     min-height: 0;
     padding: var(--space-3xl) var(--space-xl);
@@ -4908,7 +4776,12 @@ body {
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     text-align: center;
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
 }
 
 .contact-card:hover {
@@ -5217,7 +5090,12 @@ body {
     border: 1px solid rgba(0, 245, 255, 0.2);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
-    transition: var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        opacity var(--transition-normal);
     position: relative;
     overflow: hidden;
 }

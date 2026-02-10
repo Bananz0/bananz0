@@ -15,6 +15,7 @@ twitter_username: bananz0
 lastfm_username: glenfire
 lastfm_api_key: ""
 spotify_worker_url: "https://portfolio-spotify-worker.glen-muthoka.workers.dev"
+ai_summary_worker_url: "https://portfolio-spotify-worker.glen-muthoka.workers.dev"
 
 # Build settings
 markdown: kramdown

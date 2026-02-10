@@ -11,12 +11,13 @@ class ProjectModal {
         this.closeBtn = this.modal?.querySelector('.modal-close');
         this.title = document.getElementById('modal-title');
         this.image = document.getElementById('modal-image');
+        this.iframe = document.getElementById('modal-iframe');
         this.caption = document.getElementById('modal-caption');
         this.indicators = document.getElementById('gallery-indicators');
         this.prevBtn = this.modal?.querySelector('.gallery-prev');
         this.nextBtn = this.modal?.querySelector('.gallery-next');
         
-        this.currentImages = [];
+        this.currentItems = [];
         this.currentIndex = 0;
         this.isOpen = false;
         
@@ -83,31 +84,81 @@ class ProjectModal {
     }
 
     attachToCards() {
-        const cards = document.querySelectorAll('[data-modal-images]');
+        const cards = document.querySelectorAll('[data-modal-images], [data-modal-iframe], [data-project-link]');
         cards.forEach(card => {
             card.style.cursor = 'pointer';
-            card.addEventListener('click', (e) => {
-                // Don't open modal if clicking a link inside the card
+            if (!card.hasAttribute('tabindex')) {
+                card.setAttribute('tabindex', '0');
+            }
+            card.setAttribute('role', 'button');
+
+            const handleActivate = (e) => {
+                // Allow explicit links inside the card to work normally
                 if (e.target.tagName === 'A' || e.target.closest('a')) return;
-                
-                const images = card.dataset.modalImages?.split(',').map(src => src.trim()) || [];
-                const captions = card.dataset.modalCaptions?.split('|').map(cap => cap.trim()) || [];
-                const title = card.dataset.modalTitle || 'Project';
-                
-                if (images.length > 0) {
-                    this.open(title, images, captions);
+
+                const items = this.getItemsFromCard(card);
+                const title = card.dataset.modalTitle || card.dataset.projectTitle || card.querySelector('h3')?.textContent?.trim() || 'Project';
+                const link = card.dataset.projectLink;
+                const linkTarget = card.dataset.projectLinkTarget || (link && link.startsWith('http') ? '_blank' : '_self');
+
+                if (items.length > 0) {
+                    e.preventDefault();
+                    this.open(title, items);
+                    return;
+                }
+
+                if (link) {
+                    if (linkTarget === '_blank') {
+                        window.open(link, '_blank', 'noopener');
+                    } else {
+                        window.location.href = link;
+                    }
+                }
+            };
+
+            card.addEventListener('click', handleActivate);
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleActivate(e);
                 }
             });
         });
     }
 
-    open(title, images, captions = []) {
-        if (!this.modal || images.length === 0) return;
+    getItemsFromCard(card) {
+        const items = [];
+        const imagesRaw = card.dataset.modalImages || '';
+        const captionsRaw = card.dataset.modalCaptions || '';
+        const iframeRaw = card.dataset.modalIframe || '';
+        const iframeCaption = (card.dataset.modalIframeCaption || '').trim();
 
-        this.currentImages = images.map((src, index) => ({
-            src,
-            caption: captions[index] || ''
-        }));
+        const images = imagesRaw ? imagesRaw.split(',').map(src => src.trim()).filter(Boolean) : [];
+        const captions = captionsRaw ? captionsRaw.split('|').map(cap => cap.trim()) : [];
+
+        images.forEach((src, index) => {
+            items.push({
+                type: 'image',
+                src,
+                caption: captions[index] || ''
+            });
+        });
+
+        if (iframeRaw.trim()) {
+            items.push({
+                type: 'iframe',
+                src: iframeRaw.trim(),
+                caption: iframeCaption
+            });
+        }
+
+        return items;
+    }
+
+    open(title, items) {
+        if (!this.modal || items.length === 0) return;
+
+        this.currentItems = items;
         this.currentIndex = 0;
         this.isOpen = true;
 
@@ -117,7 +168,7 @@ class ProjectModal {
         }
 
         // Update image and caption
-        this.updateImage();
+        this.updateMedia();
 
         // Build indicators
         this.buildIndicators();
@@ -139,50 +190,70 @@ class ProjectModal {
         document.body.style.overflow = ''; // Restore scroll
         this.isOpen = false;
 
+        if (this.iframe) {
+            this.iframe.src = '';
+            this.iframe.classList.remove('active');
+        }
+
         // Clear after animation
         setTimeout(() => {
-            this.currentImages = [];
+            this.currentItems = [];
             this.currentIndex = 0;
         }, 300);
     }
 
     navigate(direction) {
-        if (this.currentImages.length <= 1) return;
+        if (this.currentItems.length <= 1) return;
 
         this.currentIndex += direction;
 
         // Wrap around
         if (this.currentIndex < 0) {
-            this.currentIndex = this.currentImages.length - 1;
+            this.currentIndex = this.currentItems.length - 1;
         }
-        if (this.currentIndex >= this.currentImages.length) {
+        if (this.currentIndex >= this.currentItems.length) {
             this.currentIndex = 0;
         }
 
-        this.updateImage();
+        this.updateMedia();
         this.updateIndicators();
     }
 
-    updateImage() {
-        if (!this.image || !this.currentImages[this.currentIndex]) return;
+    updateMedia() {
+        const current = this.currentItems[this.currentIndex];
+        if (!current) return;
 
-        const current = this.currentImages[this.currentIndex];
-
-        // Fade out
-        this.image.style.opacity = '0';
-
-        setTimeout(() => {
-            this.image.src = current.src;
-            this.image.alt = current.caption || 'Project screenshot';
-
-            if (this.caption) {
-                this.caption.textContent = current.caption || '';
-                this.caption.style.display = current.caption ? 'block' : 'none';
+        if (current.type === 'iframe') {
+            if (this.image) {
+                this.image.style.opacity = '0';
+                this.image.style.display = 'none';
+                this.image.src = '';
             }
 
-            // Fade in
-            this.image.style.opacity = '1';
-        }, 150);
+            if (this.iframe) {
+                this.iframe.src = current.src;
+                this.iframe.classList.add('active');
+            }
+        } else if (this.image) {
+            if (this.iframe) {
+                this.iframe.src = '';
+                this.iframe.classList.remove('active');
+            }
+
+            this.image.style.display = 'block';
+            this.image.style.opacity = '0';
+
+            setTimeout(() => {
+                this.image.src = current.src;
+                this.image.alt = current.caption || 'Project screenshot';
+                this.image.style.opacity = '1';
+            }, 150);
+        }
+
+        if (this.caption) {
+            this.caption.textContent = current.caption || '';
+            this.caption.style.display = current.caption ? 'block' : 'none';
+        }
 
         // Update navigation buttons
         this.updateNavButtons();
@@ -191,7 +262,7 @@ class ProjectModal {
     updateNavButtons() {
         if (!this.prevBtn || !this.nextBtn) return;
 
-        const isSingle = this.currentImages.length <= 1;
+        const isSingle = this.currentItems.length <= 1;
 
         this.prevBtn.disabled = isSingle;
         this.nextBtn.disabled = isSingle;
@@ -204,14 +275,14 @@ class ProjectModal {
 
         this.indicators.innerHTML = '';
 
-        if (this.currentImages.length <= 1) {
+        if (this.currentItems.length <= 1) {
             this.indicators.style.display = 'none';
             return;
         }
 
         this.indicators.style.display = 'flex';
 
-        this.currentImages.forEach((_, index) => {
+        this.currentItems.forEach((_, index) => {
             const indicator = document.createElement('button');
             indicator.className = 'gallery-indicator';
             indicator.setAttribute('aria-label', `Go to image ${index + 1}`);
@@ -240,10 +311,12 @@ class ProjectModal {
     }
 
     preloadImages() {
-        this.currentImages.forEach(({ src }) => {
-            const img = new Image();
-            img.src = src;
-        });
+        this.currentItems
+            .filter(item => item.type === 'image')
+            .forEach(({ src }) => {
+                const img = new Image();
+                img.src = src;
+            });
     }
 }
 

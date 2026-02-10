@@ -497,58 +497,34 @@ let lastScroll = 0;
 let ticking = false;
 let autoCollapseTimer = null;
 let manuallyExpanded = false; // Track if user manually expanded the bar
+let isHeroExpanded = null;
+let isHeroVisible = null;
 
 // Detect if we're on the music page
 const isMusicPage = window.location.pathname.includes('/music');
 
 // Handle Mini-Mode Toggle Click
 if (floatingInner && miniToggle) {
-    // Improved toggle: use rAF and immediate pointer-events so CTAs appear promptly
+    // Improved toggle: unified with scroll state application
     const toggleExpansion = (e) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
 
-        const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
-
-
+        const isMiniMode = window.innerWidth <= 900 || window.innerHeight <= 660;
         if (!isMiniMode) return;
 
         const isExpanded = floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded');
 
-
         if (isExpanded) {
-            // Collapse: remove visible immediately, then adjust classes
-
-            manuallyExpanded = false; // Clear manual flag
-            if (floatingCtas) {
-                floatingCtas.classList.remove('visible');
-                floatingCtas.style.pointerEvents = 'none';
-            }
-
-            // allow the collapse transition to run
-            requestAnimationFrame(() => {
-                floatingInner.classList.remove('mini-expanded', 'expanded');
-                floatingInner.classList.add('compact');
-            });
+            // Collapse
+            manuallyExpanded = false;
+            updateHeroState(false, false);
         } else {
-            // Expand: set classes first to expose area, then make CTAs visible
-
-            manuallyExpanded = true; // Set manual flag to prevent scroll override
-            floatingInner.classList.remove('compact');
-            // Force a reflow so the browser acknowledges layout change before animating CTAs
-            floatingInner.classList.add('mini-expanded', 'expanded');
-            void floatingInner.offsetHeight;
-
-            if (floatingCtas) {
-                // Make interactable immediately so clicks don't miss during transition
-                floatingCtas.style.pointerEvents = 'auto';
-                // Use rAF to ensure CSS transitions trigger properly
-                requestAnimationFrame(() => {
-                    floatingCtas.classList.add('visible');
-                });
-            }
+            // Expand
+            manuallyExpanded = true;
+            updateHeroState(true, true);
         }
 
         // reset auto-collapse timer whenever user manually toggles
@@ -571,7 +547,7 @@ if (floatingInner && miniToggle) {
     const headerCenterBox = floatingInner.querySelector('.header-center-box');
     if (headerCenterBox) {
         headerCenterBox.addEventListener('click', (e) => {
-            const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
+            const isMiniMode = window.innerWidth <= 900 || window.innerHeight <= 660;
             if (isMiniMode) {
                 // Only trigger if click is not on CTA buttons
                 if (!e.target.closest('.floating-ctas')) {
@@ -587,8 +563,8 @@ function startAutoCollapseTimer() {
     clearAutoCollapseTimer();
     autoCollapseTimer = setTimeout(() => {
         // Auto-collapse after 2 seconds of no activity (Universal in mini-mode)
-        // Mini mode activates at 870px (horizontal) or 660px (vertical)
-        const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
+        // Mini mode activates at 900px (horizontal) or 660px (vertical)
+        const isMiniMode = window.innerWidth <= 900 || window.innerHeight <= 660;
 
         if (floatingInner && isMiniMode) {
             const isExpanded = floatingInner.classList.contains('mini-expanded') ||
@@ -621,108 +597,114 @@ function clearAutoCollapseTimer() {
     }
 }
 
-function updateFloatingHero() {
-    // Skip CTA logic entirely on music page
+// Helper for smooth state updates - accessible globally for toggle and scroll
+function updateHeroState(isExpanded, isVisible) {
+    if (!floatingInner) return;
+
     if (isMusicPage) {
-        // Keep header compact at all times
-        if (floatingInner) {
-            floatingInner.classList.add('compact');
-            floatingInner.classList.remove('expanded', 'mini-expanded');
+        if (isHeroExpanded === false && isHeroVisible === false) return;
+        isHeroExpanded = false;
+        isHeroVisible = false;
+
+        floatingInner.classList.remove('mini-expanded', 'expanded');
+        floatingInner.classList.add('compact');
+        if (floatingCtas) {
+            floatingCtas.classList.remove('visible');
+            floatingCtas.style.pointerEvents = 'none';
         }
+        if (miniToggle) miniToggle.classList.remove('highlight');
         return;
     }
 
-    const currentScroll = window.pageYOffset;
+    if (isHeroExpanded === isExpanded && isHeroVisible === isVisible) return;
+    isHeroExpanded = isExpanded;
+    isHeroVisible = isVisible;
+    
+    requestAnimationFrame(() => {
+        if (isExpanded) {
+            floatingInner.classList.remove('compact');
+            floatingInner.classList.add('mini-expanded', 'expanded');
+        } else {
+            floatingInner.classList.remove('mini-expanded', 'expanded');
+            floatingInner.classList.add('compact');
+        }
+
+        if (floatingCtas) {
+            if (isVisible) {
+                floatingCtas.classList.add('visible');
+            } else {
+                floatingCtas.classList.remove('visible');
+            }
+        }
+    });
+}
+
+function updateFloatingHero() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
     const scrollDelta = currentScroll - lastScroll;
     const isScrollingUp = scrollDelta < -10;
     const isScrollingDown = scrollDelta > 2;
 
     const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
-    const isMiniMode = window.innerWidth <= 870 || window.innerHeight <= 660;
+    const isMiniMode = window.innerWidth <= 900 || window.innerHeight <= 660;
+
+    // Respect manual expansion - don't let scroll override if user just clicked
+    if (manuallyExpanded && isMiniMode) {
+        lastScroll = currentScroll;
+        return;
+    }
+
+    if (isMusicPage) {
+        updateHeroState(false, false);
+        lastScroll = currentScroll;
+        ticking = true;
+        return;
+    }
 
     if (currentScroll > heroHeight) {
         // PAST HERO
         if (!isMiniMode) {
             // Desktop/Tablet stays expanded
-            if (floatingCtas) floatingCtas.classList.add('visible');
-            if (floatingInner) {
-                floatingInner.classList.remove('compact', 'mini-expanded');
-                floatingInner.classList.add('expanded');
-            }
+            updateHeroState(true, true);
             clearAutoCollapseTimer();
         } else {
-            // Mobile past hero: can be compact UNLESS actively interacting/scrolling stop timer
-            // We only FORCE expansion on scroll-up
+            // Mobile past hero
             if (isScrollingUp) {
-                // Always expand on scroll-up in mini-mode
-                if (floatingInner) {
-                    floatingInner.classList.remove('compact');
-                    floatingInner.classList.add('mini-expanded', 'expanded');
-                    if (floatingCtas) floatingCtas.classList.add('visible');
-                }
-                manuallyExpanded = false; // Clear flag on scroll-up expand
+                updateHeroState(true, true);
+                manuallyExpanded = false;
             } else if (isScrollingDown) {
-                // Always collapse on scroll-down in mini-mode
-                manuallyExpanded = false; // Clear flag on scroll-down
-                if (floatingInner) {
-                    floatingInner.classList.remove('mini-expanded', 'expanded');
-                    floatingInner.classList.add('compact');
-                    if (floatingCtas) floatingCtas.classList.remove('visible');
-                }
+                updateHeroState(false, false);
+                manuallyExpanded = false;
             }
         }
-        if (miniToggle) {
-            // Preserve chevron highlight for mini-mode users when they've scrolled past
-            // the hero/CTAs. Only remove highlight for non-mini (desktop/tablet).
-            if (!isMiniMode) {
+        
+        if (miniToggle && isMiniMode) {
+            if (floatingInner && (floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded'))) {
                 miniToggle.classList.remove('highlight');
-            } else {
-                // If the header is expanded (user opened it), don't keep highlight
-                if (floatingInner && (floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded'))) {
-                    miniToggle.classList.remove('highlight');
-                }
-                // Otherwise keep the highlight so the chevron remains noticeable
             }
         }
     } else {
         // IN HERO SECTION
         if (isMiniMode) {
             if (isScrollingUp && currentScroll > 50) {
-                // Always expand on scroll-up in mini-mode
-                if (floatingInner) {
-                    floatingInner.classList.add('mini-expanded', 'expanded');
-                    floatingInner.classList.remove('compact');
-                }
-                if (floatingCtas) floatingCtas.classList.add('visible');
+                updateHeroState(true, true);
                 if (miniToggle) miniToggle.classList.remove('highlight');
-                manuallyExpanded = false; // Clear flag
+                manuallyExpanded = false;
             } else if (isScrollingDown && currentScroll > 50) {
-                // Immediate collapse hint on scroll-down
-                if (floatingInner) {
-                    floatingInner.classList.remove('mini-expanded', 'expanded');
-                    floatingInner.classList.add('compact');
-                    if (floatingCtas) floatingCtas.classList.remove('visible');
-                }
+                updateHeroState(false, false);
                 if (miniToggle) miniToggle.classList.add('highlight');
-                manuallyExpanded = false; // Clear flag on scroll-down
+                manuallyExpanded = false;
             } else if (currentScroll < 50) {
-                // Full reset at top
-                manuallyExpanded = false; // Clear flag at top
-                if (floatingInner) {
-                    floatingInner.classList.remove('mini-expanded', 'expanded');
-                    floatingInner.classList.add('compact');
-                }
-                if (floatingCtas) floatingCtas.classList.remove('visible');
+                // Full reset at top - ensure it happens smoothly
+                manuallyExpanded = false;
+                updateHeroState(false, false);
                 if (miniToggle) miniToggle.classList.remove('highlight');
                 clearAutoCollapseTimer();
             }
         } else {
             // Desktop/Tablet
-            if (floatingCtas) floatingCtas.classList.remove('visible');
-            if (floatingInner) {
-                floatingInner.classList.remove('expanded', 'mini-expanded');
-                floatingInner.classList.add('compact');
-            }
+            updateHeroState(false, false);
             if (miniToggle) miniToggle.classList.remove('highlight');
             clearAutoCollapseTimer();
         }
@@ -760,41 +742,111 @@ if (floatingInner) {
 // OPTIMIZED: Passive scroll listener for better performance
 window.addEventListener('scroll', handleScroll, { passive: true });
 
-// Scroll to top when nav hub main button is clicked (only prevent reload if on home page)
-const navHubMain = document.querySelector('.nav-hub .hub-main');
-if (navHubMain) {
-    navHubMain.addEventListener('click', (e) => {
-        const currentPath = window.location.pathname;
-        const isHomePage = currentPath === '/' || currentPath === '/index.html';
-
-        if (isHomePage) {
-            // On home page - just scroll to top
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-        // Otherwise allow normal navigation to home page
-    });
-}
-
 // ==========================================
 // EXPANDABLE NAVIGATION HUB
-// Enhanced hover interactions with keyboard support
+// Unified handler for navigation and touch-expansion
 // ==========================================
 (function initExpandableNav() {
     const navHub = document.querySelector('.nav-hub');
-    if (!navHub) return;
+    const navHubMain = navHub?.querySelector('.hub-main');
+    if (!navHub || !navHubMain) return;
 
-    // Add keyboard navigation support
+    // 1. Navigation & State Handler for the "G" Button
+    let touchStartScroll = 0;
+    let autoCollapseTimer = null;
+
+    const scheduleAutoCollapse = () => {
+        clearTimeout(autoCollapseTimer);
+        autoCollapseTimer = setTimeout(() => {
+            navHub.classList.remove('touch-active');
+        }, 2000);
+    };
+
+    const expandForTouch = () => {
+        const isActive = navHub.classList.contains('touch-active');
+        if (!isActive) {
+            navHub.classList.add('touch-active');
+            navHubMain._justExpanded = true;
+            touchStartScroll = window.scrollY;
+        }
+        scheduleAutoCollapse();
+    };
+
+    navHubMain.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+            expandForTouch();
+        }
+    });
+
+    navHubMain.addEventListener('touchstart', () => {
+        expandForTouch();
+    }, { passive: true });
+
+    navHubMain.addEventListener('click', (e) => {
+        if (navHubMain._justExpanded) {
+            delete navHubMain._justExpanded;
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        const currentPath = window.location.pathname;
+        const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
+        const isMainHome = normalizedPath === '/' || normalizedPath === '/index.html' || normalizedPath === '';
+        const host = window.location.hostname.toLowerCase();
+        const isMusicHost = host.startsWith('music.');
+        const isMusicContext = isMusicHost || currentPath.includes('/music');
+        const isMusicRoot = isMusicHost ? normalizedPath === '/' : normalizedPath === '/music';
+        const musicRootHref = isMusicHost ? '/' : '/music';
+        
+        const isActive = navHub.classList.contains('touch-active');
+        const isTouchEvent = e.pointerType === 'touch' || (e.detail === 0 && e.clientX === 0);
+        const hasCoarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        const noHover = window.matchMedia && window.matchMedia('(hover: none)').matches;
+        const isLikelyTouch = isTouchEvent || hasCoarsePointer || noHover;
+
+        if (isLikelyTouch && !isActive) {
+            e.preventDefault();
+            e.stopPropagation();
+            navHub.classList.add('touch-active');
+            touchStartScroll = window.scrollY;
+            scheduleAutoCollapse();
+            return;
+        }
+
+        // Navigation Logic (Home context = scroll top, Else = navigate to area root)
+        if (isMusicContext) {
+            e.preventDefault();
+            if (isMusicRoot) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.location.href = musicRootHref;
+            }
+            navHub.classList.remove('touch-active');
+        } else if (isMainHome) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navHub.classList.remove('touch-active');
+        } else {
+            // On a sub-page: let the default link behavior take us to "/" root
+            navHub.classList.remove('touch-active');
+        }
+    });
+
+    // 2. Collapse on scroll for touch devices
+    window.addEventListener('scroll', () => {
+        if (navHub.classList.contains('touch-active')) {
+            const currentScroll = window.scrollY;
+            if (Math.abs(currentScroll - touchStartScroll) > 30) {
+                navHub.classList.remove('touch-active');
+            }
+        }
+    }, { passive: true });
+
+    // 3. Keyboard Navigation Support for Secondary Buttons
     const secondaryButtons = navHub.querySelectorAll('.hub-btn');
-
     secondaryButtons.forEach((btn, index) => {
-        // Ensure buttons are tabbable when visible
         btn.setAttribute('tabindex', '0');
-
-        // Add keyboard support for better accessibility
         btn.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' && index < secondaryButtons.length - 1) {
                 secondaryButtons[index + 1].focus();
@@ -804,20 +856,12 @@ if (navHubMain) {
         });
     });
 
-    // Optional: Add touch support for mobile hover simulation
-    if ('ontouchstart' in window) {
-        let touchTimeout;
-        navHub.addEventListener('touchstart', (e) => {
-            clearTimeout(touchTimeout);
-            navHub.classList.add('touch-active');
-        }, { passive: true });
-
-        navHub.addEventListener('touchend', () => {
-            touchTimeout = setTimeout(() => {
-                navHub.classList.remove('touch-active');
-            }, 1500); // Keep visible for 1.5s after touch
-        }, { passive: true });
-    }
+    // 4. Document-level Tap-to-Close
+    document.addEventListener('touchstart', (e) => {
+        if (!navHub.contains(e.target) && navHub.classList.contains('touch-active')) {
+            navHub.classList.remove('touch-active');
+        }
+    }, { passive: true });
 })();
 
 // OPTIMIZED: Removed MutationObserver - using event delegation instead
@@ -1549,7 +1593,7 @@ document.querySelectorAll('a:not([target="_blank"]):not([href^="#"]):not([href^=
 
 // ==========================================
 // RESPONSIVE BADGE ANIMATIONS (600px breakpoint)
-// Uses spring.js timing for smooth in-place transitions
+// Concurrent directional morphing for seamless breakpoint transitions
 // ==========================================
 (function initResponsiveBadgeAnimations() {
     const navHub = document.querySelector('.nav-hub');
@@ -1558,76 +1602,110 @@ document.querySelectorAll('a:not([target="_blank"]):not([href^="#"]):not([href^=
 
     if (!navHub) return;
 
-    let wasMobile = window.innerWidth <= 600;
+    const MORPH_X = 28;
+    const MORPH_Y = '-40vh';
+    const MORPH_SCALE = 0.9;
+    const MORPH_DURATION = 550; // Match spring-smooth transition time
 
-    // Track when crossing the 600px breakpoint
-    function handleBreakpointCross() {
-        const isMobile = window.innerWidth <= 600;
+    const mql = window.matchMedia('(max-width: 600px)');
+    let wasMobile = mql.matches;
+    let morphTimer;
 
-        if (isMobile !== wasMobile) {
-            // Crossed the breakpoint - animate badges in place
-            if (isMobile) {
-                // Going to mobile: fade/scale in place (no diagonal movement)
-                navHub.style.transform = 'scale(0.9)';
-                navHub.style.opacity = '0';
+    function buildTransform(x, y, scale) {
+        const xValue = typeof x === 'number' ? `${x}px` : x;
+        const yValue = typeof y === 'number' ? `${y}px` : y;
+        return `translate3d(${xValue}, ${yValue}, 0) scale(${scale})`;
+    }
 
-                // Use requestAnimationFrame to ensure styles are applied before transition
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        navHub.style.transform = 'scale(1)';
-                        navHub.style.opacity = '1';
-                    });
-                });
-
-                // Fade out inline badges in place (scale down)
-                if (socialBadgesInline) {
-                    socialBadgesInline.style.transform = 'scale(0.8)';
-                    socialBadgesInline.style.opacity = '0';
-                }
-
-                // Fade in mobile badges in place (scale up)
-                if (socialBadgesMobile) {
-                    socialBadgesMobile.style.transform = 'scale(0.8)';
-                    socialBadgesMobile.style.opacity = '0';
-
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            socialBadgesMobile.style.transform = 'scale(1)';
-                            socialBadgesMobile.style.opacity = '1';
-                        });
-                    });
-                }
-            } else {
-                // Going to desktop: reset to normal state
-                navHub.style.transform = '';
-                navHub.style.opacity = '';
-
-                if (socialBadgesInline) {
-                    socialBadgesInline.style.transform = '';
-                    socialBadgesInline.style.opacity = '';
-                }
-
-                if (socialBadgesMobile) {
-                    socialBadgesMobile.style.transform = '';
-                    socialBadgesMobile.style.opacity = '';
-                }
-            }
-
-            wasMobile = isMobile;
+    function setMorphState(el, x, y, scale, opacity, isInstant = false) {
+        if (!el) return;
+        if (isInstant) el.classList.add('setup-morph');
+        else el.classList.remove('setup-morph');
+        
+        el.style.transform = buildTransform(x, y, scale);
+        el.style.opacity = opacity;
+        
+        if (isInstant) {
+            void el.offsetHeight; // Force reflow
         }
     }
 
-    // Debounce resize handler
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(handleBreakpointCross, 100);
-    }, { passive: true });
+    function clearMorph(el) {
+        if (!el) return;
+        el.classList.remove('setup-morph');
+        el.style.transform = '';
+        el.style.opacity = '';
+    }
+
+    function handleBreakpointChange(e) {
+        const isMobile = e.matches;
+        if (isMobile === wasMobile) return;
+        
+        clearTimeout(morphTimer);
+        const elements = [navHub, socialBadgesMobile, socialBadgesInline];
+
+        if (isMobile) {
+            // TRANSITION TO MOBILE (Bottom Placement)
+            document.body.classList.remove('badge-morph-to-desktop');
+
+            // 1. Instant setup: Start buttons at "entry" positions (mid-page/sides)
+            setMorphState(navHub, MORPH_X, MORPH_Y, MORPH_SCALE, '0', true);
+            setMorphState(socialBadgesMobile, -MORPH_X, MORPH_Y, MORPH_SCALE, '0', true);
+            setMorphState(socialBadgesInline, MORPH_X, 0, MORPH_SCALE, '0', true);
+
+            // 2. Animate to final mobile positions
+            requestAnimationFrame(() => {
+                setMorphState(navHub, 0, 0, 1, '1');
+                setMorphState(socialBadgesMobile, 0, 0, 1, '1');
+                
+                morphTimer = setTimeout(() => {
+                    elements.forEach(clearMorph);
+                }, MORPH_DURATION);
+            });
+        } else {
+            // TRANSITION TO DESKTOP (Header Placement)
+            document.body.classList.add('badge-morph-to-desktop');
+
+            // 1. Instant setup: Anchor them at the bottom before they jump to header
+            setMorphState(navHub, 0, 0, 1, '1', true);
+            setMorphState(socialBadgesMobile, 0, 0, 1, '1', true);
+
+            // 2. Animate lift-off and fade
+            requestAnimationFrame(() => {
+                setMorphState(navHub, -MORPH_X, MORPH_Y, MORPH_SCALE, '0');
+                setMorphState(socialBadgesMobile, MORPH_X, MORPH_Y, MORPH_SCALE, '0');
+
+                morphTimer = setTimeout(() => {
+                    document.body.classList.remove('badge-morph-to-desktop');
+                    
+                    // 3. Instant setup for header arrival (start from sides)
+                    setMorphState(navHub, -MORPH_X, 0, MORPH_SCALE, '0', true);
+                    setMorphState(socialBadgesInline, MORPH_X, 0, MORPH_SCALE, '0', true);
+
+                    // 4. Final slide into place
+                    requestAnimationFrame(() => {
+                        clearMorph(navHub);
+                        clearMorph(socialBadgesInline);
+                        clearMorph(socialBadgesMobile);
+                    });
+                }, MORPH_DURATION);
+            });
+        }
+
+        wasMobile = isMobile;
+    }
+
+    // Use MatchMedia for zero-latency breakpoint detection
+    if (mql.addEventListener) {
+        mql.addEventListener('change', handleBreakpointChange);
+    } else {
+        mql.addListener(handleBreakpointChange);
+    }
 
     // Initial state check
-    if (wasMobile && navHub) {
-        // If starting on mobile, ensure proper initial state
-        navHub.style.transform = 'scale(1)';
-        navHub.style.opacity = '1';
+    if (wasMobile) {
+        document.body.classList.remove('badge-morph-to-desktop');
+        elements = [navHub, socialBadgesMobile, socialBadgesInline];
+        elements.forEach(clearMorph);
     }
 })();

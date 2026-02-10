@@ -76,6 +76,22 @@ title: Now Playing
                 <ul id="recent-tracks-list"></ul>
             </div>
         </div>
+
+        <!-- AI Summary Card -->
+        <div class="ai-summary-card" id="ai-summary-card" data-spring="smooth" data-bounce="1">
+            <div class="ai-summary-header">
+                <span class="ai-summary-title">Session recap</span>
+                <span class="ai-summary-badge">AI</span>
+            </div>
+            <div class="ai-summary-body" aria-live="polite">
+                <p class="ai-summary-text" id="ai-summary-text"></p>
+                <div class="ai-summary-loading" id="ai-summary-loading">Generating a recap...</div>
+            </div>
+            <div class="ai-summary-footer">
+                <span class="ai-summary-powered">Powered by</span>
+                <img class="groq-logo" src="{{ '/assets/icons/groq.svg' | relative_url }}" alt="Groq" />
+            </div>
+        </div>
     </div>
 </section>
 
@@ -89,6 +105,10 @@ title: Now Playing
         spotify: {
             enabled: true,
             workerUrl: '{{ site.spotify_worker_url | default: "" }}'
+        },
+        aiSummary: {
+            enabled: true,
+            workerUrl: '{{ site.ai_summary_worker_url | default: site.spotify_worker_url }}'
         }
     };
 </script>

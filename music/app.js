@@ -21,6 +21,13 @@ const CONFIG = {
         enabled: window.MUSIC_CONFIG?.spotify?.enabled ?? true,
         workerUrl: window.MUSIC_CONFIG?.spotify?.workerUrl || '',
     },
+    aiSummary: {
+        enabled: window.MUSIC_CONFIG?.aiSummary?.enabled ?? true,
+        workerUrl: window.MUSIC_CONFIG?.aiSummary?.workerUrl || window.MUSIC_CONFIG?.spotify?.workerUrl || '',
+        activeLimit: 10,
+        sessionLimit: 50,
+        sessionGapMinutes: 90,
+    },
     maxRecentTracks: 8, // Increased for desktop view
 };
 
@@ -37,7 +44,12 @@ const state = {
     },
     recentTracks: [],
     artistCache: new Map(), // Cache artist images
+    trackCache: new Map(), // Cache album/artist art by track+artist key
     currentColors: null, // Extracted colors from current track
+    aiSummary: {
+        lastSignature: '',
+        isLoading: false,
+    },
 };
 
 let hasLoadedOnce = false;
@@ -65,7 +77,25 @@ const elements = {
     immersiveBg: document.getElementById('immersive-bg'),
     headerBox: document.querySelector('.header-center-box'),
     recentTracksCard: document.querySelector('.recent-tracks'),
+    aiSummaryCard: document.getElementById('ai-summary-card'),
+    aiSummaryText: document.getElementById('ai-summary-text'),
+    aiSummaryLoading: document.getElementById('ai-summary-loading'),
 };
+
+async function readJsonSafely(response, label) {
+    const text = await response.text();
+
+    if (!text) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        console.warn(`${label} JSON parse failed:`, error);
+        return null;
+    }
+}
 
 // ==========================================
 // Spotify API (via Cloudflare Worker Proxy)
@@ -87,7 +117,11 @@ async function getSpotifyArtistImage(artistName) {
 
         if (!response.ok) throw new Error('Worker request failed');
 
-        const data = await response.json();
+        const data = await readJsonSafely(response, 'Spotify artist');
+        if (!data) {
+            state.sources.spotify.connected = false;
+            return null;
+        }
         state.sources.spotify.connected = true;
 
         if (data.artistImage) {
@@ -116,7 +150,11 @@ async function getSpotifyTrackData(trackName, artistName) {
 
         if (!response.ok) throw new Error('Worker request failed');
 
-        const data = await response.json();
+        const data = await readJsonSafely(response, 'Spotify track');
+        if (!data) {
+            state.sources.spotify.connected = false;
+            return null;
+        }
         state.sources.spotify.connected = true;
 
         return {
@@ -158,7 +196,11 @@ async function fetchLastFmNowPlaying() {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Last.fm API error');
 
-        const data = await response.json();
+        const data = await readJsonSafely(response, 'Last.fm');
+        if (!data) {
+            state.sources.lastfm.connected = false;
+            return null;
+        }
         const tracks = data.recenttracks?.track;
 
         if (!tracks || tracks.length === 0) {
@@ -182,6 +224,7 @@ async function fetchLastFmNowPlaying() {
             url: nowPlaying.url,
             source: 'lastfm',
         };
+        const trackKey = getTrackCacheKey(trackInfo.name, trackInfo.artist);
 
         const isSameTrack = state.sources.lastfm.track && state.sources.lastfm.track.name === trackInfo.name;
 
@@ -201,7 +244,14 @@ async function fetchLastFmNowPlaying() {
             // Still fetch in background to check for updates (silent)
             if (CONFIG.spotify.enabled) {
                 getSpotifyTrackData(trackInfo.name, trackInfo.artist).then(spotifyData => {
-                    if (spotifyData && spotifyData.artistImage && !trackInfo.artistImage) {
+                    if (!spotifyData) return;
+                    if (spotifyData.albumImage || spotifyData.artistImage) {
+                        state.trackCache.set(trackKey, {
+                            albumImage: spotifyData.albumImage || trackInfo.image || null,
+                            artistImage: spotifyData.artistImage || null,
+                        });
+                    }
+                    if (spotifyData.artistImage && !trackInfo.artistImage) {
                         state.sources.lastfm.track.artistImage = spotifyData.artistImage;
                         if (state.activeSource === 'lastfm') updateNowPlayingCard(state.sources.lastfm.track, true);
                     }
@@ -221,6 +271,12 @@ async function fetchLastFmNowPlaying() {
                     // Success! Use Spotify data immediately
                     if (spotifyData.albumImage) trackInfo.image = spotifyData.albumImage;
                     trackInfo.artistImage = spotifyData.artistImage;
+                    if (spotifyData.albumImage || spotifyData.artistImage) {
+                        state.trackCache.set(trackKey, {
+                            albumImage: spotifyData.albumImage || trackInfo.image || null,
+                            artistImage: spotifyData.artistImage || null,
+                        });
+                    }
                 } else {
                     // Timeout - Render Last.fm data first, then update when Spotify arrives
                     spotifyPromise.then(delayedData => {
@@ -231,6 +287,12 @@ async function fetchLastFmNowPlaying() {
 
                                 if (delayedData.albumImage) state.sources.lastfm.track.image = delayedData.albumImage;
                                 state.sources.lastfm.track.artistImage = delayedData.artistImage;
+                                if (delayedData.albumImage || delayedData.artistImage) {
+                                    state.trackCache.set(trackKey, {
+                                        albumImage: delayedData.albumImage || state.sources.lastfm.track.image || null,
+                                        artistImage: delayedData.artistImage || null,
+                                    });
+                                }
 
                                 // Re-extract colors for the new high-res image
                                 if (delayedData.albumImage) {
@@ -256,23 +318,39 @@ async function fetchLastFmNowPlaying() {
             state.sources.lastfm.playing = true;
             state.sources.lastfm.track = trackInfo;
 
-            state.recentTracks = tracks.slice(1, CONFIG.maxRecentTracks + 1).map(track => ({
-                name: track.name,
-                artist: track.artist['#text'] || track.artist.name,
-                image: getLastFmImage(track.image, 'large'),
-                date: track.date?.uts ? new Date(track.date.uts * 1000) : null,
-            }));
+            state.recentTracks = tracks.slice(1, CONFIG.maxRecentTracks + 1).map(track => {
+                const name = track.name;
+                const artist = track.artist['#text'] || track.artist.name;
+                const key = getTrackCacheKey(name, artist);
+                const cached = state.trackCache.get(key);
+                return {
+                    name,
+                    artist,
+                    image: cached?.albumImage || getLastFmImage(track.image, 'large'),
+                    artistImage: cached?.artistImage || null,
+                    date: track.date?.uts ? new Date(track.date.uts * 1000) : null,
+                    enriched: !!cached,
+                };
+            });
 
             return state.sources.lastfm.track;
         } else {
             state.sources.lastfm.playing = false;
 
-            state.recentTracks = tracks.slice(0, CONFIG.maxRecentTracks).map(track => ({
-                name: track.name,
-                artist: track.artist['#text'] || track.artist.name,
-                image: getLastFmImage(track.image, 'large'),
-                date: track.date?.uts ? new Date(track.date.uts * 1000) : null,
-            }));
+            state.recentTracks = tracks.slice(0, CONFIG.maxRecentTracks).map(track => {
+                const name = track.name;
+                const artist = track.artist['#text'] || track.artist.name;
+                const key = getTrackCacheKey(name, artist);
+                const cached = state.trackCache.get(key);
+                return {
+                    name,
+                    artist,
+                    image: cached?.albumImage || getLastFmImage(track.image, 'large'),
+                    artistImage: cached?.artistImage || null,
+                    date: track.date?.uts ? new Date(track.date.uts * 1000) : null,
+                    enriched: !!cached,
+                };
+            });
 
             return null;
         }
@@ -295,6 +373,225 @@ function getLastFmImage(images, size = 'extralarge') {
         }
     }
     return null;
+}
+
+function getTrackCacheKey(name, artist) {
+    return `${(name || '').toLowerCase()}||${(artist || '').toLowerCase()}`;
+}
+
+// ==========================================
+// AI Summary
+// ==========================================
+function setAiSummaryLoading(isLoading) {
+    if (!elements.aiSummaryCard || !elements.aiSummaryLoading) return;
+    elements.aiSummaryCard.classList.toggle('is-loading', isLoading);
+    elements.aiSummaryLoading.textContent = isLoading ? 'Generating a recap...' : '';
+}
+
+function resetAiSummaryText() {
+    if (!elements.aiSummaryText) return;
+    elements.aiSummaryText.textContent = '';
+}
+
+function setAiSummaryMessage(text) {
+    if (!elements.aiSummaryText || !elements.aiSummaryCard) return;
+    elements.aiSummaryText.textContent = text;
+    elements.aiSummaryCard.classList.remove('is-loading');
+}
+
+function appendAiSummaryChunk(text) {
+    if (!elements.aiSummaryText || !text) return;
+    const fragment = document.createDocumentFragment();
+    const chars = Array.from(text);
+    chars.forEach((char, index) => {
+        const span = document.createElement('span');
+        span.className = 'ai-char';
+        span.textContent = char;
+        span.style.animationDelay = `${index * 8}ms`;
+        fragment.appendChild(span);
+    });
+    elements.aiSummaryText.appendChild(fragment);
+}
+
+async function fetchLastFmRecentTracks(limit) {
+    const workerUrl = CONFIG.spotify.workerUrl;
+
+    if (!CONFIG.lastfm.enabled) {
+        return [];
+    }
+
+    let url;
+    if (workerUrl) {
+        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getrecenttracks&limit=${limit}`;
+    } else if (CONFIG.lastfm.apiKey) {
+        url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${limit}`;
+    } else {
+        return [];
+    }
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Last.fm API error');
+
+        const data = await readJsonSafely(response, 'Last.fm summary');
+        const tracks = data?.recenttracks?.track || [];
+        return Array.isArray(tracks) ? tracks : [];
+    } catch (error) {
+        console.warn('Summary track fetch failed:', error);
+        return [];
+    }
+}
+
+function selectActiveTracks(tracks) {
+    const filtered = tracks.filter(track => track?.['@attr']?.nowplaying !== 'true');
+    return filtered.slice(0, CONFIG.aiSummary.activeLimit);
+}
+
+function selectSessionTracks(tracks) {
+    const session = [];
+    let lastUts = null;
+    const gapSeconds = CONFIG.aiSummary.sessionGapMinutes * 60;
+
+    for (const track of tracks) {
+        if (track?.['@attr']?.nowplaying === 'true') {
+            continue;
+        }
+
+        const uts = track?.date?.uts ? Number(track.date.uts) : null;
+        if (!uts) {
+            continue;
+        }
+
+        if (lastUts && (lastUts - uts) > gapSeconds) {
+            break;
+        }
+
+        session.push(track);
+        lastUts = uts;
+
+        if (session.length >= CONFIG.aiSummary.sessionLimit) {
+            break;
+        }
+    }
+
+    return session;
+}
+
+function formatTracksForSummary(tracks) {
+    return tracks.map(track => ({
+        name: track.name || 'Unknown',
+        artist: track.artist?.['#text'] || track.artist?.name || 'Unknown',
+    })).filter(track => track.name && track.artist);
+}
+
+async function streamAiSummary(tracks, mode) {
+    if (!CONFIG.aiSummary.workerUrl) {
+        setAiSummaryMessage('AI summary unavailable.');
+        return;
+    }
+
+    const response = await fetch(`${CONFIG.aiSummary.workerUrl}?type=summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            mode,
+            tracks,
+            trackCount: tracks.length,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Summary request failed: ${response.status}`);
+    }
+
+    if (!response.body) {
+        const data = await readJsonSafely(response, 'AI summary');
+        if (data?.summary) {
+            appendAiSummaryChunk(data.summary);
+        }
+        return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+            if (!line.startsWith('data:')) continue;
+            const payload = line.replace(/^data:\s*/, '').trim();
+            if (!payload || payload === '[DONE]') continue;
+
+            try {
+                const json = JSON.parse(payload);
+                const delta = json.choices?.[0]?.delta?.content;
+                if (delta) {
+                    appendAiSummaryChunk(delta);
+                }
+            } catch (error) {
+                console.warn('AI stream parse failed:', error);
+            }
+        }
+    }
+}
+
+async function updateAiSummary() {
+    if (!elements.aiSummaryCard || !CONFIG.aiSummary.enabled) return;
+    if (state.aiSummary.isLoading) return;
+    if (!CONFIG.aiSummary.workerUrl) {
+        setAiSummaryMessage('AI summary unavailable.');
+        return;
+    }
+
+    const isPlaying = state.sources.lastfm.playing;
+    const trackLimit = isPlaying
+        ? CONFIG.aiSummary.activeLimit + 1
+        : CONFIG.aiSummary.sessionLimit;
+
+    const recentTracks = await fetchLastFmRecentTracks(trackLimit);
+    if (!recentTracks.length) {
+        setAiSummaryMessage('No recent tracks to summarize yet.');
+        return;
+    }
+
+    const selectedTracks = isPlaying
+        ? selectActiveTracks(recentTracks)
+        : selectSessionTracks(recentTracks);
+
+    if (!selectedTracks.length) {
+        setAiSummaryMessage('No recent session to summarize yet.');
+        return;
+    }
+
+    const formattedTracks = formatTracksForSummary(selectedTracks);
+    const signature = `${isPlaying ? 'active' : 'session'}|${formattedTracks.map(track => `${track.name}|${track.artist}`).join('||')}`;
+
+    if (signature === state.aiSummary.lastSignature) {
+        return;
+    }
+
+    state.aiSummary.lastSignature = signature;
+    state.aiSummary.isLoading = true;
+    resetAiSummaryText();
+    setAiSummaryLoading(true);
+
+    try {
+        const chronologicalTracks = [...formattedTracks].reverse();
+        await streamAiSummary(chronologicalTracks, isPlaying ? 'active' : 'session');
+    } catch (error) {
+        console.warn('AI summary failed:', error);
+        setAiSummaryMessage('AI summary unavailable right now.');
+    } finally {
+        state.aiSummary.isLoading = false;
+        setAiSummaryLoading(false);
+    }
 }
 
 
@@ -321,6 +618,7 @@ function updateUI() {
     updateSourceIndicators();
     updateNowPlayingCard(activeTrack, !!activeTrack);
     updateRecentTracks();
+    updateAiSummary();
 
     const hasAnyData = !!(
         state.sources.lastfm.connected ||
@@ -426,60 +724,96 @@ function updateNowPlayingCard(track, isPlaying) {
             });
         }
     } else {
-        elements.trackName.textContent = 'Not Playing';
-        elements.artistName.textContent = '—';
-        elements.albumName.textContent = '';
-        elements.albumArt.classList.remove('loaded');
-        elements.artistThumbnailContainer.classList.remove('loaded');
-        elements.artistBackdrop.classList.remove('loaded');
         elements.playingIndicator.classList.remove('active');
 
         if (state.recentTracks.length > 0) {
             const lastTrack = state.recentTracks[0];
             elements.trackName.textContent = lastTrack.name;
             elements.artistName.textContent = lastTrack.artist;
+            elements.albumName.textContent = '';
 
             if (lastTrack.image) {
                 setImageIfChanged(elements.albumArt, lastTrack.image, () => {
                     elements.albumArt.classList.add('loaded');
                 });
+            } else {
+                setImageIfChanged(elements.albumArt, '', () => {
+                    elements.albumArt.classList.remove('loaded');
+                }, () => {
+                    elements.albumArt.classList.remove('loaded');
+                });
+            }
+
+            if (lastTrack.artistImage) {
+                setImageIfChanged(elements.artistThumbnail, lastTrack.artistImage, () => {
+                    elements.artistThumbnailContainer.classList.add('loaded');
+                });
+                setBackgroundIfChanged(elements.artistBackdrop, lastTrack.artistImage);
+                elements.artistBackdrop.classList.add('loaded');
+                if (elements.immersiveBg) {
+                    setBackgroundIfChanged(elements.immersiveBg, lastTrack.artistImage);
+                }
+            } else {
+                elements.artistThumbnailContainer.classList.remove('loaded');
+                elements.artistBackdrop.classList.remove('loaded');
+                if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
             }
 
             const timeAgo = lastTrack.date ? getTimeAgo(lastTrack.date) : 'recently';
             elements.listeningStatus.textContent = `Last played ${timeAgo}`;
 
             // ENRICHMENT: Fetch high-res art/artist image for the last played track too
-            if (CONFIG.spotify.enabled && !lastTrack.enriched) {
-                lastTrack.enriched = true; // prevent loop
+            const recentKey = getTrackCacheKey(lastTrack.name, lastTrack.artist);
+            if (CONFIG.spotify.enabled && !state.trackCache.has(recentKey)) {
                 getSpotifyTrackData(lastTrack.name, lastTrack.artist).then(spotifyData => {
-                    if (spotifyData) {
-                        if (spotifyData.albumImage) {
-                            lastTrack.image = spotifyData.albumImage;
-                            elements.albumArt.src = spotifyData.albumImage;
+                    if (!spotifyData) return;
 
-                            // Also update dynamic colors for high-res image
-                            extractColors(spotifyData.albumImage).then(colors => {
-                                if (colors) applyDynamicColors(colors);
-                            });
-                        }
-                        if (spotifyData.artistImage) {
-                            setImageIfChanged(elements.artistThumbnail, spotifyData.artistImage, () => {
-                                elements.artistThumbnailContainer.classList.add('loaded');
-                            });
-                            setBackgroundIfChanged(elements.artistBackdrop, spotifyData.artistImage);
-                            elements.artistBackdrop.classList.add('loaded');
-                            if (elements.immersiveBg) {
-                                setBackgroundIfChanged(elements.immersiveBg, spotifyData.artistImage);
-                            }
-                        }
-                        updateSourceIndicators();
+                    if (spotifyData.albumImage || spotifyData.artistImage) {
+                        state.trackCache.set(recentKey, {
+                            albumImage: spotifyData.albumImage || lastTrack.image || null,
+                            artistImage: spotifyData.artistImage || null,
+                        });
                     }
+
+                    if (spotifyData.albumImage) {
+                        lastTrack.image = spotifyData.albumImage;
+                        setImageIfChanged(elements.albumArt, spotifyData.albumImage, () => {
+                            elements.albumArt.classList.add('loaded');
+                        });
+
+                        // Also update dynamic colors for high-res image
+                        extractColors(spotifyData.albumImage).then(colors => {
+                            if (colors) applyDynamicColors(colors);
+                        });
+                    }
+
+                    if (spotifyData.artistImage) {
+                        lastTrack.artistImage = spotifyData.artistImage;
+                        setImageIfChanged(elements.artistThumbnail, spotifyData.artistImage, () => {
+                            elements.artistThumbnailContainer.classList.add('loaded');
+                        });
+                        setBackgroundIfChanged(elements.artistBackdrop, spotifyData.artistImage);
+                        elements.artistBackdrop.classList.add('loaded');
+                        if (elements.immersiveBg) {
+                            setBackgroundIfChanged(elements.immersiveBg, spotifyData.artistImage);
+                        }
+                    }
+
+                    updateSourceIndicators();
                 });
-            } else if (lastTrack.enriched) {
-                // If already enriched, ensure we show the artist bg/thumbnail
-                // (we might need to store artistImage on lastTrack object in fetchLastFmNowPlaying loop, but for now we just handle the fetch above)
             }
         } else {
+            elements.trackName.textContent = 'Not Playing';
+            elements.artistName.textContent = '—';
+            elements.albumName.textContent = '';
+            setImageIfChanged(elements.albumArt, '', () => {
+                elements.albumArt.classList.remove('loaded');
+            }, () => {
+                elements.albumArt.classList.remove('loaded');
+            });
+            elements.artistThumbnailContainer.classList.remove('loaded');
+            elements.artistBackdrop.classList.remove('loaded');
+            if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
             elements.listeningStatus.textContent = 'Nothing playing';
         }
         elements.listeningStatus.classList.remove('now-playing');
@@ -490,6 +824,13 @@ function updateRecentTracks() {
     if (!elements.recentTracksList) return;
 
     if (state.isLoading && state.recentTracks.length === 0) {
+        return;
+    }
+
+    if (!state.activeSource && state.recentTracks.length === 0) {
+        if (!elements.musicHero.classList.contains('is-loading')) {
+            setLoadingState(true);
+        }
         return;
     }
 
@@ -783,15 +1124,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Check if Last.fm API key is configured
+    setLoadingState(true);
+
     if (!CONFIG.lastfm.apiKey) {
+        setLoadingState(false);
         elements.listeningStatus.textContent = 'API key not configured';
         elements.trackName.textContent = 'Setup Required';
         elements.artistName.textContent = 'Add LASTFM_API_KEY to your environment';
+        setAiSummaryMessage('Add LASTFM_API_KEY to enable AI recap.');
+        if (elements.recentTracksList) {
+            elements.recentTracksList.innerHTML = '';
+        }
         console.warn('Last.fm API key not configured. Set LASTFM_API_KEY in _config.yml or as a GitHub secret.');
         return;
     }
-
-    setLoadingState(true);
 
     // Start the polling
     startPolling();
@@ -822,6 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Music page initialized', {
         lastfm: CONFIG.lastfm.apiKey ? 'configured' : 'missing',
         spotify: CONFIG.spotify.workerUrl ? 'configured' : 'missing (artist images will be unavailable)',
+        aiSummary: CONFIG.aiSummary.workerUrl ? 'configured' : 'missing (AI summary disabled)',
     });
 });
 
@@ -830,6 +1177,23 @@ function setLoadingState(isLoading) {
     if (!elements.musicHero) return;
 
     elements.musicHero.classList.toggle('is-loading', isLoading);
+    if (elements.aiSummaryCard) {
+        if (isLoading) {
+            resetAiSummaryText();
+        }
+        setAiSummaryLoading(isLoading);
+    }
+
+    if (!isLoading) {
+        if (elements.recentTracksList) {
+            const items = Array.from(elements.recentTracksList.children);
+            const allLoading = items.length > 0 && items.every(item => item.classList.contains('loading-item'));
+            if (allLoading) {
+                elements.recentTracksList.innerHTML = '';
+            }
+        }
+        return;
+    }
 
     if (isLoading) {
         elements.trackName.textContent = 'Loading...';

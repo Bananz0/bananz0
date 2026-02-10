@@ -92,13 +92,13 @@
                 </div>
 
                 <!-- CTA Buttons -->
-                <div class="floating-ctas" data-spring="smooth" data-bounce="1" data-spring-size="false">
-                    <a href="{{ '/projects/' | relative_url }}" class="cta-btn" data-spring="smooth" data-bounce="1">
+                <div class="floating-ctas" data-spring="smooth" data-spring-size="false">
+                    <a href="{{ '/projects/' | relative_url }}" class="cta-btn" data-spring="smooth">
                         <span class="desktop-text">PROJECTS</span>
                         <span class="mobile-text">WORK</span>
                     </a>
                     <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cta-btn primary"
-                        download="Glen_Muthoka_CV.pdf" data-spring="smooth" data-bounce="1">
+                        data-spring="smooth">
                         <span class="desktop-text">DOWNLOAD CV</span>
                         <span class="mobile-text">CV</span>
                     </a>
@@ -200,6 +200,7 @@
                     </button>
                     <div class="gallery-container">
                         <img id="modal-image" src="" alt="" />
+                        <iframe id="modal-iframe" class="modal-iframe" title="Project preview" loading="lazy"></iframe>
                         <div class="gallery-caption" id="modal-caption"></div>
                     </div>
                     <button class="gallery-nav gallery-next" aria-label="Next image" data-spring="snappy"

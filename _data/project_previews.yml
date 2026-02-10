@@ -1,0 +1,23 @@
+# Optional preview data for project/repo cards.
+# Keyed by repo name to allow joins with github_repos.json.
+# Supported fields: title, images, captions, iframe, iframe_caption.
+
+WattsApp:
+  title: "WattsApp: Smart System Management Platform"
+  images:
+    - /assets/images/projects/wattsapp-dashboard.jpg
+    - /assets/images/projects/wattsapp-circuit.jpg
+    - /assets/images/projects/wattsapp-grafana.jpg
+  captions:
+    - "Real-time monitoring dashboard"
+    - "ATMega644p circuit with sensors"
+    - "Grafana visualization interface"
+
+MIPSquare:
+  title: "MIPSquare++: 5-Stage Pipelined MIPS Simulator"
+  images:
+    - /assets/images/projects/mipsquare-pipeline.jpg
+    - /assets/images/projects/mipsquare-hazards.jpg
+  captions:
+    - "5-stage pipeline architecture diagram"
+    - "Hazard detection and forwarding logic"
