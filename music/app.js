@@ -48,6 +48,7 @@ const state = {
     currentColors: null, // Extracted colors from current track
     aiSummary: {
         lastSignature: '',
+        lastUpdated: 0,
         isLoading: false,
     },
 };
@@ -451,9 +452,9 @@ async function fetchLastFmRecentTracks(limit) {
 
     let url;
     if (workerUrl) {
-        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getrecenttracks&limit=${limit}`;
+        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getrecenttracks&limit=${limit}&_cb=${Date.now()}`;
     } else if (CONFIG.lastfm.apiKey) {
-        url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${limit}`;
+        url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${limit}&_cb=${Date.now()}`;
     } else {
         return [];
     }
@@ -518,29 +519,30 @@ function formatTracksForSummary(tracks) {
         const artist = track.artist?.['#text'] || track.artist?.name || 'Unknown';
         const isNowPlaying = track?.['@attr']?.nowplaying === 'true';
 
-        // Tiers per user request:
-        // 0-3: Heavy weighting
-        // 4-7: Moderate weighting (total 8 main tracks)
-        // 8-19: "Sprinkle" of context
-        let focus, weight;
+        // Stricter Tiers to prevent LLM "artist anchor" bias:
+        // 0-3: Core Narrative (The current vibe)
+        // 4-7: Transitional (How we got here)
+        // 8-19: Echoes (Pure background context, do NOT anchor summary on these)
+        let focus, weight, ignoreReason = null;
         if (index < 4) {
-            focus = "CRITICAL_PRIMARY";
-            weight = "MAX_WEIGHT";
+            focus = "CURRENT_ESSENTIAL";
+            weight = 1.0;
         } else if (index < 8) {
-            focus = "SECONDARY_SESSION";
-            weight = "MODERATE_WEIGHT";
+            focus = "RECENT_CONTEXT";
+            weight = 0.5;
         } else {
-            focus = "HISTORICAL_SPRINKLE";
-            weight = "MINIMAL_CONTEXT_ONLY";
+            focus = "DISTANT_ECHO";
+            weight = 0.05; // Drop weighting almost to zero
+            // If an artist only appears in this tier, they shouldn't be the summary title/hook
+            if (artistCounts[artist] < 3) ignoreReason = "low_frequency_historical";
         }
 
         return {
             name: track.name || 'Unknown',
             artist: artist,
             importance: focus,
-            prompt_weight: weight,
-            recency: index === 0 ? "Now Playing" : `${index} tracks ago`,
-            artist_frequency: `${artistCounts[artist]} plays in session`,
+            relevance_score: weight,
+            hint: ignoreReason ? "Minor historical data" : focus.replace(/_/g, ' '),
             is_active: isNowPlaying
         };
     }).filter(track => track.name && track.artist);
@@ -552,6 +554,7 @@ async function streamAiSummary(tracks, mode) {
         return;
     }
 
+    // Force a fresh take by sending a dynamic token and explicit personality instructions
     const response = await fetch(`${CONFIG.aiSummary.workerUrl}?type=summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -559,16 +562,18 @@ async function streamAiSummary(tracks, mode) {
             mode,
             tracks,
             trackCount: tracks.length,
+            // Anti-repetition seed
+            request_id: `vibe_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
             // Explicit instructions for the LLM weighting tiers
-            weightingInstructions: {
-                primaryFocusIndices: [0, 1, 2, 3],
-                secondaryFocusIndices: [4, 5, 6, 7],
-                sprinkleIndices: Array.from({length: 12}, (_, i) => i + 8)
+            weighting: {
+                hero_indices: [0, 1, 2, 3],
+                background_indices: [8, 9, 10, 11, 12, 13, 14, 15]
             },
             options: {
-                weightRecent: true,
-                diversity: 0.9,
-                temperature: 0.88
+                temperature: 0.9, // Higher for more creative diversity
+                top_p: 0.95,
+                frequency_penalty: 1.2, // Discourage repeating the same hooks/artists
+                presence_penalty: 1.0
             }
         }),
     });
@@ -646,11 +651,18 @@ async function updateAiSummary() {
     const formattedTracks = formatTracksForSummary(selectedTracks);
     const signature = `${isPlaying ? 'active' : 'session'}|${formattedTracks.map(track => `${track.name}|${track.artist}`).join('||')}`;
 
-    if (signature === state.aiSummary.lastSignature) {
+    // Cooldown: Don't refresh more than once every 45 seconds even if tracks change
+    // This prevents hitting the LLM too hard during rapid track skipping
+    const now = Date.now();
+    const cooldownMs = 45000;
+    const isCooldownActive = (now - state.aiSummary.lastUpdated) < cooldownMs;
+
+    if (signature === state.aiSummary.lastSignature || isCooldownActive) {
         return;
     }
 
     state.aiSummary.lastSignature = signature;
+    state.aiSummary.lastUpdated = now;
     state.aiSummary.isLoading = true;
     resetAiSummaryText();
     setAiSummaryLoading(true);
