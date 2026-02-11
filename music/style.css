@@ -169,12 +169,12 @@
 
 /* Spotify connected = GREEN (it's providing enrichment data) */
 .source-pill[data-source="spotify"].connected {
-    border-color: rgba(29, 185, 84, 0.3);
+    border-color: rgba(var(--spotify-green-rgb), 0.3);
 }
 
 .source-pill[data-source="spotify"].connected .status-dot {
-    background: #1DB954;
-    box-shadow: 0 0 8px rgba(29, 185, 84, 0.5);
+    background: var(--spotify-green);
+    box-shadow: 0 0 8px rgba(var(--spotify-green-rgb), 0.5);
 }
 
 @keyframes pulse-dot {
@@ -197,7 +197,7 @@
 .now-playing-card {
     position: relative;
     width: 100%;
-    background: rgba(var(--bg-tertiary-rgb), 0.45);
+    background: rgba(var(--bg-tertiary-rgb), 0.3);
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
@@ -421,7 +421,7 @@
 }
 
 .listening-status.now-playing {
-    color: #1DB954;
+    color: var(--spotify-green);
 }
 
 /* ==========================================
@@ -471,7 +471,7 @@
     overflow: hidden;
     width: 100%;
     padding: var(--space-lg);
-    background: rgba(var(--bg-tertiary-rgb), 0.45);
+    background: rgba(var(--bg-tertiary-rgb), 0.3);
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
@@ -590,7 +590,7 @@
     max-width: calc(480px * 2 + var(--space-2xl));
     margin: 0 auto;
     
-    background: rgba(var(--bg-tertiary-rgb), 0.45);
+    background: rgba(var(--bg-tertiary-rgb), 0.3);
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
@@ -772,22 +772,24 @@
    ========================================== */
 .immersive-bg {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     z-index: 0;
-    background-color: #000;
+    background-color: var(--bg-primary);
     background-size: cover;
     background-position: center;
-    filter: blur(50px) brightness(0.4) saturate(1.2);
-    transform: scale(1.1);
-    /* Prevent blur edges */
-    transition: background-image 1s ease-in-out;
+    background-repeat: no-repeat;
+    /* Massive blur for the "universal" feel */
+    filter: blur(80px) brightness(0.4) saturate(1.3);
+    /* Scale up slightly to hide blurred edges */
+    transform: scale(1.2) translateZ(0);
+    opacity: 0;
+    transition: opacity 1.5s ease, background-image 2s ease-in-out;
     pointer-events: none;
-    /* Force GPU layer for this massive full-screen blurred element */
-    will-change: transform;
-    transform: scale(1.1) translateZ(0);
+    will-change: opacity, background-image;
+}
+
+.immersive-bg.loaded {
+    opacity: 0.45;
 }
 
 /* Mobile adjustments */

@@ -711,14 +711,8 @@ function updateBackdrops(imageUrl) {
             bg.classList.remove('loaded');
         }
     });
-
-    // Dim the main background when cards have their own backdrops (on desktop)
-    // This makes the gaps "darker" while the cards look like windows
-    if (elements.immersiveBg) {
-        const isDesktop = window.innerWidth >= 900;
-        elements.immersiveBg.style.opacity = (imageUrl && isDesktop) ? '0' : (imageUrl ? '0.15' : '0.4');
-    }
 }
+
 
 function updateNowPlayingCard(track, isPlaying) {
     if (state.isLoading && !track && state.recentTracks.length === 0) {
@@ -1000,6 +994,7 @@ function applyDynamicColors(colors) {
     // Apply to Immersive Background (Fallback if no artist image)
     if (elements.immersiveBg && !elements.immersiveBg.style.backgroundImage) {
         elements.immersiveBg.style.background = gradientBlur;
+        elements.immersiveBg.classList.add('loaded');
     }
 
     // Calculate blended color for a richer glow effect
@@ -1162,13 +1157,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. API Key Check & Initial Load
     setLoadingState(true);
-    if (!CONFIG.lastfm.apiKey) {
+    // Allow loading if we have EITHER a direct API key OR a worker URL
+    if (!CONFIG.lastfm.apiKey && !CONFIG.spotify.workerUrl) {
         setLoadingState(false);
         elements.listeningStatus.textContent = "Seems like glen didn't pay the API bills";
         setAiSummaryMessage("The robots are on a coffee break until a valid key is provided.");
     } else {
         startPolling();
     }
+
+    // Fade source indicators when scrolling behind the fixed header
+    const sourceIndicators = document.querySelector('.source-indicators');
+    if (sourceIndicators) {
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            // Start fading at 50px, completely hidden by 120px
+            const fadeStart = 50;
+            const fadeEnd = 150;
+
+            if (scrollY > fadeStart) {
+                const opacity = Math.max(0, 1 - (scrollY - fadeStart) / (fadeEnd - fadeStart));
+                sourceIndicators.style.opacity = opacity;
+                sourceIndicators.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+            } else {
+                sourceIndicators.style.opacity = 1;
+                sourceIndicators.style.pointerEvents = 'auto';
+            }
+        }, { passive: true });
+    }
+
+    // Log configuration status
+    console.log('Music page initialized', {
+        lastfm: CONFIG.lastfm.apiKey ? 'configured' : 'missing',
+        spotify: CONFIG.spotify.workerUrl ? 'configured' : 'missing (artist images will be unavailable)',
+        aiSummary: CONFIG.aiSummary.workerUrl ? 'configured' : 'missing (AI summary disabled)',
+    });
 });
 
 function initResponsiveMusicMorph() {
@@ -1199,34 +1222,6 @@ function initResponsiveMusicMorph() {
         });
     });
 }
-
-    // Fade source indicators when scrolling behind the fixed header
-    const sourceIndicators = document.querySelector('.source-indicators');
-    if (sourceIndicators) {
-        window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            // Start fading at 50px, completely hidden by 120px
-            const fadeStart = 50;
-            const fadeEnd = 150;
-
-            if (scrollY > fadeStart) {
-                const opacity = Math.max(0, 1 - (scrollY - fadeStart) / (fadeEnd - fadeStart));
-                sourceIndicators.style.opacity = opacity;
-                sourceIndicators.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-            } else {
-                sourceIndicators.style.opacity = 1;
-                sourceIndicators.style.pointerEvents = 'auto';
-            }
-        }, { passive: true });
-    }
-
-    // Log configuration status
-    console.log('Music page initialized', {
-        lastfm: CONFIG.lastfm.apiKey ? 'configured' : 'missing',
-        spotify: CONFIG.spotify.workerUrl ? 'configured' : 'missing (artist images will be unavailable)',
-        aiSummary: CONFIG.aiSummary.workerUrl ? 'configured' : 'missing (AI summary disabled)',
-    });
-});
 
 function setLoadingState(isLoading) {
     state.isLoading = isLoading;

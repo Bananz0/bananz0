@@ -21,6 +21,9 @@
     --neon-amber-rgb: 251, 191, 36;
     --neon-cyan-rgb: 6, 182, 212;
     --bg-tertiary-rgb: 18, 18, 18;
+    --bg-primary-rgb: 0, 0, 0;
+    --deep-space-rgb: 3, 0, 20;
+    --night-sky-rgb: 18, 10, 40;
 
     --gradient-primary: linear-gradient(135deg, var(--neon-gold), var(--neon-amber));
     --gradient-secondary: linear-gradient(135deg, var(--neon-cyan), var(--neon-teal));
@@ -57,6 +60,13 @@
     --netflix-red-rgb: 185, 0, 0;
     --github-gray: #24292f;
     --github-gray-rgb: 36, 41, 47;
+
+    /* Status/Terminal Colors */
+    --terminal-red: #ff5f56;
+    --terminal-yellow: #ffbd2e;
+    --terminal-green: #27c93f;
+    --success-green: #22c55e;
+    --error-red: #ef4444;
 
     /* Apple-style Spring Animations */
     /* These will be dynamically updated by spring.js */
@@ -368,7 +378,7 @@ nav {
     top: 0;
     width: 100%;
     padding: 1rem 2rem;
-    background: rgba(3, 0, 20, 0.8);
+    background: rgba(var(--deep-space-rgb), 0.8);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(var(--neon-amber-rgb), 0.15);
@@ -421,7 +431,7 @@ nav.nav-hidden {
 
 nav.scrolled {
     padding: 0.75rem 2rem;
-    background: rgba(3, 0, 20, 0.95);
+    background: rgba(var(--deep-space-rgb), 0.95);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
@@ -2892,8 +2902,8 @@ a.repo-card-full .repo-desc-muted,
 /* Glass morphism base */
 .carousel-card-inner {
     background: linear-gradient(145deg,
-            rgba(18, 10, 40, 0.7) 0%,
-            rgba(18, 10, 40, 0.4) 100%);
+            rgba(var(--night-sky-rgb), 0.7) 0%,
+            rgba(var(--night-sky-rgb), 0.4) 100%);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -3121,8 +3131,8 @@ a.repo-card-full .repo-desc-muted,
     inset: 0;
     background: linear-gradient(180deg,
             transparent 0%,
-            rgba(3, 0, 20, 0.4) 60%,
-            rgba(3, 0, 20, 0.9) 100%);
+            rgba(var(--deep-space-rgb), 0.4) 60%,
+            rgba(var(--deep-space-rgb), 0.9) 100%);
     pointer-events: none;
 }
 
@@ -3222,7 +3232,7 @@ a.repo-card-full .repo-desc-muted,
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: rgba(18, 10, 40, 0.8);
+    background: rgba(var(--night-sky-rgb), 0.8);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(var(--neon-amber-rgb), 0.3);
@@ -3469,7 +3479,7 @@ a.repo-card-full .repo-desc-muted,
         height: 100vh;
         width: 80%;
         max-width: 320px;
-        background: rgba(3, 0, 20, 0.98);
+        background: rgba(var(--deep-space-rgb), 0.98);
         -webkit-backdrop-filter: blur(30px);
         backdrop-filter: blur(30px);
         flex-direction: column;
@@ -4847,8 +4857,8 @@ body {
 
 /* Terminal Form */
 .terminal-window {
-    background: #000;
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    background: var(--bg-primary);
+    border: 1px solid rgba(var(--neon-purple-rgb), 0.3);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
@@ -4860,7 +4870,7 @@ body {
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    border-bottom: 1px solid rgba(var(--neon-purple-rgb), 0.2);
 }
 
 .terminal-btn {
@@ -4870,15 +4880,15 @@ body {
 }
 
 .terminal-btn.red {
-    background: #ff5f56;
+    background: var(--terminal-red);
 }
 
 .terminal-btn.yellow {
-    background: #ffbd2e;
+    background: var(--terminal-yellow);
 }
 
 .terminal-btn.green {
-    background: #27c93f;
+    background: var(--terminal-green);
 }
 
 .terminal-title {
