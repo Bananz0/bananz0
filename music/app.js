@@ -773,13 +773,13 @@ async function updateAiSummary() {
 
     const formattedTracks = formatTracksForSummary(selectedTracks);
     const signature = `${isPlaying ? 'active' : 'session'}|${formattedTracks.map(track => `${track.name}|${track.artist}`).join('||')}`;
-    const currentTopTrack = formattedTracks[0]?.name;
+    const currentTopTrack = formattedTracks[0]?.name + formattedTracks[0]?.artist; // Include artist to be sure
 
-    // Cooldown: normally 25s, but if the song actually changed, reduce to 5s safety
+    // Cooldown: normally 25s, but if the song actually changed, reduce to 3s safety
     // This makes it feel instant when a new song starts while preventing spam
     const now = Date.now();
     const isNewTrack = currentTopTrack !== state.aiSummary.lastTopTrack;
-    const cooldownMs = isNewTrack ? 5000 : 25000;
+    const cooldownMs = isNewTrack ? 3000 : 25000;
     const isCooldownActive = (now - state.aiSummary.lastUpdated) < cooldownMs;
 
     if (signature === state.aiSummary.lastSignature || isCooldownActive) {
