@@ -223,6 +223,104 @@ This project provided deep expertise in:
 - **Hackintosh Community**: Shared knowledge and testing feedback
 - **Intel/Microsoft**: Public ACPI specifications and developer documentation
 
+## Visual Gallery
+
+### Core System Integration
+Here are the primary integration points for GramSMC on macOS:
+
+<div class="project-gallery">
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/desktop-overview.png" alt="GramSMC - Desktop Overview" class="zoomable">
+    <span class="caption">Desktop: System integration and UI overview</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/pci-devices.png" alt="GramSMC - PCI Mapping" class="zoomable">
+    <span class="caption">PCI: Hardware device mapping in System Info</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/usb-map.png" alt="GramSMC - USB Mapping" class="zoomable">
+    <span class="caption">USB: Detailed hardware tree and mapping</span>
+  </div>
+</div>
+
+### Hardware Validation & Diagnostics
+Proof of native-level support for various subsystems:
+
+<div class="project-gallery secondary-gallery">
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/graphics.png" alt="GramSMC - Graphics" class="zoomable">
+    <span class="caption">Graphics & Displays</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/wifi.png" alt="GramSMC - WiFi" class="zoomable">
+    <span class="caption">Native WiFi Support</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/bluetooth.png" alt="GramSMC - Bluetooth" class="zoomable">
+    <span class="caption">Bluetooth Integration</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/airdrop.png" alt="GramSMC - AirDrop" class="zoomable">
+    <span class="caption">AirDrop & Continuity</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/peripherals.png" alt="GramSMC - Peripherals" class="zoomable">
+    <span class="caption">Trackpad & Peripherals</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/desk-setup.jpg" alt="GramSMC - Desk Setup" class="zoomable">
+    <span class="caption">Physical Build / Desk Setup</span>
+  </div>
+</div>
+
+<style>
+.project-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 20px 0 40px;
+}
+.secondary-gallery {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+.gallery-item {
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(var(--bg-tertiary-rgb), 0.3);
+  border: 1px solid rgba(var(--neon-gold-rgb), 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+.gallery-item:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--neon-gold);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(var(--neon-gold-rgb), 0.2);
+}
+.gallery-item img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.secondary-gallery .gallery-item img {
+  aspect-ratio: 16/9;
+}
+.gallery-item .caption {
+  display: block;
+  padding: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: rgba(0,0,0,0.2);
+  text-align: center;
+  flex-grow: 1;
+}
+</style>
+
 ## License
 
 Licensed under BSD 3-Clause License - see [LICENSE](https://github.com/Bananz0/GramSMC/blob/main/LICENSE) file.
