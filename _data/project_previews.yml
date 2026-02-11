@@ -32,3 +32,15 @@ GramSMC:
     - "GramControlCenter — Desktop overview"
     - "GramControlCenter — Compact menu"
     - "GramControlCenter — Settings dialog"
+
+bananz0:
+  title: "Personal Portfolio & Technical Playground"
+  images:
+    - /assets/images/projects/portfolio-home.jpg
+    - /assets/images/projects/portfolio-music.jpg
+    - /assets/images/projects/portfolio-worker.jpg
+  captions:
+    - "Clean, responsive homepage design"
+    - "Real-time AI music consciousness"
+    - "Cloudflare Worker backend architecture"
+
