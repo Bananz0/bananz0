@@ -261,27 +261,47 @@ async function fetchLastFmNowPlaying() {
     let url;
     if (workerUrl) {
         // Use secure worker proxy (production)
-        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getrecenttracks&limit=${CONFIG.maxRecentTracks + 1}`;
+        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getRecentTracks&limit=${CONFIG.maxRecentTracks + 1}`;
     } else if (CONFIG.lastfm.apiKey) {
         // Direct API call (local development only)
-        url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${CONFIG.maxRecentTracks + 1}`;
+        url = `https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${CONFIG.maxRecentTracks + 1}`;
     } else {
         state.sources.lastfm.connected = false;
         return null;
     }
 
     try {
+        console.log('Fetching Last.fm data...', url.split('?')[0]);
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Last.fm API error');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Last.fm API error (${response.status}): ${errorText}`);
+        }
 
         const data = await readJsonSafely(response, 'Last.fm');
         if (!data) {
+            console.warn('Last.fm returned empty data');
             state.sources.lastfm.connected = false;
             return null;
         }
-        const tracks = data.recenttracks?.track;
 
-        if (!tracks || tracks.length === 0) {
+        // Handle Last.fm API errors returned within 200 OK
+        if (data.error) {
+            console.warn('Last.fm API internal error:', data.message);
+            state.sources.lastfm.connected = false;
+            return null;
+        }
+
+        const tracks = data.recenttracks?.track;
+        if (!tracks) {
+            console.warn('Last.fm returned no tracks property');
+            state.sources.lastfm.connected = true; // Still connected, just no tracks
+            state.sources.lastfm.playing = false;
+            return null;
+        }
+
+        if (tracks.length === 0) {
             state.sources.lastfm.connected = true;
             state.sources.lastfm.playing = false;
             return null;
@@ -1068,14 +1088,13 @@ function updateNowPlayingCard(track, isPlaying) {
 function updateRecentTracks() {
     if (!elements.recentTracksList) return;
 
-    if (state.isLoading && state.recentTracks.length === 0) {
+    // Use state.hasLoadedOnce or similar if we want to bypass during initialization
+    if (state.isLoading) {
         return;
     }
 
-    if (!state.activeSource && state.recentTracks.length === 0) {
-        if (!elements.musicHero.classList.contains('is-loading')) {
-            setLoadingState(true);
-        }
+    if (state.recentTracks.length === 0) {
+        elements.recentTracksList.innerHTML = '<li class="no-recent-tracks">No recent scrobbles found. Glen is living in the moment.</li>';
         return;
     }
 
@@ -1388,11 +1407,22 @@ function getTimeAgo(date) {
 // Polling / Main Loop
 // ==========================================
 async function pollAllSources() {
-    await Promise.all([
-        fetchLastFmNowPlaying(),
-    ]);
-
-    updateUI();
+    try {
+        await Promise.all([
+            fetchLastFmNowPlaying(),
+        ]);
+    } catch (error) {
+        console.error('Failed to poll music sources:', error);
+    } finally {
+        // Clear initial loading state before updating UI
+        // to ensure updateNowPlayingCard doesn't return early
+        if (state.isLoading) {
+            console.log('Clearing initial loading state');
+            setLoadingState(false);
+        }
+        
+        updateUI();
+    }
 }
 
 function startPolling() {

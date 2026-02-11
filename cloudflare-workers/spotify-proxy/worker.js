@@ -20,12 +20,14 @@ export default {
         const url = new URL(request.url);
         const origin = request.headers.get('Origin');
 
-        // Allow localhost for development
+        // Allow localhost for development, and the main domain + its subdomains
         let allowedOrigin = 'https://glenmuthoka.com';
-        if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-            allowedOrigin = origin;
-        } else if (origin && origin.endsWith('.glenmuthoka.com')) {
-            allowedOrigin = origin;
+        if (origin) {
+            if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+                allowedOrigin = origin;
+            } else if (origin.endsWith('glenmuthoka.com') || origin.endsWith('github.io')) {
+                allowedOrigin = origin;
+            }
         }
 
         // CORS headers
@@ -137,16 +139,18 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     // CACHE CHECK: Protect the wallet from massive traffic spikes
     const cacheKey = await generateCacheKey(summaryTracks, mode);
     const cacheUrl = new URL(`https://cache.glen.muthoka/summary/${cacheKey}`);
-    const cache = caches.default;
+    const cache = (typeof caches !== 'undefined' && caches.default) ? caches.default : null;
 
-    const cachedResponse = await cache.match(cacheUrl);
-    if (cachedResponse) {
-        const response = new Response(cachedResponse.body, cachedResponse);
-        // Refresh CORS headers and add cache hit info
-        Object.entries(corsHeaders).forEach(([k, v]) => response.headers.set(k, v));
-        response.headers.set('X-Cache', 'HIT');
-        response.headers.set('Access-Control-Expose-Headers', 'X-Cache, X-Model-Used');
-        return response;
+    if (cache) {
+        const cachedResponse = await cache.match(cacheUrl);
+        if (cachedResponse) {
+            const response = new Response(cachedResponse.body, cachedResponse);
+            // Refresh CORS headers and add cache hit info
+            Object.entries(corsHeaders).forEach(([k, v]) => response.headers.set(k, v));
+            response.headers.set('X-Cache', 'HIT');
+            response.headers.set('Access-Control-Expose-Headers', 'X-Cache, X-Model-Used');
+            return response;
+        }
     }
 
     let moodClass = { label: 'unknown', description: 'mixed vibes' };
@@ -275,16 +279,18 @@ roast/summarize glen:`
     };
 
     // Store the result in background cache
-    ctx.waitUntil((async () => {
-        const cacheResponse = new Response(cacheStream, {
-            headers: {
-                'Content-Type': 'text/event-stream; charset=utf-8',
-                'Cache-Control': 'public, max-age=14400', // Cache for 4 hours
-                'X-Model-Used': groqResult.model,
-            }
-        });
-        await cache.put(cacheUrl, cacheResponse);
-    })());
+    if (cache) {
+        ctx.waitUntil((async () => {
+            const cacheResponse = new Response(cacheStream, {
+                headers: {
+                    'Content-Type': 'text/event-stream; charset=utf-8',
+                    'Cache-Control': 'public, max-age=14400', // Cache for 4 hours
+                    'X-Model-Used': groqResult.model,
+                }
+            });
+            await cache.put(cacheUrl, cacheResponse);
+        })());
+    }
 
     return new Response(clientStream, {
         status: groqResult.response.status,
@@ -443,7 +449,7 @@ async function handleLastFm(url, env, corsHeaders) {
     }
 
     const user = url.searchParams.get('user');
-    const method = url.searchParams.get('method') || 'user.getrecenttracks';
+    const method = url.searchParams.get('method') || 'user.getRecentTracks';
     const limit = url.searchParams.get('limit') || '10';
 
     if (!user) {
@@ -455,17 +461,32 @@ async function handleLastFm(url, env, corsHeaders) {
 
     const lastfmUrl = `https://ws.audioscrobbler.com/2.0/?method=${method}&user=${encodeURIComponent(user)}&api_key=${env.LASTFM_API_KEY}&format=json&limit=${limit}`;
 
-    const response = await fetch(lastfmUrl);
-    const data = await response.json();
+    try {
+        const response = await fetch(lastfmUrl);
+        const data = await response.json();
 
-    return new Response(JSON.stringify(data), {
-        headers: {
-            ...corsHeaders,
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
+        // Check if Last.fm returned an error in the JSON
+        if (data.error) {
+            console.error('Last.fm API internal error:', data);
+            return new Response(JSON.stringify(data), {
+                status: 200, // Still return 200 so frontend can parse the error message
+                headers: corsHeaders
+            });
         }
-    });
+
+        return new Response(JSON.stringify(data), {
+            headers: {
+                ...corsHeaders,
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            }
+        });
+    } catch (error) {
+        console.error('Last.fm fetch error:', error);
+        return new Response(
+            JSON.stringify({ error: 'Failed to fetch from Last.fm' }),
+            { status: 502, headers: corsHeaders }
+        );
+    }
 }
 
 // ==========================================

@@ -243,6 +243,24 @@ Here are the primary integration points for GramSMC on macOS:
   </div>
 </div>
 
+### Gram Control Center
+Screenshots of the GramControlCenter macOS UI:
+
+<div class="project-gallery control-center-gallery">
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/gramsmc-legacy-ui.png" alt="GramControlCenter - Desktop" class="zoomable">
+    <span class="caption">Desktop Overview</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/gramsmc-menu-popover.png" alt="GramControlCenter - Compact Menu" class="zoomable">
+    <span class="caption">Compact Menu</span>
+  </div>
+  <div class="gallery-item" data-modal-trigger>
+    <img src="/assets/images/projects/gramsmc/gramsmc-liquid-glass-settings.png" alt="GramControlCenter - Settings Dialog" class="zoomable">
+    <span class="caption">Settings Dialog</span>
+  </div>
+</div>
+
 ### Hardware Validation & Diagnostics
 Proof of native-level support for various subsystems:
 

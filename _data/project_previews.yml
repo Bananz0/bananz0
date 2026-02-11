@@ -21,3 +21,14 @@ MIPSquare:
   captions:
     - "5-stage pipeline architecture diagram"
     - "Hazard detection and forwarding logic"
+
+GramSMC:
+  title: "GramSMC + GramControlCenter"
+  images:
+    - /assets/images/projects/gramsmc/gramsmc-legacy-ui.png
+    - /assets/images/projects/gramsmc/gramsmc-menu-popover.png
+    - /assets/images/projects/gramsmc/gramsmc-liquid-glass-settings.png
+  captions:
+    - "GramControlCenter — Desktop overview"
+    - "GramControlCenter — Compact menu"
+    - "GramControlCenter — Settings dialog"
