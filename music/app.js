@@ -229,6 +229,14 @@ async function fetchLastFmNowPlaying() {
         };
         const trackKey = getTrackCacheKey(trackInfo.name, trackInfo.artist);
 
+        // Check cache immediately for Spotify enrichment
+        if (state.trackCache.has(trackKey)) {
+            const cached = state.trackCache.get(trackKey);
+            trackInfo.image = cached.albumImage || trackInfo.image;
+            trackInfo.artistImage = cached.artistImage;
+            trackInfo.spotifyUrl = cached.spotifyUrl;
+        }
+
         const isSameTrack = state.sources.lastfm.track && state.sources.lastfm.track.name === trackInfo.name;
 
         // PRESERVE EXISTING IMAGE if track hasn't changed
@@ -236,6 +244,7 @@ async function fetchLastFmNowPlaying() {
         if (isSameTrack && state.sources.lastfm.track.image) {
             trackInfo.image = state.sources.lastfm.track.image;
             trackInfo.artistImage = state.sources.lastfm.track.artistImage;
+            trackInfo.spotifyUrl = state.sources.lastfm.track.spotifyUrl;
 
             // FIX: If colors are missing (e.g. first load failed), retry extraction
             if (!state.currentColors && trackInfo.image) {
@@ -248,11 +257,13 @@ async function fetchLastFmNowPlaying() {
             if (CONFIG.spotify.enabled) {
                 getSpotifyTrackData(trackInfo.name, trackInfo.artist).then(spotifyData => {
                     if (!spotifyData) return;
-                    if (spotifyData.albumImage || spotifyData.artistImage) {
+                    if (spotifyData.albumImage || spotifyData.artistImage || spotifyData.spotifyUrl) {
                         state.trackCache.set(trackKey, {
                             albumImage: spotifyData.albumImage || trackInfo.image || null,
                             artistImage: spotifyData.artistImage || null,
+                            spotifyUrl: spotifyData.spotifyUrl || null,
                         });
+                        trackInfo.spotifyUrl = spotifyData.spotifyUrl;
                     }
                     if (spotifyData.artistImage && !trackInfo.artistImage) {
                         state.sources.lastfm.track.artistImage = spotifyData.artistImage;
@@ -274,10 +285,13 @@ async function fetchLastFmNowPlaying() {
                     // Success! Use Spotify data immediately
                     if (spotifyData.albumImage) trackInfo.image = spotifyData.albumImage;
                     trackInfo.artistImage = spotifyData.artistImage;
-                    if (spotifyData.albumImage || spotifyData.artistImage) {
+                    trackInfo.spotifyUrl = spotifyData.spotifyUrl;
+                    
+                    if (spotifyData.albumImage || spotifyData.artistImage || spotifyData.spotifyUrl) {
                         state.trackCache.set(trackKey, {
                             albumImage: spotifyData.albumImage || trackInfo.image || null,
                             artistImage: spotifyData.artistImage || null,
+                            spotifyUrl: spotifyData.spotifyUrl || null,
                         });
                     }
                 } else {
@@ -290,10 +304,13 @@ async function fetchLastFmNowPlaying() {
 
                                 if (delayedData.albumImage) state.sources.lastfm.track.image = delayedData.albumImage;
                                 state.sources.lastfm.track.artistImage = delayedData.artistImage;
-                                if (delayedData.albumImage || delayedData.artistImage) {
+                                state.sources.lastfm.track.spotifyUrl = delayedData.spotifyUrl;
+
+                                if (delayedData.albumImage || delayedData.artistImage || delayedData.spotifyUrl) {
                                     state.trackCache.set(trackKey, {
                                         albumImage: delayedData.albumImage || state.sources.lastfm.track.image || null,
                                         artistImage: delayedData.artistImage || null,
+                                        spotifyUrl: delayedData.spotifyUrl || null,
                                     });
                                 }
 
@@ -331,6 +348,7 @@ async function fetchLastFmNowPlaying() {
                     artist,
                     image: cached?.albumImage || getLastFmImage(track.image, 'large'),
                     artistImage: cached?.artistImage || null,
+                    spotifyUrl: cached?.spotifyUrl || null,
                     date: track.date?.uts ? new Date(track.date.uts * 1000) : null,
                     enriched: !!cached,
                 };
@@ -350,6 +368,7 @@ async function fetchLastFmNowPlaying() {
                     artist,
                     image: cached?.albumImage || getLastFmImage(track.image, 'large'),
                     artistImage: cached?.artistImage || null,
+                    spotifyUrl: cached?.spotifyUrl || null,
                     date: track.date?.uts ? new Date(track.date.uts * 1000) : null,
                     enriched: !!cached,
                 };
@@ -780,6 +799,14 @@ function updateNowPlayingCard(track, isPlaying) {
         elements.artistName.textContent = track.artist;
         elements.albumName.textContent = track.album || '';
 
+        // Add clickable link to the card
+        const songLink = getSongLink(track);
+        if (elements.card) {
+            elements.card.style.cursor = 'pointer';
+            elements.card.onclick = () => window.open(songLink, '_blank', 'noopener,noreferrer');
+            elements.card.title = `Click to open ${track.name} on your music app`;
+        }
+
         // Album art
         if (track.image) {
             setImageIfChanged(elements.albumArt, track.image, () => {
@@ -824,6 +851,14 @@ function updateNowPlayingCard(track, isPlaying) {
             elements.artistName.textContent = lastTrack.artist;
             elements.albumName.textContent = '';
 
+            // Add clickable link for last played track
+            const songLink = getSongLink(lastTrack);
+            if (elements.card) {
+                elements.card.style.cursor = 'pointer';
+                elements.card.onclick = () => window.open(songLink, '_blank', 'noopener,noreferrer');
+                elements.card.title = `Click to open ${lastTrack.name} on your music app`;
+            }
+
             if (lastTrack.image) {
                 setImageIfChanged(elements.albumArt, lastTrack.image, () => {
                     elements.albumArt.classList.add('loaded');
@@ -855,11 +890,16 @@ function updateNowPlayingCard(track, isPlaying) {
                 getSpotifyTrackData(lastTrack.name, lastTrack.artist).then(spotifyData => {
                     if (!spotifyData) return;
 
-                    if (spotifyData.albumImage || spotifyData.artistImage) {
+                    if (spotifyData.albumImage || spotifyData.artistImage || spotifyData.spotifyUrl) {
                         state.trackCache.set(recentKey, {
                             albumImage: spotifyData.albumImage || lastTrack.image || null,
                             artistImage: spotifyData.artistImage || null,
+                            spotifyUrl: spotifyData.spotifyUrl || null,
                         });
+                    }
+
+                    if (spotifyData.spotifyUrl) {
+                        lastTrack.spotifyUrl = spotifyData.spotifyUrl;
                     }
 
                     if (spotifyData.albumImage) {
@@ -902,6 +942,12 @@ function updateNowPlayingCard(track, isPlaying) {
             elements.artistBackdrop.classList.remove('loaded');
             if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
             elements.listeningStatus.textContent = 'Silence is golden';
+
+            if (elements.card) {
+                elements.card.onclick = null;
+                elements.card.style.cursor = 'default';
+                elements.card.title = '';
+            }
         }
         elements.listeningStatus.classList.remove('now-playing');
     }
@@ -927,13 +973,17 @@ function updateRecentTracks() {
 
     tracksToShow.forEach(track => {
         const li = document.createElement('li');
+        const trackLink = getSongLink(track);
+        
         li.innerHTML = `
-            <img class="track-thumb" src="${track.image || ''}" alt="" onerror="this.style.display='none'">
-            <div class="track-details">
-                <div class="name">${escapeHtml(track.name)}</div>
-                <div class="artist">${escapeHtml(track.artist)}</div>
-            </div>
-            <span class="track-time">${track.date ? getTimeAgo(track.date) : ''}</span>
+            <a href="${trackLink}" target="_blank" rel="noopener noreferrer" class="track-link">
+                <img class="track-thumb" src="${track.image || ''}" alt="" onerror="this.style.display='none'">
+                <div class="track-details">
+                    <div class="name">${escapeHtml(track.name)}</div>
+                    <div class="artist">${escapeHtml(track.artist)}</div>
+                </div>
+                <span class="track-time">${track.date ? getTimeAgo(track.date) : ''}</span>
+            </a>
         `;
         elements.recentTracksList.appendChild(li);
     });
@@ -1155,6 +1205,21 @@ function resetDynamicColors() {
 // ==========================================
 function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getSongLink(track) {
+    if (!track || !track.name || !track.artist) return '#';
+    
+    // 1. If we have the direct Spotify URL, use it via Odesli (Songlink)
+    // This provides a multi-platform landing page for the specific track
+    if (track.spotifyUrl) {
+        return `https://song.link/${track.spotifyUrl}`;
+    }
+
+    // 2. Fallback: Search on Spotify directly
+    const cleanName = track.name.replace(/\(feat\..*?\)/gi, '').replace(/\[feat\..*?\]/gi, '').trim();
+    const query = encodeURIComponent(`${track.artist} ${cleanName}`);
+    return `https://open.spotify.com/search/${query}`;
 }
 
 function escapeHtml(text) {

@@ -211,6 +211,14 @@
     transform: translateZ(0);
 }
 
+.now-playing-card:hover {
+    background: rgba(var(--bg-tertiary-rgb), 0.4);
+    border-color: rgba(var(--neon-gold-rgb), 0.3);
+    box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.5),
+        0 0 50px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.25));
+}
+
 /* Card should remain static on hover for the music page */
 
 /* Artist Backdrop (blurred background) */
@@ -530,17 +538,30 @@
     display: flex;
     align-items: center;
     gap: var(--space-md);
-    padding: var(--space-sm) var(--space-md);
+    padding: 0; /* Remove padding to handle it within the link */
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-md);
     transition: all var(--spring-snappy);
     width: 100%;
+    cursor: pointer;
+    overflow: hidden;
 }
 
 .recent-tracks li:hover {
     background: rgba(var(--bg-tertiary-rgb), 0.6);
-    border-color: rgba(var(--neon-gold-rgb), 0.15);
+    border-color: rgba(var(--neon-gold-rgb), 0.3);
+    transform: translateX(4px);
+}
+
+.recent-tracks .track-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
 }
 
 .recent-tracks .track-thumb {
