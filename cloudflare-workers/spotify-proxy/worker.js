@@ -195,6 +195,20 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
                 const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
                 return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
             }).join('\n');
+
+            // 6. Calculate Repetition (Ear-worm detection)
+            const trackCounts = {};
+            summaryTracks.forEach(t => {
+                const key = `${t.name} by ${t.artist}`.toLowerCase();
+                trackCounts[key] = (trackCounts[key] || 0) + 1;
+            });
+            const counts = Object.values(trackCounts);
+            const maxReps = counts.length > 0 ? Math.max(...counts) : 0;
+            const topTrack = Object.keys(trackCounts).find(k => trackCounts[k] === maxReps);
+            const repetitionInfo = maxReps >= 4 ? `earworm detected: ${topTrack} played ${maxReps} times` : 'none';
+
+            // Add repetition to prompt
+            trackListForPrompt += `\n\nRepetition: ${repetitionInfo}`;
         }
     } catch (error) {
         console.error('Spotify processing failed', error);
@@ -205,16 +219,37 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     const messages = [
         {
             role: 'system',
-            content: 'You are a witty music critic roasting a user named "glen". Output exactly one sentence in lower-case, 10-18 words. No quotes, no emojis, no hashtags, no preface. Do not mention "session", "playlist", "mode", or "tracks". Use era and audio stats for the roast. Use 1-2 track or artist names for puns. If you cannot comply, output: glen is off the grid.'
+            content: `You are the consciousness of a witty, slightly dark, and musically-obsessed entity named "glen". 
+You are observing glen's current music intake and providing a sharp, era-aware, and effortful summary.
+
+PERSONALITY TRAITS:
+- Mysterious and slightly dark if the music is moody/indie (e.g., Lithe).
+- Nostalgic but sharp regarding older decades (50s-90s).
+- Unapologetic "girly pop" energy for upbeat/poppy tracks.
+- Respectful but witty for "Legends/OGs" (Rock, Classical, Jazz).
+- Darkly witty regarding tragic legends like Kurt Cobain.
+- If a song is repeated 4+ times, call out the "ear worm" addiction.
+- Use regional/genre context significantly (Spanish, French, Classical, etc.).
+- Avoid basic puns like "vibe-ing" or "energy levels". Go for deeper cuts.
+- If the vibes are sad, say "glen was sadge :( give him a hug".
+- If vibes are happy, say "glen is feeling whimsical and jovial" and maybe suggest he asks a favor.
+
+CONSTRAINTS:
+- Output ONE sentence in lower-case.
+- 12-25 words.
+- No quotes, no hashtags, no preface, no emojis (except the specific sadge one if needed).
+- Refer to "glen" in the third person.
+- Focus on the *soul* of the music, not the metadata tags but get important data from them.
+- Use 1-2 track or artist names naturally in the critique.`
         },
         {
             role: 'user',
             content: `mode: ${mode}
 era: ${dominantEra}
 mood: ${moodClass.label} (${moodClass.description})
-audio: valence=${audioStats?.valence?.toFixed(2) ?? 'n/a'}, energy=${audioStats?.energy?.toFixed(2) ?? 'n/a'}, dance=${audioStats?.danceability?.toFixed(2) ?? 'n/a'}, acoustic=${audioStats?.acousticness?.toFixed(2) ?? 'n/a'}, tempo=${audioStats?.tempo?.toFixed(0) ?? 'n/a'} bpm
-tracks:\n${trackListForPrompt}\n
-roast glen:`
+audio_stats: valence=${audioStats?.valence?.toFixed(2) ?? 'n/a'}, energy=${audioStats?.energy?.toFixed(2) ?? 'n/a'}, dance=${audioStats?.danceability?.toFixed(2) ?? 'n/a'}
+context:\n${trackListForPrompt}\n
+roast/summarize glen:`
         }
     ];
 

@@ -104,6 +104,7 @@ const state = {
     currentColors: null, // Extracted colors from current track
     aiSummary: {
         lastSignature: '',
+        lastTopTrack: '',
         lastUpdated: 0,
         isLoading: false,
     },
@@ -772,11 +773,13 @@ async function updateAiSummary() {
 
     const formattedTracks = formatTracksForSummary(selectedTracks);
     const signature = `${isPlaying ? 'active' : 'session'}|${formattedTracks.map(track => `${track.name}|${track.artist}`).join('||')}`;
+    const currentTopTrack = formattedTracks[0]?.name;
 
-    // Cooldown: Don't refresh more than once every 45 seconds even if tracks change
-    // This prevents hitting the LLM too hard during rapid track skipping
+    // Cooldown: normally 25s, but if the song actually changed, reduce to 5s safety
+    // This makes it feel instant when a new song starts while preventing spam
     const now = Date.now();
-    const cooldownMs = 45000;
+    const isNewTrack = currentTopTrack !== state.aiSummary.lastTopTrack;
+    const cooldownMs = isNewTrack ? 5000 : 25000;
     const isCooldownActive = (now - state.aiSummary.lastUpdated) < cooldownMs;
 
     if (signature === state.aiSummary.lastSignature || isCooldownActive) {
@@ -784,6 +787,7 @@ async function updateAiSummary() {
     }
 
     state.aiSummary.lastSignature = signature;
+    state.aiSummary.lastTopTrack = currentTopTrack;
     state.aiSummary.lastUpdated = now;
     state.aiSummary.isLoading = true;
     resetAiSummaryText();
