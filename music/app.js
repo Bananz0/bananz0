@@ -24,8 +24,8 @@ const CONFIG = {
     aiSummary: {
         enabled: window.MUSIC_CONFIG?.aiSummary?.enabled ?? true,
         workerUrl: window.MUSIC_CONFIG?.aiSummary?.workerUrl || window.MUSIC_CONFIG?.spotify?.workerUrl || '',
-        activeLimit: 12, // Slightly tighter context for better weighting
-        sessionLimit: 25, // Focused window to prevent stale artist stay-overs
+        activeLimit: 20, // Increased to capture the "sprinkle" history
+        sessionLimit: 25,
         sessionGapMinutes: 90,
     },
     maxRecentTracks: 8, // Increased for desktop view
@@ -508,7 +508,6 @@ function selectSessionTracks(tracks) {
 
 function formatTracksForSummary(tracks) {
     const artistCounts = {};
-    const total = tracks.length;
     
     tracks.forEach(track => {
         const artist = track.artist?.['#text'] || track.artist?.name || 'Unknown';
@@ -519,14 +518,30 @@ function formatTracksForSummary(tracks) {
         const artist = track.artist?.['#text'] || track.artist?.name || 'Unknown';
         const isNowPlaying = track?.['@attr']?.nowplaying === 'true';
 
+        // Tiers per user request:
+        // 0-3: Heavy weighting
+        // 4-7: Moderate weighting (total 8 main tracks)
+        // 8-19: "Sprinkle" of context
+        let focus, weight;
+        if (index < 4) {
+            focus = "CRITICAL_PRIMARY";
+            weight = "MAX_WEIGHT";
+        } else if (index < 8) {
+            focus = "SECONDARY_SESSION";
+            weight = "MODERATE_WEIGHT";
+        } else {
+            focus = "HISTORICAL_SPRINKLE";
+            weight = "MINIMAL_CONTEXT_ONLY";
+        }
+
         return {
             name: track.name || 'Unknown',
             artist: artist,
-            // Natural language hints work better for LLM weighting
-            importance: index === 0 ? "PRIMARY_FOCUS" : (index < 3 ? "HEAVY_WEIGHT" : "CONTEXTUAL"),
-            recency_index: index, // 0 is newest
-            artist_frequency: `${artistCounts[artist]} plays`,
-            is_current: isNowPlaying
+            importance: focus,
+            prompt_weight: weight,
+            recency: index === 0 ? "Now Playing" : `${index} tracks ago`,
+            artist_frequency: `${artistCounts[artist]} plays in session`,
+            is_active: isNowPlaying
         };
     }).filter(track => track.name && track.artist);
 }
@@ -544,13 +559,17 @@ async function streamAiSummary(tracks, mode) {
             mode,
             tracks,
             trackCount: tracks.length,
-            // Explicitly instruct the worker to weight recent tracks more heavily
+            // Explicit instructions for the LLM weighting tiers
+            weightingInstructions: {
+                primaryFocusIndices: [0, 1, 2, 3],
+                secondaryFocusIndices: [4, 5, 6, 7],
+                sprinkleIndices: Array.from({length: 12}, (_, i) => i + 8)
+            },
             options: {
                 weightRecent: true,
-                diversity: 0.8,
-                temperature: 0.85 // Slight bump to prevent repetitive templates
-            },
-            context_hint: tracks.length > 0 ? `Heavy focus on ${tracks[tracks.length-1].artist}` : ''
+                diversity: 0.9,
+                temperature: 0.88
+            }
         }),
     });
 
