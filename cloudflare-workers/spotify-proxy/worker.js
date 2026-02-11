@@ -88,6 +88,9 @@ const SUMMARY_MODEL_PRIORITY = [
     'canopylabs/orpheus-v1-english',
 ];
 
+const SUMMARY_MAX_TOKENS = 60;
+const SUMMARY_PROMPT_TRACK_LIMIT = 12;
+
 async function handleAiSummary(request, env, ctx, corsHeaders) {
     if (request.method !== 'POST') {
         return new Response(
@@ -129,6 +132,7 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     }));
 
     const summaryTracks = tracks.slice(0, 50);
+    const promptTracks = summaryTracks.slice(0, SUMMARY_PROMPT_TRACK_LIMIT);
 
     // CACHE CHECK: Protect the wallet from massive traffic spikes
     const cacheKey = await generateCacheKey(summaryTracks, mode);
@@ -146,8 +150,9 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     }
 
     let moodClass = { label: 'unknown', description: 'mixed vibes' };
-    let dominantEra = 'unknown'; 
-    let trackListForPrompt = [];
+    let dominantEra = 'unknown';
+    let trackListForPrompt = '';
+    let audioStats = null;
 
     try {
         const token = await getAccessToken(env);
@@ -174,10 +179,18 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
             const features = trackIds.length ? await getAudioFeatures(token, trackIds) : [];
             if (features.length) {
                 moodClass = classifyMood(features);
+                const avg = (key) => features.reduce((sum, item) => sum + (item[key] ?? 0), 0) / features.length;
+                audioStats = {
+                    valence: avg('valence'),
+                    energy: avg('energy'),
+                    danceability: avg('danceability'),
+                    acousticness: avg('acousticness'),
+                    tempo: avg('tempo'),
+                };
             }
 
             // 5. Format the list for the LLM
-            trackListForPrompt = summaryTracks.map((t, i) => {
+            trackListForPrompt = promptTracks.map((t, i) => {
                 const foundDetail = trackDetails[i]; // Only exists for first 15
                 const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
                 return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
@@ -186,40 +199,22 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     } catch (error) {
         console.error('Spotify processing failed', error);
         // Fallback if API fails
-        trackListForPrompt = summaryTracks.map((t, i) => `${i + 1}. ${t.name} - ${t.artist}`).join('\n');
+        trackListForPrompt = promptTracks.map((t, i) => `${i + 1}. ${t.name} - ${t.artist}`).join('\n');
     }
 
     const messages = [
         {
             role: 'system',
-            content: `You are a witty music critic roasting a user named "Glen".
-            
-            **Guidelines:**
-            1. **Tone:** Playful, sarcastic, culturally aware. 
-            2. **Generational Awareness:** Look at the years provided.
-               - If mostly 70s/80s: Joke about him being an "old soul" or having back pain.
-               - If 2000s: Joke about awkward emo phases or Y2K nostalgia.
-               - If Modern: Joke about TikTok trends or short attention spans.
-            3. **Content:** Weave in **specific track titles** or **artist names** to make puns.
-            4. **Vibe Check:** Use the calculated mood (e.g., "Sad", "High Energy") to comment on his emotional state.
-            
-            **Output:**
-            - ONE single sentence.
-            - Lower-case only.
-            - No quotes, no emojis, no hashtags.
-            - Under 25 words.`
+            content: 'You are a witty music critic roasting a user named "glen". Output exactly one sentence in lower-case, 10-18 words. No quotes, no emojis, no hashtags, no preface. Do not mention "session", "playlist", "mode", or "tracks". Use era and audio stats for the roast. Use 1-2 track or artist names for puns. If you cannot comply, output: glen is off the grid.'
         },
         {
             role: 'user',
-            content: `Context:
-            - Mode: ${mode}
-            - Mood: ${moodClass.label} (${moodClass.description})
-            - Dominant Era: ${dominantEra}
-            
-            Tracks:
-            ${trackListForPrompt}
-            
-            Summarize this session:`
+            content: `mode: ${mode}
+era: ${dominantEra}
+mood: ${moodClass.label} (${moodClass.description})
+audio: valence=${audioStats?.valence?.toFixed(2) ?? 'n/a'}, energy=${audioStats?.energy?.toFixed(2) ?? 'n/a'}, dance=${audioStats?.danceability?.toFixed(2) ?? 'n/a'}, acoustic=${audioStats?.acousticness?.toFixed(2) ?? 'n/a'}, tempo=${audioStats?.tempo?.toFixed(0) ?? 'n/a'} bpm
+tracks:\n${trackListForPrompt}\n
+roast glen:`
         }
     ];
 
@@ -272,7 +267,8 @@ async function callGroqStream(messages, env) {
             body: JSON.stringify({
                 model,
                 temperature: 0.7,
-                max_tokens: 120,
+                max_tokens: SUMMARY_MAX_TOKENS,
+                stop: ['\n'],
                 stream: true,
                 messages,
             }),
@@ -588,3 +584,4 @@ async function searchTrack(token, trackName, artistName) {
         return { albumImage: null, artistImage: null };
     }
 }
+

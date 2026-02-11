@@ -31,6 +31,61 @@ const CONFIG = {
     maxRecentTracks: 8, // Increased for desktop view
 };
 
+class LRUCache {
+    constructor(maxSize = 100) {
+        this.maxSize = maxSize;
+        this.cache = new Map();
+    }
+
+    get(key) {
+        if (!this.cache.has(key)) return undefined;
+        const value = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, value);
+        return value;
+    }
+
+    has(key) {
+        return this.cache.has(key);
+    }
+
+    set(key, value) {
+        if (this.cache.has(key)) {
+            this.cache.delete(key);
+        }
+        this.cache.set(key, value);
+        if (this.cache.size > this.maxSize) {
+            const oldestKey = this.cache.keys().next().value;
+            this.cache.delete(oldestKey);
+        }
+    }
+}
+
+const spotifyRequestLimiter = {
+    maxConcurrent: 3,
+    active: 0,
+    queue: [],
+};
+
+function limitedFetch(url, options) {
+    return new Promise((resolve, reject) => {
+        const run = () => {
+            spotifyRequestLimiter.active += 1;
+            fetch(url, options).then(resolve, reject).finally(() => {
+                spotifyRequestLimiter.active -= 1;
+                const next = spotifyRequestLimiter.queue.shift();
+                if (next) next();
+            });
+        };
+
+        if (spotifyRequestLimiter.active < spotifyRequestLimiter.maxConcurrent) {
+            run();
+        } else {
+            spotifyRequestLimiter.queue.push(run);
+        }
+    });
+}
+
 // ==========================================
 // State Management
 // ==========================================
@@ -43,8 +98,9 @@ const state = {
         spotify: { connected: false, playing: false, track: null },
     },
     recentTracks: [],
-    artistCache: new Map(), // Cache artist images
-    trackCache: new Map(), // Cache album/artist art by track+artist key
+    artistCache: new LRUCache(50), // Cache artist images
+    trackCache: new LRUCache(100), // Cache album/artist art by track+artist key
+    pendingTrackRequests: new Map(),
     currentColors: null, // Extracted colors from current track
     aiSummary: {
         lastSignature: '',
@@ -114,7 +170,7 @@ async function getSpotifyArtistImage(artistName) {
     }
 
     try {
-        const response = await fetch(
+        const response = await limitedFetch(
             `${CONFIG.spotify.workerUrl}?type=spotify&artist=${encodeURIComponent(artistName)}`
         );
 
@@ -146,29 +202,47 @@ async function getSpotifyTrackData(trackName, artistName) {
         return null;
     }
 
-    try {
-        const response = await fetch(
-            `${CONFIG.spotify.workerUrl}?type=spotify&track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
-        );
+    const trackKey = getTrackCacheKey(trackName, artistName);
+    if (state.trackCache.has(trackKey)) {
+        return state.trackCache.get(trackKey);
+    }
 
-        if (!response.ok) throw new Error('Worker request failed');
+    if (state.pendingTrackRequests.has(trackKey)) {
+        return state.pendingTrackRequests.get(trackKey);
+    }
 
-        const data = await readJsonSafely(response, 'Spotify track');
-        if (!data) {
+    const requestPromise = (async () => {
+        try {
+            const response = await limitedFetch(
+                `${CONFIG.spotify.workerUrl}?type=spotify&track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
+            );
+
+            if (!response.ok) throw new Error('Worker request failed');
+
+            const data = await readJsonSafely(response, 'Spotify track');
+            if (!data) {
+                state.sources.spotify.connected = false;
+                return null;
+            }
+            state.sources.spotify.connected = true;
+
+            return {
+                albumImage: data.albumImage || null,
+                artistImage: data.artistImage || null,
+                spotifyUrl: data.spotifyUrl || null,
+            };
+        } catch (error) {
+            console.warn('Spotify track fetch failed:', error);
             state.sources.spotify.connected = false;
             return null;
         }
-        state.sources.spotify.connected = true;
+    })();
 
-        return {
-            albumImage: data.albumImage || null,
-            artistImage: data.artistImage || null,
-            spotifyUrl: data.spotifyUrl || null,
-        };
-    } catch (error) {
-        console.warn('Spotify track fetch failed:', error);
-        state.sources.spotify.connected = false;
-        return null;
+    state.pendingTrackRequests.set(trackKey, requestPromise);
+    try {
+        return await requestPromise;
+    } finally {
+        state.pendingTrackRequests.delete(trackKey);
     }
 }
 
@@ -462,6 +536,27 @@ function appendAiSummaryChunk(text) {
     elements.aiSummaryText.appendChild(fragment);
 }
 
+function normalizeAiSummary(text) {
+    if (!text) return '';
+    let cleaned = String(text).replace(/\s+/g, ' ').trim();
+
+    cleaned = cleaned.replace(/^session recap\s*ai\s*/i, '').trim();
+    const firstSentence = cleaned.match(/[^.!?]+[.!?]/);
+    if (firstSentence) {
+        cleaned = firstSentence[0].trim();
+    }
+
+    const words = cleaned.split(' ').filter(Boolean).slice(0, 24);
+    cleaned = words.join(' ');
+    return cleaned.toLowerCase();
+}
+
+function rebuildAiSummaryText(text) {
+    if (!elements.aiSummaryText) return;
+    elements.aiSummaryText.textContent = '';
+    appendAiSummaryChunk(text);
+}
+
 async function fetchLastFmRecentTracks(limit) {
     const workerUrl = CONFIG.spotify.workerUrl;
 
@@ -604,7 +699,8 @@ async function streamAiSummary(tracks, mode) {
     if (!response.body) {
         const data = await readJsonSafely(response, 'AI summary');
         if (data?.summary) {
-            appendAiSummaryChunk(data.summary);
+            const normalized = normalizeAiSummary(data.summary);
+            rebuildAiSummaryText(normalized || data.summary);
         }
         return;
     }
@@ -612,6 +708,7 @@ async function streamAiSummary(tracks, mode) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    let fullText = '';
 
     while (true) {
         const { value, done } = await reader.read();
@@ -630,12 +727,18 @@ async function streamAiSummary(tracks, mode) {
                 const json = JSON.parse(payload);
                 const delta = json.choices?.[0]?.delta?.content;
                 if (delta) {
+                    fullText += delta;
                     appendAiSummaryChunk(delta);
                 }
             } catch (error) {
                 console.warn('AI stream parse failed:', error);
             }
         }
+    }
+
+    const normalized = normalizeAiSummary(fullText);
+    if (normalized && normalized !== fullText.trim()) {
+        rebuildAiSummaryText(normalized);
     }
 }
 
