@@ -261,10 +261,10 @@ async function fetchLastFmNowPlaying() {
     let url;
     if (workerUrl) {
         // Use secure worker proxy (production)
-        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getRecentTracks&limit=${CONFIG.maxRecentTracks + 1}`;
+        url = `${workerUrl}?type=lastfm&user=${CONFIG.lastfm.username}&method=user.getrecenttracks&limit=${CONFIG.maxRecentTracks + 1}`;
     } else if (CONFIG.lastfm.apiKey) {
         // Direct API call (local development only)
-        url = `https://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${CONFIG.maxRecentTracks + 1}`;
+        url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${CONFIG.lastfm.username}&api_key=${CONFIG.lastfm.apiKey}&format=json&limit=${CONFIG.maxRecentTracks + 1}`;
     } else {
         state.sources.lastfm.connected = false;
         return null;

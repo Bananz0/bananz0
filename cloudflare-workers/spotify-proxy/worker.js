@@ -449,7 +449,7 @@ async function handleLastFm(url, env, corsHeaders) {
     }
 
     const user = url.searchParams.get('user');
-    const method = url.searchParams.get('method') || 'user.getRecentTracks';
+    const method = url.searchParams.get('method') || 'user.getrecenttracks';
     const limit = url.searchParams.get('limit') || '10';
 
     if (!user) {
