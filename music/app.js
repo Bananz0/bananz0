@@ -821,9 +821,13 @@ function updateNowPlayingCard(track, isPlaying) {
 
         // Artist image (thumbnail and shared backdrops)
         if (track.artistImage) {
-            setImageIfChanged(elements.artistThumbnail, track.artistImage, () => {
+            const changed = setImageIfChanged(elements.artistThumbnail, track.artistImage, () => {
                 elements.artistThumbnailContainer.classList.add('loaded');
             });
+            // If the image URL didn't change, ensure the loaded class is still present
+            if (!changed) {
+                elements.artistThumbnailContainer.classList.add('loaded');
+            }
             updateBackdrops(track.artistImage);
         } else {
             elements.artistThumbnailContainer.classList.remove('loaded');
@@ -872,9 +876,12 @@ function updateNowPlayingCard(track, isPlaying) {
             }
 
             if (lastTrack.artistImage) {
-                setImageIfChanged(elements.artistThumbnail, lastTrack.artistImage, () => {
+                const changed = setImageIfChanged(elements.artistThumbnail, lastTrack.artistImage, () => {
                     elements.artistThumbnailContainer.classList.add('loaded');
                 });
+                if (!changed) {
+                    elements.artistThumbnailContainer.classList.add('loaded');
+                }
                 updateBackdrops(lastTrack.artistImage);
             } else {
                 elements.artistThumbnailContainer.classList.remove('loaded');
@@ -916,14 +923,13 @@ function updateNowPlayingCard(track, isPlaying) {
 
                     if (spotifyData.artistImage) {
                         lastTrack.artistImage = spotifyData.artistImage;
-                        setImageIfChanged(elements.artistThumbnail, spotifyData.artistImage, () => {
+                        const changed = setImageIfChanged(elements.artistThumbnail, spotifyData.artistImage, () => {
                             elements.artistThumbnailContainer.classList.add('loaded');
                         });
-                        setBackgroundIfChanged(elements.artistBackdrop, spotifyData.artistImage);
-                        elements.artistBackdrop.classList.add('loaded');
-                        if (elements.immersiveBg) {
-                            setBackgroundIfChanged(elements.immersiveBg, spotifyData.artistImage);
+                        if (!changed) {
+                            elements.artistThumbnailContainer.classList.add('loaded');
                         }
+                        updateBackdrops(spotifyData.artistImage);
                     }
 
                     updateSourceIndicators();

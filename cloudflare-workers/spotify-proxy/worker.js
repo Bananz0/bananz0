@@ -16,7 +16,7 @@ let cachedToken = null;
 let tokenExpiry = 0;
 
 export default {
-    async fetch(request, env) {
+    async fetch(request, env, ctx) {
         const url = new URL(request.url);
         const origin = request.headers.get('Origin');
 
@@ -45,7 +45,7 @@ export default {
 
         try {
             if (type === 'summary') {
-                return await handleAiSummary(request, env, corsHeaders);
+                return await handleAiSummary(request, env, ctx, corsHeaders);
             } else if (type === 'lastfm') {
                 return await handleLastFm(url, env, corsHeaders);
             } else {
@@ -64,14 +64,22 @@ export default {
 // ==========================================
 // AI SUMMARY (GROQ)
 // ==========================================
+async function generateCacheKey(tracks, mode) {
+    const data = JSON.stringify({ tracks, mode });
+    const msgUint8 = new TextEncoder().encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const SUMMARY_MODEL_PRIORITY = [
+    'groq/compound',
     'llama-3.3-70b-versatile',
+    'groq/compound-mini',
     'meta-llama/llama-4-maverick-17b-128e-instruct',
     'qwen/qwen3-32b',
     'openai/gpt-oss-120b',
     'moonshotai/kimi-k2-instruct',
-    'groq/compound',
-    'groq/compound-mini',
     'llama-3.1-8b-instant',
     'meta-llama/llama-4-scout-17b-16e-instruct',
     'openai/gpt-oss-20b',
@@ -80,7 +88,7 @@ const SUMMARY_MODEL_PRIORITY = [
     'canopylabs/orpheus-v1-english',
 ];
 
-async function handleAiSummary(request, env, corsHeaders) {
+async function handleAiSummary(request, env, ctx, corsHeaders) {
     if (request.method !== 'POST') {
         return new Response(
             JSON.stringify({ error: 'Method not allowed' }),
@@ -120,36 +128,98 @@ async function handleAiSummary(request, env, corsHeaders) {
         artist: String(track?.artist || '').trim() || 'Unknown',
     }));
 
-    const summaryTracks = tracks.slice(0, 50); // Use up to 50 tracks for classification
-    // Still take a subset for the prompt text to avoid hitting token limits even if they are freeish
-    // But since user asked for "revert to initial" 15/50 logic, we will pass them all if possible. 
-    // Groq limits are high. Let's pass all 50.
-    const trackLines = summaryTracks.map((track, index) => `${index + 1}. ${track.name} - ${track.artist}`).join('\n');
+    const summaryTracks = tracks.slice(0, 50);
+
+    // CACHE CHECK: Protect the wallet from massive traffic spikes
+    const cacheKey = await generateCacheKey(summaryTracks, mode);
+    const cacheUrl = new URL(`https://cache.glen.muthoka/summary/${cacheKey}`);
+    const cache = caches.default;
+
+    const cachedResponse = await cache.match(cacheUrl);
+    if (cachedResponse) {
+        const response = new Response(cachedResponse.body, cachedResponse);
+        // Refresh CORS headers and add cache hit info
+        Object.entries(corsHeaders).forEach(([k, v]) => response.headers.set(k, v));
+        response.headers.set('X-Cache', 'HIT');
+        response.headers.set('Access-Control-Expose-Headers', 'X-Cache, X-Model-Used');
+        return response;
+    }
 
     let moodClass = { label: 'unknown', description: 'mixed vibes' };
+    let dominantEra = 'unknown'; 
+    let trackListForPrompt = [];
+
     try {
         const token = await getAccessToken(env);
         if (token) {
-            // Only classify based on first 15 to save Spotify API calls latency
+            // 1. Get Details for top 15 tracks (IDs and Years)
             const classificationTracks = summaryTracks.slice(0, 15);
-            const trackIds = await resolveTrackIds(token, classificationTracks);
+            const trackDetails = await resolveTrackIds(token, classificationTracks);
+            
+            // 2. Extract IDs for audio features
+            const trackIds = trackDetails.map(t => t.id);
+            
+            // 3. Calculate Dominant Era (Math in Worker to save AI tokens)
+            const years = trackDetails.map(t => parseInt(t.year)).filter(y => !isNaN(y));
+            if (years.length > 0) {
+                const avgYear = years.reduce((a, b) => a + b, 0) / years.length;
+                if (avgYear < 1980) dominantEra = 'Classic Rock / Oldies';
+                else if (avgYear < 1990) dominantEra = '80s Nostalgia';
+                else if (avgYear < 2000) dominantEra = '90s Kid';
+                else if (avgYear < 2010) dominantEra = '2000s / Millennial';
+                else dominantEra = 'Modern / Gen Z';
+            }
+
+            // 4. Get Audio Features
             const features = trackIds.length ? await getAudioFeatures(token, trackIds) : [];
             if (features.length) {
                 moodClass = classifyMood(features);
             }
+
+            // 5. Format the list for the LLM
+            trackListForPrompt = summaryTracks.map((t, i) => {
+                const foundDetail = trackDetails[i]; // Only exists for first 15
+                const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
+                return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
+            }).join('\n');
         }
     } catch (error) {
-        console.error('Spotify audio features failed, falling back to LLM-only mode', error);
+        console.error('Spotify processing failed', error);
+        // Fallback if API fails
+        trackListForPrompt = summaryTracks.map((t, i) => `${i + 1}. ${t.name} - ${t.artist}`).join('\n');
     }
 
     const messages = [
         {
             role: 'system',
-            content: 'you write one-line music session summaries about a person named "glen". write in lower-case, casual, witty tone with clever music-related puns or commentary on his taste. use the person name "glen" in every summary. weave in actual track titles or artist names from the provided list to make the puns deeply personal. Example styles:\n- "glen definitely missed the 80s because they called and he answered"\n- "glen is currently the main character in a indie movie with a top-tier soundtrack"\n- "glen is speed-running his favorite albums like he\'s late for a flight"\n- "glen\'s music taste is so eclectic even the algorithm is taking notes"\nreturn only the summary sentence with no quotes, no hashtags, no emojis. use the mood classification as a vibe check. keep it under 20 words.'
+            content: `You are a witty music critic roasting a user named "Glen".
+            
+            **Guidelines:**
+            1. **Tone:** Playful, sarcastic, culturally aware. 
+            2. **Generational Awareness:** Look at the years provided.
+               - If mostly 70s/80s: Joke about him being an "old soul" or having back pain.
+               - If 2000s: Joke about awkward emo phases or Y2K nostalgia.
+               - If Modern: Joke about TikTok trends or short attention spans.
+            3. **Content:** Weave in **specific track titles** or **artist names** to make puns.
+            4. **Vibe Check:** Use the calculated mood (e.g., "Sad", "High Energy") to comment on his emotional state.
+            
+            **Output:**
+            - ONE single sentence.
+            - Lower-case only.
+            - No quotes, no emojis, no hashtags.
+            - Under 25 words.`
         },
         {
             role: 'user',
-            content: `Mode: ${mode}\nTrack count: ${trackCount}\nMood: ${moodClass.label} (${moodClass.description})\nTracks:\n${trackLines}\n\nGenerate summary:`
+            content: `Context:
+            - Mode: ${mode}
+            - Mood: ${moodClass.label} (${moodClass.description})
+            - Dominant Era: ${dominantEra}
+            
+            Tracks:
+            ${trackListForPrompt}
+            
+            Summarize this session:`
         }
     ];
 
@@ -161,15 +231,31 @@ async function handleAiSummary(request, env, corsHeaders) {
         );
     }
 
+    // TEE THE STREAM: One for the user (immediate), one for the cache
+    const [clientStream, cacheStream] = groqResult.response.body.tee();
+
     const headers = {
         ...corsHeaders,
         'Content-Type': 'text/event-stream; charset=utf-8',
         'Cache-Control': 'no-store',
-        'Access-Control-Expose-Headers': 'X-Model-Used',
+        'Access-Control-Expose-Headers': 'X-Model-Used, X-Cache',
         'X-Model-Used': groqResult.model,
+        'X-Cache': 'MISS',
     };
 
-    return new Response(groqResult.response.body, {
+    // Store the result in background cache
+    ctx.waitUntil((async () => {
+        const cacheResponse = new Response(cacheStream, {
+            headers: {
+                'Content-Type': 'text/event-stream; charset=utf-8',
+                'Cache-Control': 'public, max-age=604800', // Cache for 7 days
+                'X-Model-Used': groqResult.model,
+            }
+        });
+        await cache.put(cacheUrl, cacheResponse);
+    })());
+
+    return new Response(clientStream, {
         status: groqResult.response.status,
         headers,
     });
@@ -219,11 +305,12 @@ async function callGroqStream(messages, env) {
 
 async function resolveTrackIds(token, tracks) {
     const results = await Promise.all(tracks.map(track => searchTrackId(token, track.name, track.artist)));
-    return results.filter(Boolean);
+    return results.filter(Boolean); // Returns array of { id, year }
 }
 
 async function searchTrackId(token, trackName, artistName) {
     try {
+        // Optimizing query to be more precise
         const query = `track:${trackName} artist:${artistName}`;
         const response = await fetch(
             `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
@@ -232,15 +319,22 @@ async function searchTrackId(token, trackName, artistName) {
             }
         );
 
-        if (!response.ok) {
-            return null;
-        }
+        if (!response.ok) return null;
 
         const data = await response.json();
         const track = data.tracks?.items?.[0];
-        return track?.id || extractSpotifyIdFromUrl(track?.external_urls?.spotify);
+
+        if (!track) return null;
+
+        // Extract just the year (YYYY) from release_date (YYYY-MM-DD)
+        const year = track.album?.release_date ? track.album.release_date.split('-')[0] : 'unknown';
+
+        return {
+            id: track.id || extractSpotifyIdFromUrl(track.external_urls?.spotify),
+            year: year
+        };
     } catch (error) {
-        console.error('Track id search error:', error);
+        console.error('Track search error:', error);
         return null;
     }
 }
