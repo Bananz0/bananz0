@@ -24,8 +24,8 @@ const CONFIG = {
     aiSummary: {
         enabled: window.MUSIC_CONFIG?.aiSummary?.enabled ?? true,
         workerUrl: window.MUSIC_CONFIG?.aiSummary?.workerUrl || window.MUSIC_CONFIG?.spotify?.workerUrl || '',
-        activeLimit: 15, // Reverted to 15 per user request
-        sessionLimit: 50,
+        activeLimit: 12, // Slightly tighter context for better weighting
+        sessionLimit: 25, // Focused window to prevent stale artist stay-overs
         sessionGapMinutes: 90,
     },
     maxRecentTracks: 8, // Increased for desktop view
@@ -507,10 +507,28 @@ function selectSessionTracks(tracks) {
 }
 
 function formatTracksForSummary(tracks) {
-    return tracks.map(track => ({
-        name: track.name || 'Unknown',
-        artist: track.artist?.['#text'] || track.artist?.name || 'Unknown',
-    })).filter(track => track.name && track.artist);
+    const artistCounts = {};
+    const total = tracks.length;
+    
+    tracks.forEach(track => {
+        const artist = track.artist?.['#text'] || track.artist?.name || 'Unknown';
+        artistCounts[artist] = (artistCounts[artist] || 0) + 1;
+    });
+
+    return tracks.map((track, index) => {
+        const artist = track.artist?.['#text'] || track.artist?.name || 'Unknown';
+        const isNowPlaying = track?.['@attr']?.nowplaying === 'true';
+
+        return {
+            name: track.name || 'Unknown',
+            artist: artist,
+            // Natural language hints work better for LLM weighting
+            importance: index === 0 ? "PRIMARY_FOCUS" : (index < 3 ? "HEAVY_WEIGHT" : "CONTEXTUAL"),
+            recency_index: index, // 0 is newest
+            artist_frequency: `${artistCounts[artist]} plays`,
+            is_current: isNowPlaying
+        };
+    }).filter(track => track.name && track.artist);
 }
 
 async function streamAiSummary(tracks, mode) {
@@ -526,6 +544,13 @@ async function streamAiSummary(tracks, mode) {
             mode,
             tracks,
             trackCount: tracks.length,
+            // Explicitly instruct the worker to weight recent tracks more heavily
+            options: {
+                weightRecent: true,
+                diversity: 0.8,
+                temperature: 0.85 // Slight bump to prevent repetitive templates
+            },
+            context_hint: tracks.length > 0 ? `Heavy focus on ${tracks[tracks.length-1].artist}` : ''
         }),
     });
 
