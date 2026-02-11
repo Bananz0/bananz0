@@ -1264,6 +1264,11 @@ function applyDynamicColors(colors) {
         card.style.setProperty('--dynamic-scrollbar-color', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.5)`);
         card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.8)`);
         card.style.borderColor = borderColor;
+        
+        // Update data attribute for Groq brand compliance (morphing logo color)
+        if (card.id === 'ai-summary-card') {
+            card.setAttribute('data-light-mode', (!colors.isDark).toString());
+        }
     });
 
     // Update playing indicator color
