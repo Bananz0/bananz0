@@ -5118,7 +5118,8 @@ body {
 .projects-grid>* {
     flex: 1 1 520px;
     width: 100%;
-    max-width: 780px;
+    max-width: 800px;
+    display: flex;
 }
 
 .project-card-full {

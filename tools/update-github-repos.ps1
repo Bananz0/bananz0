@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 
 # Manual hide list (kept in the JSON as `hidden: true` so the site can filter)
 $HiddenRepoNames = @(
-  "bananz0",
+  "old-jekyll-website",
   "p2",
   "p3",
   "p4",
