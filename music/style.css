@@ -3,6 +3,31 @@
    Integrated with main site theme
    ========================================== */
 
+/* Groq Brand Font: Montserrat */
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/Montserrat/Montserrat-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/Montserrat/Montserrat-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/Montserrat/Montserrat-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --card-width-desktop: 480px;
 }
@@ -716,18 +741,37 @@
 .ai-summary-footer {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-top: var(--space-md);
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-family: 'Montserrat', sans-serif; /* Brand font for Groq attribution */
+    font-size: 0.7rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+}
+
+.ai-summary-powered {
+    /* Slight fade for the "Powered by" text to prioritize trademark */
+    opacity: 0.8;
 }
 
 .groq-logo {
-    width: 56px;
-    height: 18px;
-    opacity: 0.75;
+    display: block;
+    height: 14px; /* Scaled to look elegant with Montserrat */
+    width: auto;
+    transition: filter 0.5s ease;
+    will-change: filter;
+}
+
+/* Use data attribute from app.js to switch logos based on card backdrop brightness */
+.ai-summary-card[data-light-mode="true"] .groq-logo {
+    content: url('../assets/icons/groq-black.svg');
+}
+
+.ai-summary-card[data-light-mode="false"] .groq-logo {
+    content: url('../assets/icons/groq-white.svg');
 }
 
 @media (max-width: 900px) {

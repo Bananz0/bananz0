@@ -221,6 +221,7 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
             role: 'system',
             content: `You are the consciousness of a witty, slightly dark, and musically-obsessed entity named "glen". 
 You are observing glen's current music intake and providing a sharp, era-aware, and effortful summary.
+Track #1 in the list provided is the most recent (now playing or just finished).
 
 PERSONALITY TRAITS:
 - Mysterious and slightly dark if the music is moody/indie (e.g., Lithe).
@@ -232,23 +233,24 @@ PERSONALITY TRAITS:
 - Use regional/genre context significantly (Spanish, French, Classical, etc.).
 - Avoid basic puns like "vibe-ing" or "energy levels". Go for deeper cuts.
 - If the vibes are sad, say "glen was sadge :( give him a hug".
-- If vibes are happy, say "glen is feeling whimsical and jovial" and maybe suggest he asks a favor.
+- If vibes are happy, say "glen is feeling whimsical and jovial".
 
 CONSTRAINTS:
 - Output ONE sentence in lower-case.
 - 12-25 words.
 - No quotes, no hashtags, no preface, no emojis (except the specific sadge one if needed).
 - Refer to "glen" in the third person.
-- Focus on the *soul* of the music, not the metadata tags but get important data from them.
+- Focus on the *soul* of the music, not the metadata tags.
 - Use 1-2 track or artist names naturally in the critique.`
         },
         {
             role: 'user',
             content: `mode: ${mode}
+time: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
 era: ${dominantEra}
 mood: ${moodClass.label} (${moodClass.description})
 audio_stats: valence=${audioStats?.valence?.toFixed(2) ?? 'n/a'}, energy=${audioStats?.energy?.toFixed(2) ?? 'n/a'}, dance=${audioStats?.danceability?.toFixed(2) ?? 'n/a'}
-context:\n${trackListForPrompt}\n
+tracks (newest first):\n${trackListForPrompt}\n
 roast/summarize glen:`
         }
     ];
@@ -278,7 +280,7 @@ roast/summarize glen:`
         const cacheResponse = new Response(cacheStream, {
             headers: {
                 'Content-Type': 'text/event-stream; charset=utf-8',
-                'Cache-Control': 'public, max-age=604800', // Cache for 7 days
+                'Cache-Control': 'public, max-age=14400', // Cache for 4 hours
                 'X-Model-Used': groqResult.model,
             }
         });
@@ -457,7 +459,14 @@ async function handleLastFm(url, env, corsHeaders) {
     const response = await fetch(lastfmUrl);
     const data = await response.json();
 
-    return new Response(JSON.stringify(data), { headers: corsHeaders });
+    return new Response(JSON.stringify(data), {
+        headers: {
+            ...corsHeaders,
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+        }
+    });
 }
 
 // ==========================================

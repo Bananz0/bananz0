@@ -324,7 +324,7 @@ async function fetchLastFmNowPlaying() {
             // FIX: If colors are missing (e.g. first load failed), retry extraction
             if (!state.currentColors && trackInfo.image) {
                 extractColors(trackInfo.image).then(colors => {
-                    if (colors) applyDynamicColors(colors);
+                    applyDynamicColors(colors || getDefaultColors());
                 });
             }
 
@@ -392,7 +392,7 @@ async function fetchLastFmNowPlaying() {
                                 // Re-extract colors for the new high-res image
                                 if (delayedData.albumImage) {
                                     extractColors(delayedData.albumImage).then(colors => {
-                                        if (colors) applyDynamicColors(colors);
+                                        applyDynamicColors(colors || getDefaultColors());
                                     });
                                 }
 
@@ -588,8 +588,8 @@ async function fetchLastFmRecentTracks(limit) {
 }
 
 function selectActiveTracks(tracks) {
-    const filtered = tracks.filter(track => track?.['@attr']?.nowplaying !== 'true');
-    return filtered.slice(0, CONFIG.aiSummary.activeLimit);
+    // Include the "now playing" track (index 0) so the summary reflects the immediate state
+    return tracks.slice(0, CONFIG.aiSummary.activeLimit);
 }
 
 function selectSessionTracks(tracks) {
@@ -794,8 +794,9 @@ async function updateAiSummary() {
     setAiSummaryLoading(true);
 
     try {
-        const chronologicalTracks = [...formattedTracks].reverse();
-        await streamAiSummary(chronologicalTracks, isPlaying ? 'active' : 'session');
+        // Send newest tracks first (Track #1 = Now Playing/Most Recent)
+        // The worker will slice the top 12, so they must be the most recent.
+        await streamAiSummary(formattedTracks, isPlaying ? 'active' : 'session');
     } catch (error) {
         console.warn('AI summary failed:', error);
         setAiSummaryMessage(getRandomAiError());
@@ -948,9 +949,7 @@ function updateNowPlayingCard(track, isPlaying) {
         // Extract colors from album art for dynamic theming
         if (track.image) {
             extractColors(track.image).then(colors => {
-                if (colors) {
-                    applyDynamicColors(colors);
-                }
+                applyDynamicColors(colors || getDefaultColors());
             });
         }
     } else {
@@ -1024,7 +1023,7 @@ function updateNowPlayingCard(track, isPlaying) {
 
                         // Also update dynamic colors for high-res image
                         extractColors(spotifyData.albumImage).then(colors => {
-                            if (colors) applyDynamicColors(colors);
+                            applyDynamicColors(colors || getDefaultColors());
                         });
                     }
 
@@ -1105,6 +1104,17 @@ function updateRecentTracks() {
 // ==========================================
 // Color Extraction & Dynamic Theming
 // ==========================================
+function getDefaultColors() {
+    return {
+        primary: 'rgb(245, 158, 11)',
+        secondary: 'rgb(6, 182, 212)',
+        accent: 'rgb(245, 158, 11)',
+        primaryRaw: { r: 245, g: 158, b: 11 },
+        secondaryRaw: { r: 6, g: 182, b: 212 },
+        isDark: true,
+    };
+}
+
 async function extractColors(imageUrl) {
     return new Promise((resolve) => {
         const img = new Image();
@@ -1165,9 +1175,9 @@ function extractDominantColors(imageData) {
     // Sort by frequency and get top colors
     const sorted = Object.values(colorCounts)
         .filter(c => {
-            // Filter out very dark or very light colors
+            // Filter out extremely dark or pure white colors
             const brightness = (c.r + c.g + c.b) / 3;
-            return brightness > 30 && brightness < 220;
+            return brightness > 10 && brightness < 245;
         })
         .sort((a, b) => b.count - a.count);
 
@@ -1216,24 +1226,43 @@ function applyDynamicColors(colors) {
         elements.immersiveBg.classList.add('loaded');
     }
 
+    // BOOST COLORS for Glow: Ensure highlight is visible even with dark album arts
+    const boostColor = (c, minBrightness = 60) => {
+        const brightness = (c.r + c.g + c.b) / 3;
+        if (brightness < minBrightness) {
+            const factor = minBrightness / Math.max(brightness, 1);
+            return {
+                r: Math.min(255, Math.round(c.r * factor)),
+                g: Math.min(255, Math.round(c.g * factor)),
+                b: Math.min(255, Math.round(c.b * factor)),
+            };
+        }
+        return c;
+    };
+
+    const boostedPrimary = boostColor(primaryRaw, 80); // Higher boost for borders
+    const boostedGlow = boostColor(primaryRaw, 60);
+
     // Calculate blended color for a richer glow effect
     const blendedR = Math.round((primaryRaw.r + secondaryRaw.r) / 2);
     const blendedG = Math.round((primaryRaw.g + secondaryRaw.g) / 2);
     const blendedB = Math.round((primaryRaw.b + secondaryRaw.b) / 2);
+    
+    const boostedBlended = boostColor({ r: blendedR, g: blendedG, b: blendedB }, 70);
 
     // Apply accent colors to card with enhanced glow
     const cards = [elements.card, elements.recentTracksCard, elements.aiSummaryCard].filter(Boolean);
-    const borderColor = `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.3)`;
-    const glowColor = `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.3)`;
+    const borderColor = `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.35)`;
+    const glowColor = `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.35)`;
 
     cards.forEach(card => {
         card.style.setProperty('--dynamic-primary', primary);
         card.style.setProperty('--dynamic-secondary', secondary);
         card.style.setProperty('--dynamic-glow-color', glowColor);
         card.style.setProperty('--dynamic-border-color', borderColor);
-        card.style.setProperty('--dynamic-border-color-bright', `rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.6)`);
-        card.style.setProperty('--dynamic-scrollbar-color', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.5)`);
-        card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${blendedR}, ${blendedG}, ${blendedB}, 0.8)`);
+        card.style.setProperty('--dynamic-border-color-bright', `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.6)`);
+        card.style.setProperty('--dynamic-scrollbar-color', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.5)`);
+        card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.8)`);
         card.style.borderColor = borderColor;
     });
 
