@@ -7,11 +7,11 @@
     "language": "PowerShell",
     "fork": false,
     "hidden": false,
-    "stargazers_count": 461,
+    "stargazers_count": 463,
     "forks_count": 37,
     "open_issues_count": 8,
-    "download_count": 10265,
-    "score": 81265,
+    "download_count": 10290,
+    "score": 81590,
     "pushed_at": "2026-01-10T05:23:02Z",
     "created_at": "2023-11-05T09:51:09Z",
     "topics": [
@@ -118,16 +118,16 @@
     "name": "bananz0",
     "full_name": "Bananz0/bananz0",
     "html_url": "https://github.com/Bananz0/bananz0",
-    "description": "The technical backbone of glenmuthoka.com. Featuring a unified Cloudflare Worker proxy, real-time music polling, and 'Glen'—a Groq-powered AI consciousness for musical roasts.",
+    "description": "Personal Portfolio and CSS Playground where I freely play with CI/CD and Dependabot and Cloudflare using DNS and Workers",
     "language": "HTML",
     "fork": false,
     "hidden": false,
     "stargazers_count": 1,
     "forks_count": 0,
-    "open_issues_count": 2,
+    "open_issues_count": 0,
     "download_count": 0,
     "score": 150,
-    "pushed_at": "2026-02-11T01:28:19Z",
+    "pushed_at": "2026-02-11T20:56:30Z",
     "created_at": "2025-11-13T00:26:20Z",
     "topics": []
   },
@@ -163,6 +163,23 @@
     "score": 25,
     "pushed_at": "2025-10-06T17:28:35Z",
     "created_at": "2024-04-19T21:44:32Z",
+    "topics": []
+  },
+  {
+    "name": "GramSMC",
+    "full_name": "Bananz0/GramSMC",
+    "html_url": "https://github.com/Bananz0/GramSMC",
+    "description": "A VirtualSMC plugin provides native macOS support for the LG Gram 13Z990-R",
+    "language": "ASL",
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 2,
+    "score": 2,
+    "pushed_at": "2026-02-11T19:42:31Z",
+    "created_at": "2026-01-01T03:18:44Z",
     "topics": []
   },
   {
@@ -305,28 +322,6 @@
     "topics": []
   },
   {
-    "name": "ControlCraft",
-    "full_name": "Bananz0/ControlCraft",
-    "html_url": "https://github.com/Bananz0/ControlCraft",
-    "description": "ControlCraft: Your Interactive Control Systems Toolbox in MATLAB",
-    "language": "MATLAB",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2024-12-01T01:44:50Z",
-    "created_at": "2024-11-30T23:51:56Z",
-    "topics": [
-      "control",
-      "control-system",
-      "control-systems",
-      "control-systems-engineering"
-    ]
-  },
-  {
     "name": "SmartSync-Lighting",
     "full_name": "Bananz0/SmartSync-Lighting",
     "html_url": "https://github.com/Bananz0/SmartSync-Lighting",
@@ -341,6 +336,23 @@
     "score": 0,
     "pushed_at": "2024-12-01T18:39:20Z",
     "created_at": "2024-11-25T09:32:44Z",
+    "topics": []
+  },
+  {
+    "name": "mag-air",
+    "full_name": "Bananz0/mag-air",
+    "html_url": "https://github.com/Bananz0/mag-air",
+    "description": "website",
+    "language": null,
+    "fork": false,
+    "hidden": true,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 0,
+    "pushed_at": "2025-02-27T16:00:42Z",
+    "created_at": "2025-02-27T16:00:42Z",
     "topics": []
   },
   {
@@ -384,23 +396,6 @@
     "topics": []
   },
   {
-    "name": "Gram-13Z990-Hackintosh",
-    "full_name": "Bananz0/Gram-13Z990-Hackintosh",
-    "html_url": "https://github.com/Bananz0/Gram-13Z990-Hackintosh",
-    "description": "Hackintosh for the LG Gram 13 (13Z990)",
-    "language": null,
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2026-02-08T04:27:29Z",
-    "created_at": "2026-01-01T02:59:00Z",
-    "topics": []
-  },
-  {
     "name": "DisplayAssistant",
     "full_name": "Bananz0/DisplayAssistant",
     "html_url": "https://github.com/Bananz0/DisplayAssistant",
@@ -418,11 +413,11 @@
     "topics": []
   },
   {
-    "name": "GramSMC",
-    "full_name": "Bananz0/GramSMC",
-    "html_url": "https://github.com/Bananz0/GramSMC",
-    "description": "A VirtualSMC plugin provides native macOS support for the LG Gram 13Z990-R",
-    "language": "ASL",
+    "name": "Gram-13Z990-Hackintosh",
+    "full_name": "Bananz0/Gram-13Z990-Hackintosh",
+    "html_url": "https://github.com/Bananz0/Gram-13Z990-Hackintosh",
+    "description": "Hackintosh for the LG Gram 13 (13Z990)",
+    "language": null,
     "fork": false,
     "hidden": false,
     "stargazers_count": 0,
@@ -430,8 +425,8 @@
     "open_issues_count": 0,
     "download_count": 0,
     "score": 0,
-    "pushed_at": "2026-02-08T02:32:47Z",
-    "created_at": "2026-01-01T03:18:44Z",
+    "pushed_at": "2026-02-08T04:27:29Z",
+    "created_at": "2026-01-01T02:59:00Z",
     "topics": []
   },
   {
@@ -441,7 +436,7 @@
     "description": null,
     "language": "HTML",
     "fork": false,
-    "hidden": false,
+    "hidden": true,
     "stargazers_count": 0,
     "forks_count": 0,
     "open_issues_count": 0,
@@ -469,21 +464,26 @@
     "topics": []
   },
   {
-    "name": "mag-air",
-    "full_name": "Bananz0/mag-air",
-    "html_url": "https://github.com/Bananz0/mag-air",
-    "description": "website",
-    "language": null,
+    "name": "ControlCraft",
+    "full_name": "Bananz0/ControlCraft",
+    "html_url": "https://github.com/Bananz0/ControlCraft",
+    "description": "ControlCraft: Your Interactive Control Systems Toolbox in MATLAB",
+    "language": "MATLAB",
     "fork": false,
-    "hidden": true,
+    "hidden": false,
     "stargazers_count": 0,
     "forks_count": 0,
     "open_issues_count": 0,
     "download_count": 0,
     "score": 0,
-    "pushed_at": "2025-02-27T16:00:42Z",
-    "created_at": "2025-02-27T16:00:42Z",
-    "topics": []
+    "pushed_at": "2024-12-01T01:44:50Z",
+    "created_at": "2024-11-30T23:51:56Z",
+    "topics": [
+      "control",
+      "control-system",
+      "control-systems",
+      "control-systems-engineering"
+    ]
   },
   {
     "name": "PictorUI",
