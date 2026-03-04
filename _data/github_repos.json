@@ -7,11 +7,11 @@
     "language": "PowerShell",
     "fork": false,
     "hidden": false,
-    "stargazers_count": 490,
+    "stargazers_count": 492,
     "forks_count": 38,
     "open_issues_count": 9,
-    "download_count": 10738,
-    "score": 86138,
+    "download_count": 10755,
+    "score": 86455,
     "pushed_at": "2026-02-15T16:02:12Z",
     "created_at": "2023-11-05T09:51:09Z",
     "topics": [
@@ -115,6 +115,23 @@
     "topics": []
   },
   {
+    "name": "Somnus",
+    "full_name": "Bananz0/Somnus",
+    "html_url": "https://github.com/Bananz0/Somnus",
+    "description": "Somnus: Sleep cycle optimized wake-up companion. Leverages Health Connect API for smart wake-up recommendations",
+    "language": "Kotlin",
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 1,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 150,
+    "pushed_at": "2026-03-03T19:13:23Z",
+    "created_at": "2025-01-13T01:08:28Z",
+    "topics": []
+  },
+  {
     "name": "bananz0",
     "full_name": "Bananz0/bananz0",
     "html_url": "https://github.com/Bananz0/bananz0",
@@ -127,25 +144,8 @@
     "open_issues_count": 0,
     "download_count": 0,
     "score": 150,
-    "pushed_at": "2026-03-02T02:57:30Z",
+    "pushed_at": "2026-03-03T02:59:17Z",
     "created_at": "2025-11-13T00:26:20Z",
-    "topics": []
-  },
-  {
-    "name": "Somnus",
-    "full_name": "Bananz0/Somnus",
-    "html_url": "https://github.com/Bananz0/Somnus",
-    "description": "Somnus: Sleep cycle optimized wake-up companion. Leverages Health Connect API for smart wake-up recommendations",
-    "language": "Kotlin",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 1,
-    "forks_count": 0,
-    "open_issues_count": 1,
-    "download_count": 0,
-    "score": 150,
-    "pushed_at": "2026-01-11T04:01:46Z",
-    "created_at": "2025-01-13T01:08:28Z",
     "topics": []
   },
   {
@@ -339,6 +339,23 @@
     "topics": []
   },
   {
+    "name": "Gram-13Z990-Hackintosh",
+    "full_name": "Bananz0/Gram-13Z990-Hackintosh",
+    "html_url": "https://github.com/Bananz0/Gram-13Z990-Hackintosh",
+    "description": "Hackintosh for the LG Gram 13 (13Z990)",
+    "language": null,
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 0,
+    "pushed_at": "2026-02-08T04:27:29Z",
+    "created_at": "2026-01-01T02:59:00Z",
+    "topics": []
+  },
+  {
     "name": "mag-air",
     "full_name": "Bananz0/mag-air",
     "html_url": "https://github.com/Bananz0/mag-air",
@@ -410,23 +427,6 @@
     "score": 0,
     "pushed_at": "2025-10-05T10:58:58Z",
     "created_at": "2025-10-05T10:58:58Z",
-    "topics": []
-  },
-  {
-    "name": "Gram-13Z990-Hackintosh",
-    "full_name": "Bananz0/Gram-13Z990-Hackintosh",
-    "html_url": "https://github.com/Bananz0/Gram-13Z990-Hackintosh",
-    "description": "Hackintosh for the LG Gram 13 (13Z990)",
-    "language": null,
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2026-02-08T04:27:29Z",
-    "created_at": "2026-01-01T02:59:00Z",
     "topics": []
   },
   {
