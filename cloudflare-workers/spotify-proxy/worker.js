@@ -341,8 +341,13 @@ async function callGroqStream(messages, env) {
     };
 }
 
-async function resolveTrackIds(token, tracks) {
-    const results = await Promise.all(tracks.map(track => searchTrackId(token, track.name, track.artist)));
+async function resolveTrackIds(token, tracks, chunkSize = 5) {
+    const results = [];
+    for (let i = 0; i < tracks.length; i += chunkSize) {
+        const chunk = tracks.slice(i, i + chunkSize);
+        const chunkResults = await Promise.all(chunk.map(track => searchTrackId(token, track.name, track.artist)));
+        results.push(...chunkResults);
+    }
     return results.filter(Boolean); // Returns array of { id, year }
 }
 
@@ -613,24 +618,24 @@ async function searchArtist(token, artistName) {
 async function searchTrack(token, trackName, artistName) {
     try {
         const query = `track:${trackName} artist:${artistName}`;
-        const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
-            {
-                headers: { 'Authorization': `Bearer ${token}` },
-            }
-        );
 
-        if (!response.ok) {
-            return { albumImage: null, artistImage: null };
+        // Fetch track and artist data concurrently
+        const [trackResponse, artistResult] = await Promise.all([
+            fetch(
+                `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            ),
+            searchArtist(token, artistName),
+        ]);
+
+        if (!trackResponse.ok) {
+            return { albumImage: null, artistImage: artistResult.artistImage };
         }
 
-        const data = await response.json();
+        const data = await trackResponse.json();
         const track = data.tracks?.items?.[0];
 
         if (track) {
-            // Also fetch artist image
-            const artistResult = await searchArtist(token, artistName);
-
             return {
                 albumImage: track.album?.images?.[0]?.url || null,
                 artistImage: artistResult.artistImage,
@@ -642,7 +647,7 @@ async function searchTrack(token, trackName, artistName) {
             };
         }
 
-        return { albumImage: null, artistImage: null };
+        return { albumImage: null, artistImage: artistResult.artistImage };
     } catch (error) {
         console.error('Track search error:', error);
         return { albumImage: null, artistImage: null };
