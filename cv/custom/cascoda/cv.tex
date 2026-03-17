@@ -1,0 +1,97 @@
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\renewcommand{\sfdefault}{lmss} 
+\usepackage[scale=0.85]{geometry}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\setlist{noitemsep, leftmargin=*}
+
+% Personal Information
+\name{Glen}{Muthoka Mutinda}
+\phone{+44 7341 625286}
+\email{theglenmuthoka@gmail.com}
+\social[linkedin]{glenmuthoka}
+\social[github]{Bananz0}
+
+\begin{document}
+
+\makecvtitle
+
+\section{Professional Summary}
+Final-year Electrical \& Electronic Engineering student at the University of Southampton with a strong focus on embedded hardware design, integrated circuits, and low-power systems. Demonstrated expertise in the full PCB design lifecycle, from schematic capture to layout, using tools like KiCad, EAGLE, and Fusion 360. Lead designer for a TSMC 65nm IC tape-out and developer of real-time embedded monitoring platforms. Passionate about IoT connectivity and communication systems, with a proven ability to solve complex hardware-software integration challenges in collaborative environments.
+
+\section{Education}
+\cventry{2023--2026}{BEng Electrical \& Electronic Engineering (Expected First Class Honours)}{University of Southampton}{Southampton, UK}{}{
+\textbf{Key Modules:} Digital Systems Design, Integrated Circuit Design, Control Systems, Embedded Systems, Network Security, Signal Processing, Electronic Circuits\\
+\textbf{Second Year Project:} TSMC 65nm Ring Oscillator for Real-Time Clock IC (Team Lead)\\
+\textbf{Final Year Project:} AI-Driven Optical Authentication Framework using Optical PUFs (Lead Researcher \& Developer)}
+
+\cventry{2022--2023}{Undergraduate Foundation Programme, Engineering Pathway (Distinction)}{ONCAMPUS Global}{Southampton, UK}{}{}
+
+\section{Technical Projects}
+
+\subsection{Hardware Design \& Embedded Systems}
+
+\cvitem{TSMC 65nm Real-Time Clock Design: Ring Oscillator IC Fabrication Flow}{Sep 2023--Jun 2024\\
+\textbf{Role:} Team Lead (6-member team) | \textbf{Tools:} S-Edit, T-Spice, L-Edit, Calibre DRC/LVS\\
+Led complete integrated circuit design from RTL to GDSII tape-out for TSMC 65nm process node. Designed and implemented a Ring Oscillator circuit for a real-time clock chip. Performed extensive SPICE simulations to verify oscillation frequency stability and timing constraints. Conducted full physical verification (DRC/LVS) and successfully submitted GDSII files for fabrication. Achieved 15\% area reduction through custom cell optimization.}
+
+\cvitem{WattsApp: Embedded Smart System Management Platform}{Jan 2025--Mar 2025\\
+\textbf{MCU:} AVR ATMega644p | \textbf{Stack:} Embedded C, InfluxDB, Grafana | \textbf{Protocols:} UART, I2C\\
+Designed a comprehensive embedded monitoring platform for real-time telemetry. Developed bare-metal C firmware for sensor polling and data acquisition. Managed hardware-software integration for temperature (I2C) and voltage/current (ADC) monitoring. Implemented interrupt-driven architecture to ensure sub-millisecond response times. Successfully demonstrated system integration in D2 IC Design coursework.\\
+\faGithub~\href{https://github.com/Bananz0/WattsApp}{github.com/Bananz0/WattsApp}}
+
+\cvitem{16-Stage FIR Notch Filter for Real-Time Audio on FPGA}{Nov 2024--Dec 2024\\
+\textbf{Platform:} Altera Cyclone V (DE1-SoC) | \textbf{Language:} SystemVerilog | \textbf{Tools:} Quartus Prime, ModelSim\\
+Designed a parameterized FIR digital filter achieving 19-cycle latency (950ns) for real-time stereo audio processing. Developed a 4-state FSM controller and custom MATLAB scripts for coefficient generation. Synthesized the design using 2,847 logic elements, demonstrating efficient hardware resource utilization.\\
+\faGithub~\href{https://github.com/Bananz0/16-Stage-FIR-Notch-Filter-for-Real-Time-Audio-Processing-on-FPGA}{github.com/Bananz0/16-Stage-FIR-Notch-Filter}}
+
+\cvitem{PiBoard: Real-Time Collaborative Whiteboard}{Apr 2024--May 2024\\
+\textbf{Framework:} Qt (C++) | \textbf{Platform:} Raspberry Pi | \textbf{Protocol:} Custom Serial over GPIO\\
+Developed a collaborative hardware-software solution using custom serial communication protocols over Raspberry Pi GPIO pins. Implemented efficient data serialization for real-time synchronization between multiple devices, achieving <100ms update latency.\\
+\faGithub~\href{https://github.com/Bananz0/PiBoard}{github.com/Bananz0/PiBoard}}
+
+\cvitem{GramSMC: macOS Hardware Control \& EC Reverse Engineering}{2026\\
+\textbf{Tools:} ACPI/ASL, C++, DriverKit, macOS Kernel SDK\\
+Reverse-engineered embedded controller (EC) protocols to enable native hardware control on macOS. Developed a DriverKit-based kernel extension for battery management and thermal monitoring. Engineered custom ACPI tables (SSDT) for hardware mapping, demonstrating deep understanding of low-level system architecture.\\
+\faGithub~\href{https://github.com/Bananz0/GramSMC}{github.com/Bananz0/GramSMC}}
+
+\section{Additional Professional Experience}
+\cventry{Sep 2023--Jun 2025}{Junior Software Engineer}{ARTEMIS Small Sat-1 Lunar CubeSat Project}{University of Southampton}{}{
+\begin{itemize}
+    \item Optimized flight software in C/C++ for a lunar mission CubeSat, reducing system latency by 6\%.
+    \item Collaborated with a multidisciplinary team of 8 engineers to deliver space-grade software meeting strict timing and safety requirements (MISRA C compliance).
+    \item Implemented real-time telemetry processing systems for ground station communication.
+\end{itemize}}
+
+\section{Technical Skills}
+
+\subsection{Hardware Design \& EDA Tools}
+\cvitem{PCB Design}{\textbf{KiCad, Autodesk EAGLE, Fusion 360}, Altium Designer (basic)}
+\cvitem{IC Design}{TSMC 65nm Process, Cadence S-Edit/L-Edit/T-Spice, Mentor Calibre (DRC/LVS)}
+\cvitem{Simulation}{LTSpice, NI Multisim, MATLAB Simulink/Simscape, ModelSim}
+\cvitem{Digital/FPGA}{Altera Quartus Prime, Xilinx Vivado, SystemVerilog, VHDL}
+
+\subsection{Embedded Systems \& Languages}
+\cvitem{Languages}{\textbf{SystemVerilog, C/C++ (Embedded)}, Python, MATLAB, PowerShell}
+\cvitem{Microcontrollers}{AVR (ATMega), ESP32, Raspberry Pi, STM32 (basic), ARM Cortex-M}
+\cvitem{Protocols}{\textbf{I2C, SPI, UART, MQTT, TCP/IP Stack}, CAN bus (understanding)}
+
+\section{Key Soft Skills}
+\cvitem{Communication}{Experienced in collaborating with Southampton ECS peers and senior engineers in the ARTEMIS project; clear technical documentation and presentation skills.}
+\cvitem{Problem Solving}{Proven track record in debugging complex hardware/firmware issues (e.g., EC reverse engineering, FPGA timing closure).}
+\cvitem{Organization}{Managed team lead responsibilities for IC design projects; adept at planning and executing multi-stage engineering workflows.}
+
+\section{Achievements \& Memberships}
+\cvitem{2024--Present}{Member, Institute of Electrical and Electronics Engineers (IEEE)}
+\cvitem{2024}{Represented university at Engineering Society technical demonstrations}
+\cvitem{GitHub}{Maintainer of 69 repositories, including community-adopted tools like Galaxy Book Enabler (10k+ downloads).}
+
+\section{Additional Information}
+\cvitem{Interests}{Amateur radio (studying for Foundation License), IoT security research}
+\cvitem{Right to Work}{UK Student Visa (valid until 2026), eligible for Graduate Route visa}
+
+\end{document}

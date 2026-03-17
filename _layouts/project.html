@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }} | Glen Muthoka</title>
     <meta name="description" content="{{ page.description }}">
-    
+
     <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}">
 
@@ -16,6 +17,7 @@
     <link rel="stylesheet" href="{{ '/assets/css/project.css' | relative_url }}?v={{ asset_version }}">
     <link rel="stylesheet" href="{{ '/assets/css/modal.css' | relative_url }}?v={{ asset_version }}">
 </head>
+
 <body>
     <div class="grid-bg"></div>
     <canvas id="particles"></canvas>
@@ -85,7 +87,7 @@
                         <span class="desktop-text">PROJECTS</span>
                         <span class="mobile-text">WORK</span>
                     </a>
-                    <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cta-btn primary"
+                    <a href="{{ '/cv/skilled/main/mega_cv.pdf' | relative_url }}" class="cta-btn primary"
                         download="Glen_Muthoka_CV.pdf" data-spring="smooth">
                         <span class="desktop-text">DOWNLOAD CV</span>
                         <span class="mobile-text">CV</span>
@@ -163,13 +165,13 @@
                     <span class="separator">/</span>
                     <span class="current">{{ page.title }}</span>
                 </div>
-                
+
                 <div class="project-title-section fade-in">
                     <span class="project-badge-large">{{ page.category }}</span>
                     <h1 class="glitch" data-text="{{ page.title }}">{{ page.title }}</h1>
                     <p class="project-tagline">{{ page.tagline }}</p>
                 </div>
-                
+
                 <div class="project-meta fade-in">
                     <div class="meta-item">
                         <span class="meta-label">TECH STACK</span>
@@ -208,7 +210,7 @@
                     <div class="main-content">
                         {{ content }}
                     </div>
-                    
+
                     <aside class="project-sidebar">
                         {% if page.quick_facts %}
                         <div class="sidebar-card fade-in">
@@ -223,7 +225,7 @@
                             </ul>
                         </div>
                         {% endif %}
-                        
+
                         {% if page.links %}
                         <div class="sidebar-card fade-in">
                             <h3>LINKS</h3>
@@ -287,4 +289,5 @@
     <script src="{{ '/assets/js/modal.js' | relative_url }}?v={{ asset_version }}"></script>
     <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ asset_version }}" defer></script>
 </body>
+
 </html>

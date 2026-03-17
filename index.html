@@ -174,12 +174,12 @@ title: Home
                 {% assign gbe_preview = site.data.project_previews[gbe_repo.name] %}
                 <!-- Galaxy Book Enabler -->
                 <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="{{ gbe_repo.html_url }}" data-project-link-target="_blank"
-                    {% if gbe_preview %}data-modal-images="{{ gbe_preview.images | join: ',' }}"
+                    data-project-link="{{ gbe_repo.html_url }}" data-project-link-target="_blank" {% if gbe_preview
+                    %}data-modal-images="{{ gbe_preview.images | join: ',' }}"
                     data-modal-captions="{{ gbe_preview.captions | join: '|' }}"
-                    data-modal-title="{{ gbe_preview.title | default: gbe_repo.name }}"
-                    {% if gbe_preview.iframe %}data-modal-iframe="{{ gbe_preview.iframe }}"{% endif %}
-                    {% if gbe_preview.iframe_caption %}data-modal-iframe-caption="{{ gbe_preview.iframe_caption }}"{% endif %}{% endif %}>
+                    data-modal-title="{{ gbe_preview.title | default: gbe_repo.name }}" {% if gbe_preview.iframe
+                    %}data-modal-iframe="{{ gbe_preview.iframe }}" {% endif %} {% if gbe_preview.iframe_caption
+                    %}data-modal-iframe-caption="{{ gbe_preview.iframe_caption }}" {% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">WINDOWS</span>
                         <div class="project-meta">
@@ -218,12 +218,12 @@ title: Home
                 {% assign egpu_preview = site.data.project_previews[egpu_repo.name] %}
                 <!-- eGPU Auto-Enabler -->
                 <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="{{ egpu_repo.html_url }}" data-project-link-target="_blank"
-                    {% if egpu_preview %}data-modal-images="{{ egpu_preview.images | join: ',' }}"
+                    data-project-link="{{ egpu_repo.html_url }}" data-project-link-target="_blank" {% if egpu_preview
+                    %}data-modal-images="{{ egpu_preview.images | join: ',' }}"
                     data-modal-captions="{{ egpu_preview.captions | join: '|' }}"
-                    data-modal-title="{{ egpu_preview.title | default: egpu_repo.name }}"
-                    {% if egpu_preview.iframe %}data-modal-iframe="{{ egpu_preview.iframe }}"{% endif %}
-                    {% if egpu_preview.iframe_caption %}data-modal-iframe-caption="{{ egpu_preview.iframe_caption }}"{% endif %}{% endif %}>
+                    data-modal-title="{{ egpu_preview.title | default: egpu_repo.name }}" {% if egpu_preview.iframe
+                    %}data-modal-iframe="{{ egpu_preview.iframe }}" {% endif %} {% if egpu_preview.iframe_caption
+                    %}data-modal-iframe-caption="{{ egpu_preview.iframe_caption }}" {% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">eGPU</span>
                         <div class="project-meta">
@@ -261,12 +261,13 @@ title: Home
                 {% assign gramsmc_preview = site.data.project_previews[gramsmc_repo.name] %}
                 <!-- GramSMC + GramControlCenter -->
                 <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="{{ gramsmc_repo.html_url }}" data-project-link-target="_blank"
-                    {% if gramsmc_preview %}data-modal-images="{{ gramsmc_preview.images | join: ',' }}"
+                    data-project-link="{{ gramsmc_repo.html_url }}" data-project-link-target="_blank" {% if
+                    gramsmc_preview %}data-modal-images="{{ gramsmc_preview.images | join: ',' }}"
                     data-modal-captions="{{ gramsmc_preview.captions | join: '|' }}"
-                    data-modal-title="{{ gramsmc_preview.title | default: gramsmc_repo.name }}"
-                    {% if gramsmc_preview.iframe %}data-modal-iframe="{{ gramsmc_preview.iframe }}"{% endif %}
-                    {% if gramsmc_preview.iframe_caption %}data-modal-iframe-caption="{{ gramsmc_preview.iframe_caption }}"{% endif %}{% endif %}>
+                    data-modal-title="{{ gramsmc_preview.title | default: gramsmc_repo.name }}" {% if
+                    gramsmc_preview.iframe %}data-modal-iframe="{{ gramsmc_preview.iframe }}" {% endif %} {% if
+                    gramsmc_preview.iframe_caption %}data-modal-iframe-caption="{{ gramsmc_preview.iframe_caption }}" {%
+                    endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">HACKINTOSH</span>
                         <div class="project-meta">
@@ -473,13 +474,15 @@ title: Home
                         </div>
                     </div>
                     <h3>Personal Portfolio & Technical Playground</h3>
-                    <p>A high-performance personal portfolio and CSS playground engineered as a testing ground for 
-                        <strong>CI/CD</strong>, <strong>Dependabot</strong> automation, and <strong>Cloudflare</strong> 
-                        infrastructure. Built with a unified <strong>DNS and Workers-based</strong> backend, this site 
-                        serves as both a creative showcase and a technical experiment. Integrated 
-                        <strong>Groq Llama 3</strong> models via Cloudflare Workers to create "Glen"—an AI personality 
-                        that analyzes real-time listening habits from <strong>Last.fm</strong> and <strong>Spotify</strong> 
-                        APIs, achieving sub-200ms latency for streaming music roasts.</p>
+                    <p>A high-performance personal portfolio and CSS playground engineered as a testing ground for
+                        <strong>CI/CD</strong>, <strong>Dependabot</strong> automation, and <strong>Cloudflare</strong>
+                        infrastructure. Built with a unified <strong>DNS and Workers-based</strong> backend, this site
+                        serves as both a creative showcase and a technical experiment. Integrated
+                        <strong>Groq Llama 3</strong> models via Cloudflare Workers to create "Glen"—an AI personality
+                        that analyzes real-time listening habits from <strong>Last.fm</strong> and
+                        <strong>Spotify</strong>
+                        APIs, achieving sub-200ms latency for streaming music roasts.
+                    </p>
                     <div class="project-stats">
                         <span class="stat"><strong>6K+</strong> Spotify Req (189ms)</span>
                         <span class="stat"><strong>4K+</strong> Last.fm Req (376ms)</span>
@@ -517,13 +520,13 @@ title: Home
             <div class="repo-grid repo-grid-compact">
                 {% for repo in repos_sorted limit: 12 %}
                 {% assign preview = site.data.project_previews[repo.name] %}
-                <div class="project-card-full repo-card-full repo-card-full-compact" data-spring="default" data-bounce="1"
-                    data-project-link="{{ repo.html_url }}" data-project-link-target="_blank"
-                    {% if preview %}data-modal-images="{{ preview.images | join: ',' }}"
+                <div class="project-card-full repo-card-full repo-card-full-compact" data-spring="default"
+                    data-bounce="1" data-project-link="{{ repo.html_url }}" data-project-link-target="_blank" {% if
+                    preview %}data-modal-images="{{ preview.images | join: ',' }}"
                     data-modal-captions="{{ preview.captions | join: '|' }}"
-                    data-modal-title="{{ preview.title | default: repo.name }}"
-                    {% if preview.iframe %}data-modal-iframe="{{ preview.iframe }}"{% endif %}
-                    {% if preview.iframe_caption %}data-modal-iframe-caption="{{ preview.iframe_caption }}"{% endif %}{% endif %}>
+                    data-modal-title="{{ preview.title | default: repo.name }}" {% if preview.iframe
+                    %}data-modal-iframe="{{ preview.iframe }}" {% endif %} {% if preview.iframe_caption
+                    %}data-modal-iframe-caption="{{ preview.iframe_caption }}" {% endif %}{% endif %}>
                     <div class="project-header">
                         <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif
                             %}</span>
@@ -563,7 +566,8 @@ title: Home
                     </div>
 
                     <div class="project-links">
-                        <a class="project-link" href="{{ repo.html_url }}" target="_blank" rel="noopener">VIEW ON GITHUB</a>
+                        <a class="project-link" href="{{ repo.html_url }}" target="_blank" rel="noopener">VIEW ON
+                            GITHUB</a>
                     </div>
                 </div>
                 {% endfor %}
@@ -813,8 +817,8 @@ title: Home
 
         <!-- CV Download -->
         <div class="cv-section fade-in" data-spring="smooth" data-bounce="1">
-            <a href="{{ '/cv/my_mega_cv.pdf' | relative_url }}" class="cv-download-btn" download="Glen_Muthoka_CV.pdf"
-                data-spring="smooth" data-bounce="1">
+            <a href="{{ '/cv/skilled/main/mega_cv.pdf' | relative_url }}" class="cv-download-btn"
+                download="Glen_Muthoka_CV.pdf" data-spring="smooth" data-bounce="1">
                 <span class="cv-icon"></span>
                 <span class="cv-text">
                     <strong>DOWNLOAD CV</strong>
