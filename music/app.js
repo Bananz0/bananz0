@@ -61,6 +61,12 @@ class LRUCache {
     }
 }
 
+function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timeout));
+}
+
 const spotifyRequestLimiter = {
     maxConcurrent: 3,
     active: 0,
@@ -71,7 +77,7 @@ function limitedFetch(url, options) {
     return new Promise((resolve, reject) => {
         const run = () => {
             spotifyRequestLimiter.active += 1;
-            fetch(url, options).then(resolve, reject).finally(() => {
+            fetchWithTimeout(url, options).then(resolve, reject).finally(() => {
                 spotifyRequestLimiter.active -= 1;
                 const next = spotifyRequestLimiter.queue.shift();
                 if (next) next();
@@ -272,7 +278,7 @@ async function fetchLastFmNowPlaying() {
 
     try {
         console.log('Fetching Last.fm data...', url.split('?')[0]);
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url);
         
         if (!response.ok) {
             const errorText = await response.text();
@@ -595,7 +601,7 @@ async function fetchLastFmRecentTracks(limit) {
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url);
         if (!response.ok) throw new Error('Last.fm API error');
 
         const data = await readJsonSafely(response, 'Last.fm summary');
@@ -690,7 +696,7 @@ async function streamAiSummary(tracks, mode) {
     }
 
     // Force a fresh take by sending a dynamic token and explicit personality instructions
-    const response = await fetch(`${CONFIG.aiSummary.workerUrl}?type=summary`, {
+    const response = await fetchWithTimeout(`${CONFIG.aiSummary.workerUrl}?type=summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1439,13 +1445,6 @@ function startPolling() {
 // Initialization & Responsive Morphing
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. GPU Optimization: Disable particle effects on music page
-    const particleCanvas = document.getElementById('particles');
-    if (particleCanvas) {
-        particleCanvas.style.display = 'none';
-        console.log('Particle system disabled for music page (GPU optimization)');
-    }
-
     const gridBg = document.querySelector('.grid-bg');
     if (gridBg) gridBg.style.opacity = '0';
 

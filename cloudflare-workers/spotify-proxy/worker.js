@@ -21,11 +21,16 @@ export default {
         const origin = request.headers.get('Origin');
 
         // Allow localhost for development, and the main domain + its subdomains
+        const ALLOWED_ORIGINS = [
+            'https://glenmuthoka.com',
+            'https://www.glenmuthoka.com',
+            'https://bananz0.github.io',
+        ];
         let allowedOrigin = 'https://glenmuthoka.com';
         if (origin) {
             if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
                 allowedOrigin = origin;
-            } else if (origin.endsWith('glenmuthoka.com') || origin.endsWith('github.io')) {
+            } else if (ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.glenmuthoka.com')) {
                 allowedOrigin = origin;
             }
         }
