@@ -444,6 +444,10 @@
     text-align: center;
     padding-top: var(--space-md);
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
 }
 
 .listening-status {
@@ -455,6 +459,31 @@
 
 .listening-status.now-playing {
     color: var(--spotify-green);
+}
+
+.spotify-code-link {
+    display: block;
+    margin-top: var(--space-xs);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all var(--spring-smooth);
+    max-width: 160px;
+}
+
+.spotify-code-link.has-code {
+    opacity: 0.8;
+    transform: translateY(0);
+}
+
+.spotify-code-link.has-code:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.spotify-code-img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* ==========================================

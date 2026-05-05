@@ -131,6 +131,7 @@ const elements = {
     artistName: document.getElementById('artist-name'),
     albumName: document.getElementById('album-name'),
     listeningStatus: document.getElementById('listening-status'),
+    spotifyCodeLink: document.getElementById('spotify-code-link'),
     playingIndicator: document.getElementById('playing-indicator'),
     recentTracksList: document.getElementById('recent-tracks-list'),
     musicHero: document.querySelector('.music-hero'),
@@ -659,6 +660,10 @@ function formatTracksForSummary(tracks) {
     return tracks.map((track, index) => {
         const artist = track.artist?.['#text'] || track.artist?.name || 'Unknown';
         const isNowPlaying = track?.['@attr']?.nowplaying === 'true';
+        const trackName = track.name || 'Unknown';
+        const trackKey = getTrackCacheKey(trackName, artist);
+        const cached = state.trackCache.get(trackKey);
+        const spotifyUrl = cached?.spotifyUrl || track.spotifyUrl || null;
 
         // Stricter Tiers to prevent LLM "artist anchor" bias:
         // 0-3: Core Narrative (The current vibe)
@@ -679,8 +684,9 @@ function formatTracksForSummary(tracks) {
         }
 
         return {
-            name: track.name || 'Unknown',
+            name: trackName,
             artist: artist,
+            spotifyUrl,
             importance: focus,
             relevance_score: weight,
             hint: ignoreReason ? "Minor historical data" : focus.replace(/_/g, ' '),
@@ -938,8 +944,9 @@ function updateNowPlayingCard(track, isPlaying) {
         if (elements.card) {
             elements.card.style.cursor = 'pointer';
             elements.card.onclick = () => window.open(songLink, '_blank', 'noopener,noreferrer');
-            elements.card.title = `Click to open ${track.name} on your music app`;
+            elements.card.title = `Click to open ${track.name} on Spotify`;
         }
+        updateSpotifyCodeLink(track);
 
         // Album art
         if (track.image) {
@@ -994,6 +1001,7 @@ function updateNowPlayingCard(track, isPlaying) {
                 elements.card.onclick = () => window.open(songLink, '_blank', 'noopener,noreferrer');
                 elements.card.title = `Click to open ${lastTrack.name} on your music app`;
             }
+            updateSpotifyCodeLink(lastTrack);
 
             if (lastTrack.image) {
                 setImageIfChanged(elements.albumArt, lastTrack.image, () => {
@@ -1039,6 +1047,7 @@ function updateNowPlayingCard(track, isPlaying) {
 
                     if (spotifyData.spotifyUrl) {
                         lastTrack.spotifyUrl = spotifyData.spotifyUrl;
+                        updateSpotifyCodeLink(lastTrack);
                     }
 
                     if (spotifyData.albumImage) {
@@ -1086,6 +1095,7 @@ function updateNowPlayingCard(track, isPlaying) {
                 elements.card.style.cursor = 'default';
                 elements.card.title = '';
             }
+            updateSpotifyCodeLink(null);
         }
         elements.listeningStatus.classList.remove('now-playing');
     }
@@ -1114,7 +1124,7 @@ function updateRecentTracks() {
         
         li.innerHTML = `
             <a href="${trackLink}" target="_blank" rel="noopener noreferrer" class="track-link">
-                <img class="track-thumb" src="${track.image || ''}" alt="" onerror="this.style.display='none'">
+                <img class="track-thumb" src="${track.image || ''}" alt="" onerror="this.style.display='none'" style="${track.image ? '' : 'display:none;'}">
                 <div class="track-details">
                     <div class="name">${escapeHtml(track.name)}</div>
                     <div class="artist">${escapeHtml(track.artist)}</div>
@@ -1379,13 +1389,47 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function parseSpotifyEntity(spotifyUrl) {
+    if (!spotifyUrl) return null;
+    const match = String(spotifyUrl).match(/open\.spotify\.com\/(track|album|playlist|artist)\/([a-zA-Z0-9]+)/i);
+    if (!match) return null;
+    return {
+        type: match[1].toLowerCase(),
+        id: match[2],
+    };
+}
+
+function getSpotifyCodeImageUrl(spotifyUrl) {
+    const entity = parseSpotifyEntity(spotifyUrl);
+    if (!entity) return null;
+    const spotifyUri = `spotify:${entity.type}:${entity.id}`;
+    return `https://scannables.scdn.co/uri/plain/png/000000/white/640/${encodeURIComponent(spotifyUri)}`;
+}
+
+function updateSpotifyCodeLink(track) {
+    if (!elements.spotifyCodeLink) return;
+
+    const spotifyUrl = track?.spotifyUrl || null;
+    const spotifyCodeUrl = getSpotifyCodeImageUrl(spotifyUrl);
+    const codeImg = elements.spotifyCodeLink.querySelector('img');
+
+    if (spotifyCodeUrl && codeImg) {
+        codeImg.src = spotifyCodeUrl;
+        elements.spotifyCodeLink.href = spotifyUrl;
+        elements.spotifyCodeLink.style.display = 'block';
+        elements.spotifyCodeLink.classList.add('has-code');
+    } else {
+        elements.spotifyCodeLink.style.display = 'none';
+        elements.spotifyCodeLink.href = '#';
+    }
+}
+
 function getSongLink(track) {
     if (!track || !track.name || !track.artist) return '#';
     
-    // 1. If we have the direct Spotify URL, use it via Odesli (Songlink)
-    // This provides a multi-platform landing page for the specific track
+    // 1. Direct Spotify Link (if available from ReccoBeats/Worker)
     if (track.spotifyUrl) {
-        return `https://song.link/${track.spotifyUrl}`;
+        return track.spotifyUrl;
     }
 
     // 2. Fallback: Search on Spotify directly

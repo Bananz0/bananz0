@@ -1,7 +1,7 @@
 /**
  * Unified API Proxy Worker
  * 
- * Securely handles both Spotify and Last.fm API authentication server-side.
+ * Unified metadata + Last.fm + AI summary proxy.
  * Frontend calls this worker without exposing credentials.
  * 
  * Endpoints:
@@ -10,10 +10,6 @@
  * - GET /?type=lastfm&user=<username>&method=<method> → Last.fm API response
  * - POST /?type=summary → Groq streamed summary
  */
-
-// In-memory token cache (persists across requests within same isolate)
-let cachedToken = null;
-let tokenExpiry = 0;
 
 export default {
     async fetch(request, env, ctx) {
@@ -97,6 +93,70 @@ const SUMMARY_MODEL_PRIORITY = [
 
 const SUMMARY_MAX_TOKENS = 60;
 const SUMMARY_PROMPT_TRACK_LIMIT = 12;
+const RECCOBEATS_BASE_URL = 'https://api.reccobeats.com';
+const CACHE_BASE_URL = 'https://cache.glen.muthoka';
+const SUMMARY_CACHE_TTL_SECONDS = 3600;
+const METADATA_CACHE_TTL_SECONDS = 21600;
+const LASTFM_NOWPLAYING_CACHE_TTL_SECONDS = 10;
+const LASTFM_DEFAULT_CACHE_TTL_SECONDS = 120;
+const SUMMARY_MAX_MODEL_ATTEMPTS = 4;
+const SUMMARY_MAX_TRANSIENT_FAILURES = 2;
+
+function getWorkerCache() {
+    return (typeof caches !== 'undefined' && caches.default) ? caches.default : null;
+}
+
+function buildCachePath(...parts) {
+    return parts.map(part => encodeURIComponent(String(part ?? ''))).join('/');
+}
+
+async function getCachedJson(cachePath, ttlSeconds, loader) {
+    const cache = getWorkerCache();
+    const cacheUrl = new URL(`${CACHE_BASE_URL}/${cachePath}`);
+
+    if (cache) {
+        const cached = await cache.match(cacheUrl);
+        if (cached) {
+            try {
+                return await cached.json();
+            } catch (error) {
+                console.warn(`Failed to parse cached JSON for ${cachePath}`, error);
+            }
+        }
+    }
+
+    const data = await loader();
+    if (data != null && cache) {
+        const response = new Response(JSON.stringify(data), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': `public, max-age=${ttlSeconds}`,
+            }
+        });
+        await cache.put(cacheUrl, response);
+    }
+
+    return data;
+}
+
+function cleanTrackNameForMatch(trackName) {
+    return String(trackName || '')
+        .replace(/\(feat\..*?\)/gi, '')
+        .replace(/\[feat\..*?\]/gi, '')
+        .replace(/\s*-\s*.*?(remaster|mix|version|edit).*/gi, '')
+        .replace(/\(.*?(remaster|mix|version|edit).*?\)/gi, '')
+        .trim();
+}
+
+function normalizeForMatch(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
 
 async function handleAiSummary(request, env, ctx, corsHeaders) {
     if (request.method !== 'POST') {
@@ -136,6 +196,7 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     const tracks = rawTracks.slice(0, 50).map(track => ({
         name: String(track?.name || '').trim() || 'Unknown',
         artist: String(track?.artist || '').trim() || 'Unknown',
+        spotifyUrl: String(track?.spotifyUrl || '').trim() || null,
     }));
 
     const summaryTracks = tracks.slice(0, 50);
@@ -143,8 +204,8 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
 
     // CACHE CHECK: Protect the wallet from massive traffic spikes
     const cacheKey = await generateCacheKey(summaryTracks, mode);
-    const cacheUrl = new URL(`https://cache.glen.muthoka/summary/${cacheKey}`);
-    const cache = (typeof caches !== 'undefined' && caches.default) ? caches.default : null;
+    const cacheUrl = new URL(`${CACHE_BASE_URL}/summary/${cacheKey}`);
+    const cache = getWorkerCache();
 
     if (cache) {
         const cachedResponse = await cache.match(cacheUrl);
@@ -164,17 +225,15 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     let audioStats = null;
 
     try {
-        const token = await getAccessToken(env);
-        if (token) {
-            // 1. Get Details for top 15 tracks (IDs and Years)
-            const classificationTracks = summaryTracks.slice(0, 15);
-            const trackDetails = await resolveTrackIds(token, classificationTracks);
-            
-            // 2. Extract IDs for audio features
-            const trackIds = trackDetails.map(t => t.id);
+        // 1. Resolve ReccoBeats metadata for top 15 tracks
+        const classificationTracks = summaryTracks.slice(0, 15);
+        const trackDetails = await resolveTrackIds(classificationTracks);
+
+        // 2. Extract Spotify IDs for audio features
+        const trackIds = trackDetails.map(t => t?.id).filter(Boolean);
             
             // 3. Calculate Dominant Era (Math in Worker to save AI tokens)
-            const years = trackDetails.map(t => parseInt(t.year)).filter(y => !isNaN(y));
+            const years = trackDetails.map(t => parseInt(t?.year)).filter(y => !isNaN(y));
             if (years.length > 0) {
                 const avgYear = years.reduce((a, b) => a + b, 0) / years.length;
                 if (avgYear < 1980) dominantEra = 'Classic Rock / Oldies';
@@ -185,42 +244,41 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
             }
 
             // 4. Get Audio Features
-            const features = trackIds.length ? await getAudioFeatures(token, trackIds) : [];
-            if (features.length) {
-                moodClass = classifyMood(features);
-                const avg = (key) => features.reduce((sum, item) => sum + (item[key] ?? 0), 0) / features.length;
-                audioStats = {
-                    valence: avg('valence'),
-                    energy: avg('energy'),
-                    danceability: avg('danceability'),
-                    acousticness: avg('acousticness'),
-                    tempo: avg('tempo'),
-                };
-            }
+        const features = trackIds.length ? await getAudioFeatures(trackIds) : [];
+        if (features.length) {
+            moodClass = classifyMood(features);
+            const avg = (key) => features.reduce((sum, item) => sum + (item[key] ?? 0), 0) / features.length;
+            audioStats = {
+                valence: avg('valence'),
+                energy: avg('energy'),
+                danceability: avg('danceability'),
+                acousticness: avg('acousticness'),
+                tempo: avg('tempo'),
+            };
+        }
 
             // 5. Format the list for the LLM
-            trackListForPrompt = promptTracks.map((t, i) => {
-                const foundDetail = trackDetails[i]; // Only exists for first 15
-                const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
-                return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
-            }).join('\n');
+        trackListForPrompt = promptTracks.map((t, i) => {
+            const foundDetail = trackDetails[i]; // Only exists for first 15
+            const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
+            return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
+        }).join('\n');
 
             // 6. Calculate Repetition (Ear-worm detection)
-            const trackCounts = {};
-            summaryTracks.forEach(t => {
-                const key = `${t.name} by ${t.artist}`.toLowerCase();
-                trackCounts[key] = (trackCounts[key] || 0) + 1;
-            });
-            const counts = Object.values(trackCounts);
-            const maxReps = counts.length > 0 ? Math.max(...counts) : 0;
-            const topTrack = Object.keys(trackCounts).find(k => trackCounts[k] === maxReps);
-            const repetitionInfo = maxReps >= 4 ? `earworm detected: ${topTrack} played ${maxReps} times` : 'none';
+        const trackCounts = {};
+        summaryTracks.forEach(t => {
+            const key = `${t.name} by ${t.artist}`.toLowerCase();
+            trackCounts[key] = (trackCounts[key] || 0) + 1;
+        });
+        const counts = Object.values(trackCounts);
+        const maxReps = counts.length > 0 ? Math.max(...counts) : 0;
+        const topTrack = Object.keys(trackCounts).find(k => trackCounts[k] === maxReps);
+        const repetitionInfo = maxReps >= 4 ? `earworm detected: ${topTrack} played ${maxReps} times` : 'none';
 
-            // Add repetition to prompt
-            trackListForPrompt += `\n\nRepetition: ${repetitionInfo}`;
-        }
+        // Add repetition to prompt
+        trackListForPrompt += `\n\nRepetition: ${repetitionInfo}`;
     } catch (error) {
-        console.error('Spotify processing failed', error);
+        console.error('Metadata processing failed', error);
         // Fallback if API fails
         trackListForPrompt = promptTracks.map((t, i) => `${i + 1}. ${t.name} - ${t.artist}`).join('\n');
     }
@@ -289,7 +347,7 @@ roast/summarize glen:`
             const cacheResponse = new Response(cacheStream, {
                 headers: {
                     'Content-Type': 'text/event-stream; charset=utf-8',
-                    'Cache-Control': 'public, max-age=14400', // Cache for 4 hours
+                    'Cache-Control': `public, max-age=${SUMMARY_CACHE_TTL_SECONDS}`,
                     'X-Model-Used': groqResult.model,
                 }
             });
@@ -304,7 +362,15 @@ roast/summarize glen:`
 }
 
 async function callGroqStream(messages, env) {
+    let attempts = 0;
+    let transientFailures = 0;
+
     for (const model of SUMMARY_MODEL_PRIORITY) {
+        if (attempts >= SUMMARY_MAX_MODEL_ATTEMPTS || transientFailures >= SUMMARY_MAX_TRANSIENT_FAILURES) {
+            break;
+        }
+
+        attempts += 1;
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -325,7 +391,10 @@ async function callGroqStream(messages, env) {
             return { response, model };
         }
 
-        if (response.status === 429 || response.status >= 500) {
+        // If rate limited, payload too large, or server error, try next model
+        if (response.status === 429 || response.status === 413 || response.status >= 500) {
+            transientFailures += 1;
+            console.warn(`Model ${model} failed with ${response.status}, trying next...`);
             continue;
         }
 
@@ -342,44 +411,223 @@ async function callGroqStream(messages, env) {
         response: null,
         model: null,
         status: 503,
-        error: 'All summary models are busy. Try again later.',
+        error: `Summary models unavailable after ${attempts} attempt(s). Try again shortly.`,
     };
 }
 
-async function resolveTrackIds(token, tracks, chunkSize = 5) {
+async function fetchReccoJson(path, searchParams = {}, cacheKeySuffix = '', ttlSeconds = METADATA_CACHE_TTL_SECONDS) {
+    const query = new URLSearchParams(
+        Object.entries(searchParams)
+            .filter(([, value]) => value !== null && value !== undefined && value !== '')
+            .map(([key, value]) => [key, String(value)])
+    );
+    const queryString = query.toString();
+    const url = `${RECCOBEATS_BASE_URL}${path}${queryString ? `?${queryString}` : ''}`;
+    const cachePath = buildCachePath('recco', path, cacheKeySuffix || queryString || 'none');
+
+    return await getCachedJson(cachePath, ttlSeconds, async () => {
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.warn(`ReccoBeats request failed (${response.status}) for ${path}`);
+            return null;
+        }
+        return await response.json();
+    });
+}
+
+async function fetchSpotifyOEmbed(spotifyUrl) {
+    if (!spotifyUrl) return null;
+    const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyUrl)}`;
+    const cachePath = buildCachePath('oembed', spotifyUrl);
+
+    return await getCachedJson(cachePath, METADATA_CACHE_TTL_SECONDS, async () => {
+        const response = await fetch(oembedUrl);
+        if (!response.ok) {
+            console.warn(`Spotify oEmbed failed (${response.status}) for ${spotifyUrl}`);
+            return null;
+        }
+        return await response.json();
+    });
+}
+
+function pickBestArtistMatch(candidates, artistName) {
+    if (!Array.isArray(candidates) || !candidates.length) return null;
+    const normalizedTarget = normalizeForMatch(artistName);
+    let best = null;
+    let bestScore = -1;
+
+    for (const candidate of candidates) {
+        const normalizedCandidate = normalizeForMatch(candidate?.name);
+        let score = 0;
+
+        if (normalizedCandidate === normalizedTarget) score += 100;
+        if (normalizedCandidate.includes(normalizedTarget)) score += 30;
+        if (normalizedTarget.includes(normalizedCandidate)) score += 15;
+
+        if (score > bestScore) {
+            best = candidate;
+            bestScore = score;
+        }
+    }
+
+    return best || candidates[0];
+}
+
+function pickBestTrackMatch(candidates, trackName, artistName) {
+    if (!Array.isArray(candidates) || !candidates.length) return null;
+
+    const targetRaw = normalizeForMatch(trackName);
+    const targetClean = normalizeForMatch(cleanTrackNameForMatch(trackName));
+    const targetArtist = normalizeForMatch(artistName);
+    let best = null;
+    let bestScore = -1;
+
+    for (const candidate of candidates) {
+        const titleRaw = normalizeForMatch(candidate?.trackTitle);
+        const titleClean = normalizeForMatch(cleanTrackNameForMatch(candidate?.trackTitle));
+        const artists = Array.isArray(candidate?.artists) ? candidate.artists : [];
+        const hasArtistMatch = artists.some(artist => normalizeForMatch(artist?.name) === targetArtist);
+
+        let score = 0;
+        if (titleRaw === targetRaw) score += 100;
+        if (titleClean === targetClean) score += 80;
+        if (titleRaw.includes(targetClean) || targetClean.includes(titleRaw)) score += 25;
+        if (titleClean.includes(targetClean) || targetClean.includes(titleClean)) score += 20;
+        if (hasArtistMatch) score += 20;
+        score += Number(candidate?.popularity || 0) / 10;
+
+        if (score > bestScore) {
+            best = candidate;
+            bestScore = score;
+        }
+    }
+
+    return bestScore > 0 ? best : null;
+}
+
+async function searchReccoArtist(artistName) {
+    const normalized = normalizeForMatch(artistName);
+    if (!normalized) return null;
+
+    const data = await fetchReccoJson(
+        '/v1/artist/search',
+        { searchText: artistName, size: 15 },
+        buildCachePath(normalized, 'search'),
+        METADATA_CACHE_TTL_SECONDS
+    );
+
+    return pickBestArtistMatch(data?.content, artistName);
+}
+
+async function getReccoArtistTracks(artistId) {
+    if (!artistId) return [];
+    const data = await fetchReccoJson(
+        `/v1/artist/${artistId}/track`,
+        { size: 100 },
+        buildCachePath(artistId, 'tracks'),
+        METADATA_CACHE_TTL_SECONDS
+    );
+    return Array.isArray(data?.content) ? data.content : [];
+}
+
+async function getReccoTrackAlbumInfo(reccoTrackId) {
+    if (!reccoTrackId) return { year: 'unknown', albumName: null };
+
+    const data = await fetchReccoJson(
+        `/v1/track/${reccoTrackId}/album`,
+        { size: 5 },
+        buildCachePath(reccoTrackId, 'album'),
+        METADATA_CACHE_TTL_SECONDS
+    );
+    const albums = Array.isArray(data?.content) ? data.content : [];
+
+    const withYear = albums
+        .map(album => ({
+            name: album?.title || null,
+            year: Number(String(album?.releaseDate || '').slice(0, 4)),
+        }))
+        .filter(a => Number.isFinite(a.year) && a.year > 1800);
+
+    if (!withYear.length) return { year: 'unknown', albumName: null };
+
+    const earliest = withYear.reduce((a, b) => a.year <= b.year ? a : b);
+    return { year: String(earliest.year), albumName: earliest.name };
+}
+
+async function getReccoTrackBySpotifyId(spotifyId) {
+    if (!spotifyId) return null;
+    const data = await fetchReccoJson(
+        '/v1/track',
+        { ids: spotifyId },
+        buildCachePath('track', spotifyId),
+        METADATA_CACHE_TTL_SECONDS
+    );
+    const content = Array.isArray(data?.content) ? data.content : [];
+    return content[0] || null;
+}
+
+async function findReccoTrackByNameAndArtist(trackName, artistName) {
+    const artist = await searchReccoArtist(artistName);
+    if (!artist?.id) return null;
+
+    const artistTracks = await getReccoArtistTracks(artist.id);
+    if (!artistTracks.length) return null;
+
+    const bestTrack = pickBestTrackMatch(artistTracks, trackName, artistName);
+    if (!bestTrack) return null;
+
+    const spotifyId = extractSpotifyIdFromUrl(bestTrack.href);
+    if (!spotifyId) return null;
+
+    const { year, albumName } = await getReccoTrackAlbumInfo(bestTrack.id);
+    const artistSpotifyUrl = artist.href || bestTrack.artists?.[0]?.href || null;
+
+    return {
+        spotifyId,
+        reccoTrackId: bestTrack.id,
+        year,
+        albumName,
+        trackHref: bestTrack.href || null,
+        artistHref: artistSpotifyUrl,
+        trackTitle: bestTrack.trackTitle || trackName,
+        artistTitle: artist.name || artistName,
+    };
+}
+
+async function resolveTrackIds(tracks, chunkSize = 5) {
     const results = [];
     for (let i = 0; i < tracks.length; i += chunkSize) {
         const chunk = tracks.slice(i, i + chunkSize);
-        const chunkResults = await Promise.all(chunk.map(track => searchTrackId(token, track.name, track.artist)));
+        const chunkResults = await Promise.all(chunk.map(track => searchTrackId(track.name, track.artist, track.spotifyUrl)));
         results.push(...chunkResults);
     }
-    return results.filter(Boolean); // Returns array of { id, year }
+    return results;
 }
 
-async function searchTrackId(token, trackName, artistName) {
+async function searchTrackId(trackName, artistName, spotifyUrl = null) {
     try {
-        // Optimizing query to be more precise
-        const query = `track:${trackName} artist:${artistName}`;
-        const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
-            {
-                headers: { 'Authorization': `Bearer ${token}` },
+        const spotifyIdFromInput = extractSpotifyIdFromUrl(spotifyUrl);
+        if (spotifyIdFromInput) {
+            const reccoTrack = await getReccoTrackBySpotifyId(spotifyIdFromInput);
+            if (reccoTrack?.id) {
+                const { year } = await getReccoTrackAlbumInfo(reccoTrack.id);
+                return {
+                    id: spotifyIdFromInput,
+                    year,
+                    reccoId: reccoTrack.id,
+                    href: reccoTrack.href || spotifyUrl,
+                };
             }
-        );
+        }
 
-        if (!response.ok) return null;
-
-        const data = await response.json();
-        const track = data.tracks?.items?.[0];
-
+        const track = await findReccoTrackByNameAndArtist(trackName, artistName);
         if (!track) return null;
 
-        // Extract just the year (YYYY) from release_date (YYYY-MM-DD)
-        const year = track.album?.release_date ? track.album.release_date.split('-')[0] : 'unknown';
-
         return {
-            id: track.id || extractSpotifyIdFromUrl(track.external_urls?.spotify),
-            year: year
+            id: track.spotifyId,
+            year: track.year,
+            reccoId: track.reccoTrackId,
+            href: track.trackHref,
         };
     } catch (error) {
         console.error('Track search error:', error);
@@ -387,24 +635,38 @@ async function searchTrackId(token, trackName, artistName) {
     }
 }
 
-async function getAudioFeatures(token, trackIds) {
+async function getAudioFeatures(trackIds) {
+    const uniqueIds = [...new Set(trackIds.filter(Boolean))].slice(0, 100);
+    if (!uniqueIds.length) return [];
+    return await getReccoBeatsAudioFeatures(uniqueIds);
+}
+
+async function getReccoBeatsAudioFeatures(trackIds) {
     const ids = trackIds.slice(0, 100).join(',');
     if (!ids) return [];
 
-    const response = await fetch(`https://api.spotify.com/v1/audio-features?ids=${encodeURIComponent(ids)}`,
-        {
-            headers: { 'Authorization': `Bearer ${token}` },
-        }
+    const data = await fetchReccoJson(
+        '/v1/audio-features',
+        { ids },
+        buildCachePath('audio-features', ids),
+        METADATA_CACHE_TTL_SECONDS
     );
+    const content = Array.isArray(data?.content) ? data.content : [];
+    return content
+        .map(item => {
+            const spotifyId = extractSpotifyIdFromUrl(item?.href);
+            if (!spotifyId) return null;
 
-    if (!response.ok) {
-        throw new Error(`Spotify audio features failed: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return Array.isArray(data?.audio_features)
-        ? data.audio_features.filter(Boolean)
-        : [];
+            return {
+                id: spotifyId,
+                danceability: item?.danceability ?? null,
+                energy: item?.energy ?? null,
+                valence: item?.valence ?? null,
+                acousticness: item?.acousticness ?? null,
+                tempo: item?.tempo ?? null,
+            };
+        })
+        .filter(Boolean);
 }
 
 function classifyMood(features) {
@@ -470,10 +732,22 @@ async function handleLastFm(url, env, corsHeaders) {
     }
 
     const lastfmUrl = `https://ws.audioscrobbler.com/2.0/?method=${method}&user=${encodeURIComponent(user)}&api_key=${env.LASTFM_API_KEY}&format=json&limit=${limit}`;
+    const cacheTtl = method === 'user.getrecenttracks'
+        ? LASTFM_NOWPLAYING_CACHE_TTL_SECONDS
+        : LASTFM_DEFAULT_CACHE_TTL_SECONDS;
 
     try {
-        const response = await fetch(lastfmUrl);
-        const data = await response.json();
+        const data = await getCachedJson(
+            buildCachePath('lastfm', method, user, limit),
+            cacheTtl,
+            async () => {
+                const response = await fetch(lastfmUrl);
+                if (!response.ok) {
+                    throw new Error(`Last.fm request failed: ${response.status}`);
+                }
+                return await response.json();
+            }
+        );
 
         // Check if Last.fm returned an error in the JSON
         if (data.error) {
@@ -487,7 +761,7 @@ async function handleLastFm(url, env, corsHeaders) {
         return new Response(JSON.stringify(data), {
             headers: {
                 ...corsHeaders,
-                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Cache-Control': `public, max-age=${cacheTtl}, stale-while-revalidate=30`,
             }
         });
     } catch (error) {
@@ -503,14 +777,6 @@ async function handleLastFm(url, env, corsHeaders) {
 // SPOTIFY HANDLER
 // ==========================================
 async function handleSpotify(url, env, corsHeaders) {
-    // Check for missing secrets
-    if (!env.SPOTIFY_CLIENT_ID || !env.SPOTIFY_CLIENT_SECRET) {
-        return new Response(
-            JSON.stringify({ error: 'Configuration Error: SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET is missing' }),
-            { status: 503, headers: corsHeaders }
-        );
-    }
-
     const artist = url.searchParams.get('artist');
     const track = url.searchParams.get('track');
 
@@ -521,138 +787,66 @@ async function handleSpotify(url, env, corsHeaders) {
         );
     }
 
-    // Get access token
-    const token = await getAccessToken(env);
-    if (!token) {
-        return new Response(
-            JSON.stringify({ error: 'Failed to authenticate with Spotify' }),
-            { status: 500, headers: corsHeaders }
-        );
-    }
-
-    // If track is provided, search for track (includes album art)
-    if (track && artist) {
-        const result = await searchTrack(token, track, artist);
-        return new Response(JSON.stringify(result), { headers: corsHeaders });
-    }
-
-    // Otherwise search for artist only
-    if (artist) {
-        const result = await searchArtist(token, artist);
-        return new Response(JSON.stringify(result), { headers: corsHeaders });
-    }
-
-    return new Response(
-        JSON.stringify({ error: 'Invalid request' }),
-        { status: 400, headers: corsHeaders }
-    );
-}
-
-async function getAccessToken(env) {
-    // Check cache
-    if (cachedToken && Date.now() < tokenExpiry) {
-        return cachedToken;
-    }
-
-    const clientId = env.SPOTIFY_CLIENT_ID;
-    const clientSecret = env.SPOTIFY_CLIENT_SECRET;
-
-    if (!clientId || !clientSecret) {
-        console.error('Missing Spotify credentials in environment');
-        return null;
-    }
-
-    try {
-        const response = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret),
-            },
-            body: 'grant_type=client_credentials',
-        });
-
-        if (!response.ok) {
-            console.error('Spotify auth failed:', response.status);
-            return null;
-        }
-
-        const data = await response.json();
-        cachedToken = data.access_token;
-        tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000; // 1 min buffer
-
-        return cachedToken;
-    } catch (error) {
-        console.error('Token fetch error:', error);
-        return null;
-    }
-}
-
-async function searchArtist(token, artistName) {
-    try {
-        const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist&limit=1`,
-            {
-                headers: { 'Authorization': `Bearer ${token}` },
+    const result = await getCachedJson(
+        buildCachePath('spotify-proxy', artist || 'none', track || 'none'),
+        180,
+        async () => {
+            if (track && artist) {
+                return await searchTrack(track, artist);
             }
-        );
-
-        if (!response.ok) {
-            return { artistImage: null };
+            return await searchArtist(artist);
         }
+    );
 
-        const data = await response.json();
-        const artist = data.artists?.items?.[0];
-
-        if (artist?.images?.length > 0) {
-            // Return medium-sized image (index 1) or largest available
-            return {
-                artistImage: artist.images[1]?.url || artist.images[0]?.url,
-                artistName: artist.name,
-                spotifyUrl: artist.external_urls?.spotify,
-            };
+    return new Response(JSON.stringify(result || { albumImage: null, artistImage: null }), {
+        headers: {
+            ...corsHeaders,
+            'Cache-Control': 'public, max-age=180, stale-while-revalidate=120',
         }
+    });
+}
 
-        return { artistImage: null };
+async function searchArtist(artistName) {
+    try {
+        const artist = await searchReccoArtist(artistName);
+        if (!artist?.id) return { artistImage: null };
+
+        const spotifyUrl = artist.href || null;
+        const embed = spotifyUrl ? await fetchSpotifyOEmbed(spotifyUrl) : null;
+        return {
+            artistImage: embed?.thumbnail_url || null,
+            artistName: artist.name || artistName,
+            spotifyUrl,
+            reccoArtistId: artist.id,
+        };
     } catch (error) {
         console.error('Artist search error:', error);
         return { artistImage: null };
     }
 }
 
-async function searchTrack(token, trackName, artistName) {
+async function searchTrack(trackName, artistName) {
     try {
-        const query = `track:${trackName} artist:${artistName}`;
-
-        // Fetch track and artist data concurrently
-        const [trackResponse, artistResult] = await Promise.all([
-            fetch(
-                `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            ),
-            searchArtist(token, artistName),
-        ]);
-
-        if (!trackResponse.ok) {
+        const track = await findReccoTrackByNameAndArtist(trackName, artistName);
+        if (!track) {
+            const artistResult = await searchArtist(artistName);
             return { albumImage: null, artistImage: artistResult.artistImage };
         }
 
-        const data = await trackResponse.json();
-        const track = data.tracks?.items?.[0];
+        const [trackEmbed, artistEmbed] = await Promise.all([
+            track.trackHref ? fetchSpotifyOEmbed(track.trackHref) : Promise.resolve(null),
+            track.artistHref ? fetchSpotifyOEmbed(track.artistHref) : Promise.resolve(null),
+        ]);
 
-        if (track) {
-            return {
-                albumImage: track.album?.images?.[0]?.url || null,
-                artistImage: artistResult.artistImage,
-                spotifyUrl: track.external_urls?.spotify,
-                spotifyId: track.id || extractSpotifyIdFromUrl(track.external_urls?.spotify),
-                trackName: track.name,
-                artistName: track.artists?.[0]?.name,
-                albumName: track.album?.name,
-            };
-        }
-
-        return { albumImage: null, artistImage: artistResult.artistImage };
+        return {
+            albumImage: trackEmbed?.thumbnail_url || null,
+            artistImage: artistEmbed?.thumbnail_url || null,
+            spotifyUrl: track.trackHref || null,
+            spotifyId: track.spotifyId || null,
+            trackName: track.trackTitle || trackName,
+            artistName: track.artistTitle || artistName,
+            albumName: track.albumName || null,
+        };
     } catch (error) {
         console.error('Track search error:', error);
         return { albumImage: null, artistImage: null };
