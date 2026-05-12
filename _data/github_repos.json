@@ -7,11 +7,11 @@
     "language": "PowerShell",
     "fork": false,
     "hidden": false,
-    "stargazers_count": 601,
+    "stargazers_count": 602,
     "forks_count": 41,
     "open_issues_count": 20,
-    "download_count": 12306,
-    "score": 104506,
+    "download_count": 12335,
+    "score": 104685,
     "pushed_at": "2026-05-09T12:37:05Z",
     "created_at": "2023-11-05T09:51:09Z",
     "topics": [
@@ -144,7 +144,7 @@
     "open_issues_count": 0,
     "download_count": 0,
     "score": 150,
-    "pushed_at": "2026-05-10T03:04:10Z",
+    "pushed_at": "2026-05-11T03:05:16Z",
     "created_at": "2025-11-13T00:26:20Z",
     "topics": []
   },
