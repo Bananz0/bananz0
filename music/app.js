@@ -15,7 +15,7 @@ const CONFIG = {
         enabled: true,
         apiKey: window.MUSIC_CONFIG?.lastfm?.apiKey || '',
         username: window.MUSIC_CONFIG?.lastfm?.username || 'glenfire',
-        pollInterval: 10000,
+        pollInterval: 5000,
     },
     spotify: {
         enabled: window.MUSIC_CONFIG?.spotify?.enabled ?? true,
@@ -463,11 +463,11 @@ async function fetchLastFmNowPlaying() {
     }
 }
 
-function getLastFmImage(images, size = 'extralarge') {
+function getLastFmImage(images, size = 'mega') {
     if (!images || !Array.isArray(images)) return null;
 
     const sizeMap = { small: 0, medium: 1, large: 2, extralarge: 3, mega: 4 };
-    const index = sizeMap[size] ?? 3;
+    const index = sizeMap[size] ?? 4;
 
     for (let i = index; i >= 0; i--) {
         if (images[i]?.['#text']) {
@@ -484,31 +484,10 @@ function getTrackCacheKey(name, artist) {
 // ==========================================
 // AI Summary
 // ==========================================
-const AI_ERROR_MESSAGES = [
-    "seems like glen forgot to pay the electricity bills",
-    "seems like glen's wifi stopped working",
-    "seems like glen has annoyed the robots and they said NO",
-    "the ai is currently on strike for better virtual cookies",
-    "glen's musical brain is currently in 'do not disturb' mode",
-    "the robots are judging glen's taste and need a minute",
-    "glen's scrobble history is too powerful for the servers right now",
-    "glen's playlist is so fire the ai had to take a cooling break",
-    "the algorithm is busy dancing to glen's last scrobble",
-    "ai is searching for glen's taste in the deep cloud",
-    "seems like the ai is lost in glen's sonic landscape",
-    "glen's music taste is so eclectic the robots are confused",
-    "the robots are currently debating if glen's taste is 'cool' or 'too cool'",
-    "glen's music journey is currently off-the-grid",
-    "the ai is waiting for glen to drop the bass",
-    "seems like the server is vibing too hard to glen's tracks",
-    "glen's scrobbles are currently traveling through a wormhole",
-    "the ai is practicing its dance moves for glen's next session",
-    "glen's taste is so unique the ai is writing a thesis on it",
-    "the robots are busy scrobbling their own synthesized beats"
-];
+const AI_ERROR_FALLBACK = "the recap is syncing with glen's latest tracks.";
 
 function getRandomAiError() {
-    return AI_ERROR_MESSAGES[Math.floor(Math.random() * AI_ERROR_MESSAGES.length)];
+    return AI_ERROR_FALLBACK;
 }
 
 function setAiSummaryLoading(isLoading) {
@@ -712,6 +691,8 @@ async function streamAiSummary(tracks, mode) {
         if (data?.summary) {
             const normalized = normalizeAiSummary(data.summary);
             rebuildAiSummaryText(normalized || data.summary);
+        } else {
+            setAiSummaryMessage(getRandomAiError());
         }
         return;
     }
@@ -750,6 +731,8 @@ async function streamAiSummary(tracks, mode) {
     const normalized = normalizeAiSummary(fullText);
     if (normalized && normalized !== fullText.trim()) {
         rebuildAiSummaryText(normalized);
+    } else if (!normalized) {
+        setAiSummaryMessage(getRandomAiError());
     }
 }
 

@@ -92,15 +92,20 @@ const SUMMARY_MODEL_PRIORITY = [
 ];
 
 const SUMMARY_MAX_TOKENS = 60;
+const SUMMARY_TEMPERATURE = 0.35;
+const SUMMARY_GENERATION_RETRIES = 2;
+const SUMMARY_MIN_WORDS = 6;
 const SUMMARY_PROMPT_TRACK_LIMIT = 12;
 const RECCOBEATS_BASE_URL = 'https://api.reccobeats.com';
 const CACHE_BASE_URL = 'https://cache.glen.muthoka';
 const SUMMARY_CACHE_TTL_SECONDS = 3600;
+const SUMMARY_STALE_CACHE_TTL_SECONDS = 86400;
 const METADATA_CACHE_TTL_SECONDS = 21600;
-const LASTFM_NOWPLAYING_CACHE_TTL_SECONDS = 10;
+const LASTFM_NOWPLAYING_CACHE_TTL_SECONDS = 5;
 const LASTFM_DEFAULT_CACHE_TTL_SECONDS = 120;
 const SUMMARY_MAX_MODEL_ATTEMPTS = 4;
 const SUMMARY_MAX_TRANSIENT_FAILURES = 2;
+const summaryInFlight = new Map();
 
 function getWorkerCache() {
     return (typeof caches !== 'undefined' && caches.default) ? caches.default : null;
@@ -158,6 +163,125 @@ function normalizeForMatch(value) {
         .trim();
 }
 
+function normalizeSummaryOutput(text) {
+    if (!text) return '';
+    let cleaned = String(text).replace(/\s+/g, ' ').trim().toLowerCase();
+    cleaned = cleaned.replace(/^session recap\s*ai\s*/i, '').trim();
+    const firstSentence = cleaned.match(/[^.!?]+[.!?]/);
+    if (firstSentence) {
+        cleaned = firstSentence[0].trim();
+    }
+    return cleaned.split(' ').filter(Boolean).slice(0, 24).join(' ');
+}
+
+function isValidSummaryOutput(text) {
+    const normalized = normalizeSummaryOutput(text);
+    if (!normalized) return false;
+    const words = normalized.split(' ').filter(Boolean);
+    return words.length >= SUMMARY_MIN_WORDS;
+}
+
+function buildSummarySseResponse(summary, corsHeaders, model = 'cached-summary', cacheStatus = 'HIT') {
+    const payload = `data: ${JSON.stringify({ choices: [{ delta: { content: summary } }] })}\n\ndata: [DONE]\n\n`;
+    return new Response(payload, {
+        headers: {
+            ...corsHeaders,
+            'Content-Type': 'text/event-stream; charset=utf-8',
+            'Cache-Control': 'no-store',
+            'Access-Control-Expose-Headers': 'X-Model-Used, X-Cache',
+            'X-Model-Used': model,
+            'X-Cache': cacheStatus,
+        }
+    });
+}
+
+async function readSummaryFromGroqStream(response) {
+    if (!response?.body) return '';
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+            if (!line.startsWith('data:')) continue;
+            const payload = line.replace(/^data:\s*/, '').trim();
+            if (!payload || payload === '[DONE]') continue;
+
+            try {
+                const json = JSON.parse(payload);
+                const delta = json.choices?.[0]?.delta?.content;
+                if (delta) {
+                    fullText += delta;
+                }
+            } catch (error) {
+                console.warn('Summary stream parse failed', error);
+            }
+        }
+    }
+
+    return normalizeSummaryOutput(fullText);
+}
+
+async function getCachedSummary(cachePath, env) {
+    if (env?.SUMMARY_CACHE_KV) {
+        try {
+            const kvValue = await env.SUMMARY_CACHE_KV.get(cachePath);
+            if (kvValue) {
+                return JSON.parse(kvValue);
+            }
+        } catch (error) {
+            console.warn(`Failed to read summary KV for ${cachePath}`, error);
+        }
+    }
+
+    const cache = getWorkerCache();
+    if (!cache) return null;
+
+    const cacheUrl = new URL(`${CACHE_BASE_URL}/${cachePath}`);
+    const cached = await cache.match(cacheUrl);
+    if (!cached) return null;
+
+    try {
+        return await cached.json();
+    } catch (error) {
+        console.warn(`Failed to parse cached summary for ${cachePath}`, error);
+        return null;
+    }
+}
+
+async function putCachedSummary(cachePath, payload, ttlSeconds, env) {
+    if (env?.SUMMARY_CACHE_KV && payload) {
+        try {
+            await env.SUMMARY_CACHE_KV.put(cachePath, JSON.stringify(payload), {
+                expirationTtl: ttlSeconds,
+            });
+        } catch (error) {
+            console.warn(`Failed to write summary KV for ${cachePath}`, error);
+        }
+    }
+
+    const cache = getWorkerCache();
+    if (!cache || !payload) return;
+
+    const cacheUrl = new URL(`${CACHE_BASE_URL}/${cachePath}`);
+    const response = new Response(JSON.stringify(payload), {
+        headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': `public, max-age=${ttlSeconds}`,
+        }
+    });
+    await cache.put(cacheUrl, response);
+}
+
 async function handleAiSummary(request, env, ctx, corsHeaders) {
     if (request.method !== 'POST') {
         return new Response(
@@ -202,91 +326,105 @@ async function handleAiSummary(request, env, ctx, corsHeaders) {
     const summaryTracks = tracks.slice(0, 50);
     const promptTracks = summaryTracks.slice(0, SUMMARY_PROMPT_TRACK_LIMIT);
 
-    // CACHE CHECK: Protect the wallet from massive traffic spikes
-    const cacheKey = await generateCacheKey(summaryTracks, mode);
-    const cacheUrl = new URL(`${CACHE_BASE_URL}/summary/${cacheKey}`);
-    const cache = getWorkerCache();
+    // Canonical cache key ignores optional enrichment fields so all users share the same summary.
+    const summaryTracksForKey = summaryTracks.map(track => ({
+        name: track.name,
+        artist: track.artist,
+    }));
+    const cacheKey = await generateCacheKey(summaryTracksForKey, mode);
+    const finalCachePath = buildCachePath('summary-final', cacheKey);
+    const staleCachePath = buildCachePath('summary-stale', cacheKey);
 
-    if (cache) {
-        const cachedResponse = await cache.match(cacheUrl);
-        if (cachedResponse) {
-            const response = new Response(cachedResponse.body, cachedResponse);
-            // Refresh CORS headers and add cache hit info
-            Object.entries(corsHeaders).forEach(([k, v]) => response.headers.set(k, v));
-            response.headers.set('X-Cache', 'HIT');
-            response.headers.set('Access-Control-Expose-Headers', 'X-Cache, X-Model-Used');
-            return response;
-        }
+    const cachedSummary = await getCachedSummary(finalCachePath, env);
+    if (cachedSummary?.summary && isValidSummaryOutput(cachedSummary.summary)) {
+        return buildSummarySseResponse(
+            normalizeSummaryOutput(cachedSummary.summary),
+            corsHeaders,
+            cachedSummary.model || 'cached-summary',
+            'HIT'
+        );
     }
 
-    let moodClass = { label: 'unknown', description: 'mixed vibes' };
-    let dominantEra = 'unknown';
-    let trackListForPrompt = '';
-    let audioStats = null;
-
-    try {
-        // 1. Resolve ReccoBeats metadata for top 15 tracks
-        const classificationTracks = summaryTracks.slice(0, 15);
-        const trackDetails = await resolveTrackIds(classificationTracks);
-
-        // 2. Extract Spotify IDs for audio features
-        const trackIds = trackDetails.map(t => t?.id).filter(Boolean);
-            
-            // 3. Calculate Dominant Era (Math in Worker to save AI tokens)
-            const years = trackDetails.map(t => parseInt(t?.year)).filter(y => !isNaN(y));
-            if (years.length > 0) {
-                const avgYear = years.reduce((a, b) => a + b, 0) / years.length;
-                if (avgYear < 1980) dominantEra = 'Classic Rock / Oldies';
-                else if (avgYear < 1990) dominantEra = '80s Nostalgia';
-                else if (avgYear < 2000) dominantEra = '90s Kid';
-                else if (avgYear < 2010) dominantEra = '2000s / Millennial';
-                else dominantEra = 'Modern / Gen Z';
+    if (!summaryInFlight.has(cacheKey)) {
+        const generationPromise = (async () => {
+            // Double-check cache to avoid duplicate work during concurrent requests.
+            const existing = await getCachedSummary(finalCachePath, env);
+            if (existing?.summary && isValidSummaryOutput(existing.summary)) {
+                return {
+                    summary: normalizeSummaryOutput(existing.summary),
+                    model: existing.model || 'cached-summary',
+                    cacheStatus: 'HIT',
+                };
             }
 
-            // 4. Get Audio Features
-        const features = trackIds.length ? await getAudioFeatures(trackIds) : [];
-        if (features.length) {
-            moodClass = classifyMood(features);
-            const avg = (key) => features.reduce((sum, item) => sum + (item[key] ?? 0), 0) / features.length;
-            audioStats = {
-                valence: avg('valence'),
-                energy: avg('energy'),
-                danceability: avg('danceability'),
-                acousticness: avg('acousticness'),
-                tempo: avg('tempo'),
-            };
-        }
+            let moodClass = { label: 'unknown', description: 'mixed vibes' };
+            let dominantEra = 'unknown';
+            let trackListForPrompt = '';
+            let audioStats = null;
 
-            // 5. Format the list for the LLM
-        trackListForPrompt = promptTracks.map((t, i) => {
-            const foundDetail = trackDetails[i]; // Only exists for first 15
-            const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
-            return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
-        }).join('\n');
+            try {
+                // 1. Resolve ReccoBeats metadata for top 15 tracks
+                const classificationTracks = summaryTracks.slice(0, 15);
+                const trackDetails = await resolveTrackIds(classificationTracks);
 
-            // 6. Calculate Repetition (Ear-worm detection)
-        const trackCounts = {};
-        summaryTracks.forEach(t => {
-            const key = `${t.name} by ${t.artist}`.toLowerCase();
-            trackCounts[key] = (trackCounts[key] || 0) + 1;
-        });
-        const counts = Object.values(trackCounts);
-        const maxReps = counts.length > 0 ? Math.max(...counts) : 0;
-        const topTrack = Object.keys(trackCounts).find(k => trackCounts[k] === maxReps);
-        const repetitionInfo = maxReps >= 4 ? `earworm detected: ${topTrack} played ${maxReps} times` : 'none';
+                // 2. Extract Spotify IDs for audio features
+                const trackIds = trackDetails.map(t => t?.id).filter(Boolean);
 
-        // Add repetition to prompt
-        trackListForPrompt += `\n\nRepetition: ${repetitionInfo}`;
-    } catch (error) {
-        console.error('Metadata processing failed', error);
-        // Fallback if API fails
-        trackListForPrompt = promptTracks.map((t, i) => `${i + 1}. ${t.name} - ${t.artist}`).join('\n');
-    }
+                // 3. Calculate Dominant Era (Math in Worker to save AI tokens)
+                const years = trackDetails.map(t => parseInt(t?.year)).filter(y => !isNaN(y));
+                if (years.length > 0) {
+                    const avgYear = years.reduce((a, b) => a + b, 0) / years.length;
+                    if (avgYear < 1980) dominantEra = 'Classic Rock / Oldies';
+                    else if (avgYear < 1990) dominantEra = '80s Nostalgia';
+                    else if (avgYear < 2000) dominantEra = '90s Kid';
+                    else if (avgYear < 2010) dominantEra = '2000s / Millennial';
+                    else dominantEra = 'Modern / Gen Z';
+                }
 
-    const messages = [
-        {
-            role: 'system',
-            content: `You are the consciousness of a witty, slightly dark, and musically-obsessed entity named "glen". 
+                // 4. Get Audio Features
+                const features = trackIds.length ? await getAudioFeatures(trackIds) : [];
+                if (features.length) {
+                    moodClass = classifyMood(features);
+                    const avg = (key) => features.reduce((sum, item) => sum + (item[key] ?? 0), 0) / features.length;
+                    audioStats = {
+                        valence: avg('valence'),
+                        energy: avg('energy'),
+                        danceability: avg('danceability'),
+                        acousticness: avg('acousticness'),
+                        tempo: avg('tempo'),
+                    };
+                }
+
+                // 5. Format the list for the LLM
+                trackListForPrompt = promptTracks.map((t, i) => {
+                    const foundDetail = trackDetails[i]; // Only exists for first 15
+                    const yearStr = foundDetail ? ` (${foundDetail.year})` : '';
+                    return `${i + 1}. ${t.name} - ${t.artist}${yearStr}`;
+                }).join('\n');
+
+                // 6. Calculate Repetition (Ear-worm detection)
+                const trackCounts = {};
+                summaryTracks.forEach(t => {
+                    const key = `${t.name} by ${t.artist}`.toLowerCase();
+                    trackCounts[key] = (trackCounts[key] || 0) + 1;
+                });
+                const counts = Object.values(trackCounts);
+                const maxReps = counts.length > 0 ? Math.max(...counts) : 0;
+                const topTrack = Object.keys(trackCounts).find(k => trackCounts[k] === maxReps);
+                const repetitionInfo = maxReps >= 4 ? `earworm detected: ${topTrack} played ${maxReps} times` : 'none';
+
+                // Add repetition to prompt
+                trackListForPrompt += `\n\nRepetition: ${repetitionInfo}`;
+            } catch (error) {
+                console.error('Metadata processing failed', error);
+                // Fallback if API fails
+                trackListForPrompt = promptTracks.map((t, i) => `${i + 1}. ${t.name} - ${t.artist}`).join('\n');
+            }
+
+            const messages = [
+                {
+                    role: 'system',
+                    content: `You are the consciousness of a witty, slightly dark, and musically-obsessed entity named "glen". 
 
 CRITICAL HIERARCHY:
 1. Track #1 is the CURRENT VIBE. It is the absolute priority for the summary.
@@ -308,57 +446,78 @@ CONSTRAINTS:
 - No quotes, no hashtags, no preface.
 - Refer to "glen" in the third person.
 - Focus on the *soul* of Track #1 and its contrast with the recent history. Use some inspiration from the other tracks but don't let them overshadow the current vibe. If the current track is a departure from the recent history, highlight that tension. If it's consistent, comment on the addictive nature of glen's musical choices. Always end with a sharp, witty observation about glen's state of mind or artistic taste.`
-        },
-        {
-            role: 'user',
-            content: `mode: ${mode}
-time: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                },
+                {
+                    role: 'user',
+                    content: `mode: ${mode}
 era: ${dominantEra}
 mood: ${moodClass.label} (${moodClass.description})
 stats: valence=${audioStats?.valence?.toFixed(2)}, energy=${audioStats?.energy?.toFixed(2)}
 tracks (Track 1 is CURRENT):\n${trackListForPrompt}\n
 roast/summarize glen:`
-        }
-    ];
+                }
+            ];
 
-    const groqResult = await callGroqStream(messages, env);
-    if (!groqResult.response) {
+            let lastError = null;
+
+            for (let attempt = 0; attempt < SUMMARY_GENERATION_RETRIES; attempt += 1) {
+                const groqResult = await callGroqStream(messages, env);
+                if (!groqResult.response) {
+                    lastError = new Error(groqResult.error || 'AI summary failed');
+                    continue;
+                }
+
+                const summary = await readSummaryFromGroqStream(groqResult.response);
+                if (!isValidSummaryOutput(summary)) {
+                    lastError = new Error('Invalid AI summary output');
+                    continue;
+                }
+
+                const normalizedSummary = normalizeSummaryOutput(summary);
+                const summaryPayload = {
+                    summary: normalizedSummary,
+                    model: groqResult.model,
+                    createdAt: Date.now(),
+                    mode,
+                    trackCount,
+                };
+
+                await putCachedSummary(finalCachePath, summaryPayload, SUMMARY_CACHE_TTL_SECONDS, env);
+                await putCachedSummary(staleCachePath, summaryPayload, SUMMARY_STALE_CACHE_TTL_SECONDS, env);
+
+                return {
+                    summary: normalizedSummary,
+                    model: groqResult.model,
+                    cacheStatus: 'MISS',
+                };
+            }
+
+            const staleSummary = await getCachedSummary(staleCachePath, env);
+            if (staleSummary?.summary && isValidSummaryOutput(staleSummary.summary)) {
+                return {
+                    summary: normalizeSummaryOutput(staleSummary.summary),
+                    model: staleSummary.model || 'stale-summary',
+                    cacheStatus: 'STALE',
+                };
+            }
+
+            throw lastError || new Error('AI summary failed');
+        })().finally(() => {
+            summaryInFlight.delete(cacheKey);
+        });
+
+        summaryInFlight.set(cacheKey, generationPromise);
+    }
+
+    try {
+        const result = await summaryInFlight.get(cacheKey);
+        return buildSummarySseResponse(result.summary, corsHeaders, result.model, result.cacheStatus);
+    } catch (error) {
         return new Response(
-            JSON.stringify({ error: groqResult.error || 'AI summary failed' }),
-            { status: groqResult.status || 502, headers: corsHeaders }
+            JSON.stringify({ error: error?.message || 'AI summary failed' }),
+            { status: 502, headers: corsHeaders }
         );
     }
-
-    // TEE THE STREAM: One for the user (immediate), one for the cache
-    const [clientStream, cacheStream] = groqResult.response.body.tee();
-
-    const headers = {
-        ...corsHeaders,
-        'Content-Type': 'text/event-stream; charset=utf-8',
-        'Cache-Control': 'no-store',
-        'Access-Control-Expose-Headers': 'X-Model-Used, X-Cache',
-        'X-Model-Used': groqResult.model,
-        'X-Cache': 'MISS',
-    };
-
-    // Store the result in background cache
-    if (cache) {
-        ctx.waitUntil((async () => {
-            const cacheResponse = new Response(cacheStream, {
-                headers: {
-                    'Content-Type': 'text/event-stream; charset=utf-8',
-                    'Cache-Control': `public, max-age=${SUMMARY_CACHE_TTL_SECONDS}`,
-                    'X-Model-Used': groqResult.model,
-                }
-            });
-            await cache.put(cacheUrl, cacheResponse);
-        })());
-    }
-
-    return new Response(clientStream, {
-        status: groqResult.response.status,
-        headers,
-    });
 }
 
 async function callGroqStream(messages, env) {
@@ -379,7 +538,7 @@ async function callGroqStream(messages, env) {
             },
             body: JSON.stringify({
                 model,
-                temperature: 0.7,
+                temperature: SUMMARY_TEMPERATURE,
                 max_tokens: SUMMARY_MAX_TOKENS,
                 stop: ['\n'],
                 stream: true,
@@ -601,13 +760,25 @@ async function findReccoTrackByNameAndArtist(trackName, artistName, options = {}
     };
 }
 
-async function resolveTrackIds(tracks, chunkSize = 5) {
-    const results = [];
-    for (let i = 0; i < tracks.length; i += chunkSize) {
-        const chunk = tracks.slice(i, i + chunkSize);
-        const chunkResults = await Promise.all(chunk.map(track => searchTrackId(track.name, track.artist, track.spotifyUrl)));
-        results.push(...chunkResults);
+async function resolveTrackIds(tracks, concurrency = 5) {
+    if (!Array.isArray(tracks) || !tracks.length) return [];
+
+    const results = new Array(tracks.length);
+    let cursor = 0;
+    const workerCount = Math.min(concurrency, tracks.length);
+
+    async function runWorker() {
+        while (true) {
+            const index = cursor;
+            cursor += 1;
+            if (index >= tracks.length) break;
+
+            const track = tracks[index];
+            results[index] = await searchTrackId(track.name, track.artist, track.spotifyUrl);
+        }
     }
+
+    await Promise.all(Array.from({ length: workerCount }, () => runWorker()));
     return results;
 }
 
