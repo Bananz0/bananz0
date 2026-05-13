@@ -114,6 +114,8 @@ const miniToggle = document.querySelector('.mini-toggle');
 let lastScroll = 0;
 let ticking = false;
 let autoCollapseTimer = null;
+let ctaCollapseTimer = null;
+const CONTENT_COLLAPSE_EXIT_MS = 320;
 let manuallyExpanded = false; // Track if user manually expanded the bar
 let isHeroExpanded = null;
 let isHeroVisible = null;
@@ -192,7 +194,7 @@ function startAutoCollapseTimer() {
                 manuallyExpanded = false; // Clear manual flag on auto-collapse
                 floatingInner.classList.remove('mini-expanded', 'expanded');
                 floatingInner.classList.add('compact');
-                if (floatingCtas) floatingCtas.classList.remove('visible');
+                setFloatingCtasVisible(false);
 
                 // Keep the chevron highlighted if the page has been scrolled past the hero.
                 // Only remove the highlight when the user is inside the hero area.
@@ -215,6 +217,37 @@ function clearAutoCollapseTimer() {
     }
 }
 
+function setFloatingCtasVisible(isVisible, options = {}) {
+    if (!floatingCtas) return;
+
+    if (isVisible) {
+        clearTimeout(ctaCollapseTimer);
+        ctaCollapseTimer = null;
+        floatingCtas.style.pointerEvents = '';
+        floatingCtas.classList.remove('leaving');
+        floatingCtas.classList.add('visible');
+        return;
+    }
+
+    if (options.immediate || !floatingCtas.classList.contains('visible')) {
+        clearTimeout(ctaCollapseTimer);
+        ctaCollapseTimer = null;
+        floatingCtas.classList.remove('visible', 'leaving');
+        floatingCtas.style.pointerEvents = '';
+        return;
+    }
+
+    if (floatingCtas.classList.contains('leaving')) return;
+
+    floatingCtas.classList.add('leaving');
+    floatingCtas.style.pointerEvents = 'none';
+    ctaCollapseTimer = setTimeout(() => {
+        floatingCtas.classList.remove('visible', 'leaving');
+        floatingCtas.style.pointerEvents = '';
+        ctaCollapseTimer = null;
+    }, CONTENT_COLLAPSE_EXIT_MS);
+}
+
 // Helper for smooth state updates - accessible globally for toggle and scroll
 function updateHeroState(isExpanded, isVisible) {
     if (!floatingInner) return;
@@ -227,8 +260,7 @@ function updateHeroState(isExpanded, isVisible) {
         floatingInner.classList.remove('mini-expanded', 'expanded');
         floatingInner.classList.add('compact');
         if (floatingCtas) {
-            floatingCtas.classList.remove('visible');
-            floatingCtas.style.pointerEvents = 'none';
+            setFloatingCtasVisible(false, { immediate: true });
         }
         if (miniToggle) miniToggle.classList.remove('highlight');
         return;
@@ -248,11 +280,7 @@ function updateHeroState(isExpanded, isVisible) {
         }
 
         if (floatingCtas) {
-            if (isVisible) {
-                floatingCtas.classList.add('visible');
-            } else {
-                floatingCtas.classList.remove('visible');
-            }
+            setFloatingCtasVisible(isVisible);
         }
     });
 }
@@ -314,7 +342,6 @@ function updateFloatingHero() {
                 if (miniToggle) miniToggle.classList.add('highlight');
                 manuallyExpanded = false;
             } else if (currentScroll < 50) {
-                // Full reset at top - ensure it happens smoothly
                 manuallyExpanded = false;
                 updateHeroState(false, false);
                 if (miniToggle) miniToggle.classList.remove('highlight');
@@ -408,46 +435,16 @@ window.addEventListener('scroll', handleScroll, { passive: true });
             return;
         }
 
-        const currentPath = window.location.pathname;
-        const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
-        const isMainHome = normalizedPath === '/' || normalizedPath === '/index.html' || normalizedPath === '';
-        const host = window.location.hostname.toLowerCase();
-        const isMusicHost = host.startsWith('music.');
-        const isMusicContext = isMusicHost || currentPath.includes('/music');
-        const isMusicRoot = isMusicHost ? normalizedPath === '/' : normalizedPath === '/music';
-        const musicRootHref = isMusicHost ? '/' : '/music';
-        
         const isActive = navHub.classList.contains('touch-active');
-        const isTouchEvent = e.pointerType === 'touch' || (e.detail === 0 && e.clientX === 0);
-        const hasCoarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-        const noHover = window.matchMedia && window.matchMedia('(hover: none)').matches;
-        const isLikelyTouch = isTouchEvent || hasCoarsePointer || noHover;
+        e.preventDefault();
+        e.stopPropagation();
 
-        if (isLikelyTouch && !isActive) {
-            e.preventDefault();
-            e.stopPropagation();
+        if (isActive) {
+            navHub.classList.remove('touch-active');
+        } else {
             navHub.classList.add('touch-active');
             touchStartScroll = window.scrollY;
             scheduleAutoCollapse();
-            return;
-        }
-
-        // Navigation Logic (Home context = scroll top, Else = navigate to area root)
-        if (isMusicContext) {
-            e.preventDefault();
-            if (isMusicRoot) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                window.location.href = musicRootHref;
-            }
-            navHub.classList.remove('touch-active');
-        } else if (isMainHome) {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            navHub.classList.remove('touch-active');
-        } else {
-            // On a sub-page: let the default link behavior take us to "/" root
-            navHub.classList.remove('touch-active');
         }
     });
 
@@ -474,12 +471,18 @@ window.addEventListener('scroll', handleScroll, { passive: true });
         });
     });
 
-    // 4. Document-level Tap-to-Close
+    // 4. Document-level tap/click-to-close
     document.addEventListener('touchstart', (e) => {
         if (!navHub.contains(e.target) && navHub.classList.contains('touch-active')) {
             navHub.classList.remove('touch-active');
         }
     }, { passive: true });
+
+    document.addEventListener('click', (e) => {
+        if (!navHub.contains(e.target) && navHub.classList.contains('touch-active')) {
+            navHub.classList.remove('touch-active');
+        }
+    });
 })();
 
 // OPTIMIZED: Removed MutationObserver - using event delegation instead
@@ -754,7 +757,7 @@ if (contactForm) {
 
             if (response.ok) {
                 // Success message
-                submitBtn.textContent = '✓ MESSAGE SENT!';
+                submitBtn.textContent = 'MESSAGE SENT';
                 submitBtn.style.background = 'var(--cyber-blue)';
                 submitBtn.style.borderColor = 'var(--cyber-blue)';
 
@@ -764,7 +767,7 @@ if (contactForm) {
                     const successLine = document.createElement('div');
                     successLine.className = 'terminal-line';
                     successLine.style.color = 'var(--cyber-blue)';
-                    successLine.innerHTML = '<span class="terminal-prompt">$</span> Message sent successfully! ✓';
+                    successLine.innerHTML = '<span class="terminal-prompt">$</span> Message sent successfully.';
                     terminalBody.appendChild(successLine);
                 }
 
@@ -781,7 +784,7 @@ if (contactForm) {
             }
         } catch (error) {
             // Error message
-            submitBtn.textContent = '✗ FAILED - TRY AGAIN';
+            submitBtn.textContent = 'FAILED - TRY AGAIN';
             submitBtn.style.background = 'var(--cyber-pink)';
             submitBtn.style.borderColor = 'var(--cyber-pink)';
 
@@ -808,7 +811,7 @@ if (contactForm) {
 // ==========================================
 // CONSOLE EASTER EGG
 // ==========================================
-console.log('%c⚡ NEXUS SYSTEM INITIALIZED ⚡', 'color: #ff2d92; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #ff2d92;');
+console.log('%cNEXUS SYSTEM INITIALIZED', 'color: #ff2d92; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #ff2d92;');
 console.log('%c Glen Muthoka - Embedded Systems Engineer', 'color: #00f5ff; font-size: 16px; font-weight: 600;');
 console.log('%c From Kenya, Based in Southampton, UK', 'color: #a855f7; font-size: 14px;');
 console.log('%c Contact: theglenmuthoka@gmail.com', 'color: #fbbf24; font-size: 14px;');

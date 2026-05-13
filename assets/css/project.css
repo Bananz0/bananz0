@@ -5,7 +5,7 @@
 
 .project-detail {
     padding-top: calc(var(--space-xl) * 2 + 80px); /* Space for floating header */
-    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 .project-hero {

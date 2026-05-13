@@ -133,7 +133,7 @@
     border-radius: var(--radius-md);
     border: 1px solid rgba(245, 158, 11, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    background: #000;
+    background: var(--bg-secondary);
     display: none;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .gallery-caption {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Geist', sans-serif;
     font-size: 0.9rem;
     color: var(--text-secondary);
     text-align: center;

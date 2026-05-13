@@ -12,7 +12,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     {% assign asset_version = site.github.build_revision | default: site.time | date: '%s' %}
     {% if site.github.build_revision %}{% assign asset_version = site.github.build_revision | slice: 0, 8 %}{% endif %}
@@ -23,7 +23,6 @@
 </head>
 
 <body>
-    <div class="grid-bg"></div>
     <div id="cursor-follower"></div>
 
     {% include navbar.html projects_active=true cv_download=true contact_href="/#contact" %}

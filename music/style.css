@@ -60,7 +60,7 @@
 }
 
 .music-hero {
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -897,7 +897,7 @@
 
 @media (max-width: 600px) {
     .music-hero {
-        min-height: 100vh;
+        min-height: 100dvh;
         padding: 7rem 1.25rem;
     }
 
