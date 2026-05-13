@@ -566,7 +566,8 @@ async function getReccoTrackBySpotifyId(spotifyId) {
     return content[0] || null;
 }
 
-async function findReccoTrackByNameAndArtist(trackName, artistName) {
+async function findReccoTrackByNameAndArtist(trackName, artistName, options = {}) {
+    const includeAlbumInfo = options.includeAlbumInfo !== false;
     const artist = await searchReccoArtist(artistName);
     if (!artist?.id) return null;
 
@@ -579,7 +580,13 @@ async function findReccoTrackByNameAndArtist(trackName, artistName) {
     const spotifyId = extractSpotifyIdFromUrl(bestTrack.href);
     if (!spotifyId) return null;
 
-    const { year, albumName } = await getReccoTrackAlbumInfo(bestTrack.id);
+    let year = 'unknown';
+    let albumName = null;
+    if (includeAlbumInfo) {
+        const albumInfo = await getReccoTrackAlbumInfo(bestTrack.id);
+        year = albumInfo.year;
+        albumName = albumInfo.albumName;
+    }
     const artistSpotifyUrl = artist.href || bestTrack.artists?.[0]?.href || null;
 
     return {
@@ -827,7 +834,7 @@ async function searchArtist(artistName) {
 
 async function searchTrack(trackName, artistName) {
     try {
-        const track = await findReccoTrackByNameAndArtist(trackName, artistName);
+        const track = await findReccoTrackByNameAndArtist(trackName, artistName, { includeAlbumInfo: false });
         if (!track) {
             const artistResult = await searchArtist(artistName);
             return { albumImage: null, artistImage: artistResult.artistImage };
@@ -852,4 +859,3 @@ async function searchTrack(trackName, artistName) {
         return { albumImage: null, artistImage: null };
     }
 }
-

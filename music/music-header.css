@@ -152,6 +152,16 @@
     transform: translateY(-2px) scale(1.05);
 }
 
+.social-badge[aria-label="GitHub"] svg,
+.social-badge[aria-label="LinkedIn"] svg {
+    filter: drop-shadow(0 0 10px var(--music-icon-glow, rgba(var(--neon-gold-rgb), 0.18)));
+}
+
+.social-badge[aria-label="GitHub"]:hover svg,
+.social-badge[aria-label="LinkedIn"]:hover svg {
+    filter: drop-shadow(0 0 14px var(--music-icon-glow-bright, rgba(var(--neon-gold-rgb), 0.35)));
+}
+
 /* Enhanced Header Center Box Glow */
 .header-center-box {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 

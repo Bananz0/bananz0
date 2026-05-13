@@ -24,8 +24,8 @@ const CONFIG = {
     aiSummary: {
         enabled: window.MUSIC_CONFIG?.aiSummary?.enabled ?? true,
         workerUrl: window.MUSIC_CONFIG?.aiSummary?.workerUrl || window.MUSIC_CONFIG?.spotify?.workerUrl || '',
-        activeLimit: 20, // Increased to capture the "sprinkle" history
-        sessionLimit: 25,
+        activeLimit: 12,
+        sessionLimit: 16,
         sessionGapMinutes: 90,
     },
     maxRecentTracks: 8, // Increased for desktop view
@@ -374,66 +374,44 @@ async function fetchLastFmNowPlaying() {
                 }).catch(() => { });
             }
         }
-        // NEW TRACK: Try to get Spotify image (Priority) but don't block forever
+        // NEW TRACK: fetch Spotify enrichment in the background to keep UI updates immediate.
         else if (CONFIG.spotify.enabled) {
-            const spotifyPromise = getSpotifyTrackData(trackInfo.name, trackInfo.artist);
-            const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 800)); // 800ms grace period
+            getSpotifyTrackData(trackInfo.name, trackInfo.artist).then(spotifyData => {
+                if (!spotifyData) return;
 
-            try {
-                // Wait briefly for Spotify (prioritize quality)
-                const spotifyData = await Promise.race([spotifyPromise, timeoutPromise]);
-
-                if (spotifyData) {
-                    // Success! Use Spotify data immediately
-                    if (spotifyData.albumImage) trackInfo.image = spotifyData.albumImage;
-                    trackInfo.artistImage = spotifyData.artistImage;
-                    trackInfo.spotifyUrl = spotifyData.spotifyUrl;
-                    
-                    if (spotifyData.albumImage || spotifyData.artistImage || spotifyData.spotifyUrl) {
-                        state.trackCache.set(trackKey, {
-                            albumImage: spotifyData.albumImage || trackInfo.image || null,
-                            artistImage: spotifyData.artistImage || null,
-                            spotifyUrl: spotifyData.spotifyUrl || null,
-                        });
-                    }
-                } else {
-                    // Timeout - Render Last.fm data first, then update when Spotify arrives
-                    spotifyPromise.then(delayedData => {
-                        if (delayedData) {
-                            if (state.sources.lastfm.playing &&
-                                state.sources.lastfm.track &&
-                                state.sources.lastfm.track.name === trackInfo.name) {
-
-                                if (delayedData.albumImage) state.sources.lastfm.track.image = delayedData.albumImage;
-                                state.sources.lastfm.track.artistImage = delayedData.artistImage;
-                                state.sources.lastfm.track.spotifyUrl = delayedData.spotifyUrl;
-
-                                if (delayedData.albumImage || delayedData.artistImage || delayedData.spotifyUrl) {
-                                    state.trackCache.set(trackKey, {
-                                        albumImage: delayedData.albumImage || state.sources.lastfm.track.image || null,
-                                        artistImage: delayedData.artistImage || null,
-                                        spotifyUrl: delayedData.spotifyUrl || null,
-                                    });
-                                }
-
-                                // Re-extract colors for the new high-res image
-                                if (delayedData.albumImage) {
-                                    extractColors(delayedData.albumImage).then(colors => {
-                                        applyDynamicColors(colors || getDefaultColors());
-                                    });
-                                }
-
-                                if (state.activeSource === 'lastfm') {
-                                    updateNowPlayingCard(state.sources.lastfm.track, true);
-                                    updateSourceIndicators();
-                                }
-                            }
-                        }
-                    }).catch(console.warn);
+                if (spotifyData.albumImage || spotifyData.artistImage || spotifyData.spotifyUrl) {
+                    state.trackCache.set(trackKey, {
+                        albumImage: spotifyData.albumImage || trackInfo.image || null,
+                        artistImage: spotifyData.artistImage || null,
+                        spotifyUrl: spotifyData.spotifyUrl || null,
+                    });
                 }
-            } catch (e) {
-                console.warn('Spotify fetch error', e);
-            }
+
+                // Only apply delayed enrichment if this exact track is still the active one.
+                if (
+                    !state.sources.lastfm.playing ||
+                    !state.sources.lastfm.track ||
+                    state.sources.lastfm.track.name !== trackInfo.name ||
+                    state.sources.lastfm.track.artist !== trackInfo.artist
+                ) {
+                    return;
+                }
+
+                if (spotifyData.albumImage) state.sources.lastfm.track.image = spotifyData.albumImage;
+                if (spotifyData.artistImage) state.sources.lastfm.track.artistImage = spotifyData.artistImage;
+                if (spotifyData.spotifyUrl) state.sources.lastfm.track.spotifyUrl = spotifyData.spotifyUrl;
+
+                if (spotifyData.albumImage) {
+                    extractColors(spotifyData.albumImage).then(colors => {
+                        applyDynamicColors(colors || getDefaultColors());
+                    });
+                }
+
+                if (state.activeSource === 'lastfm') {
+                    updateNowPlayingCard(state.sources.lastfm.track, true);
+                    updateSourceIndicators();
+                }
+            }).catch(console.warn);
         }
 
         if (isPlaying) {
@@ -914,16 +892,51 @@ function updateSourceIndicators() {
     });
 }
 
-function updateBackdrops(imageUrl) {
+function buildDynamicBackdrop(colors = state.currentColors || getDefaultColors()) {
+    const primaryRaw = colors.primaryRaw || getDefaultColors().primaryRaw;
+    const secondaryRaw = colors.secondaryRaw || getDefaultColors().secondaryRaw;
+
+    return `
+        radial-gradient(ellipse at 24% 16%, rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.58) 0%, transparent 52%),
+        radial-gradient(ellipse at 78% 82%, rgba(${secondaryRaw.r}, ${secondaryRaw.g}, ${secondaryRaw.b}, 0.5) 0%, transparent 56%),
+        radial-gradient(ellipse at 50% 50%, rgba(var(--bg-primary-rgb), 0.18) 0%, transparent 72%)
+    `;
+}
+
+function applyColorBackdrops(colors = state.currentColors || getDefaultColors()) {
+    const backdrops = [elements.artistBackdrop, elements.recentBackdrop, elements.aiBackdrop, elements.immersiveBg];
+    const gradient = buildDynamicBackdrop(colors);
+
+    backdrops.forEach(bg => {
+        if (!bg || bg.dataset.bg) return;
+        bg.style.background = gradient;
+        bg.classList.add('loaded');
+    });
+}
+
+function updateBackdrops(imageUrl, options = {}) {
     const backdrops = [elements.artistBackdrop, elements.recentBackdrop, elements.aiBackdrop, elements.immersiveBg];
     backdrops.forEach(bg => {
         if (!bg) return;
         if (imageUrl) {
-            setBackgroundIfChanged(bg, imageUrl);
+            const currentUrl = bg.dataset.bg || '';
+            if (currentUrl !== imageUrl) {
+                // Clear gradient fallback only when switching to a different image.
+                bg.style.background = '';
+            }
+            const changed = setBackgroundIfChanged(bg, imageUrl);
+            if (!changed && !bg.style.backgroundImage) {
+                // Recover from any prior style reset when URL is unchanged.
+                bg.style.backgroundImage = `url(${imageUrl})`;
+            }
             bg.classList.add('loaded');
+        } else if (options.clear) {
+            setBackgroundIfChanged(bg, '');
+            bg.style.background = '';
+            bg.classList.remove('loaded');
         } else {
             setBackgroundIfChanged(bg, '');
-            bg.classList.remove('loaded');
+            applyColorBackdrops();
         }
     });
 }
@@ -972,7 +985,7 @@ function updateNowPlayingCard(track, isPlaying) {
             updateBackdrops(track.artistImage);
         } else {
             elements.artistThumbnailContainer.classList.remove('loaded');
-            updateBackdrops('');
+            updateBackdrops('', { clear: !track.image });
         }
 
         elements.playingIndicator.classList.add('active');
@@ -1025,7 +1038,7 @@ function updateNowPlayingCard(track, isPlaying) {
                 updateBackdrops(lastTrack.artistImage);
             } else {
                 elements.artistThumbnailContainer.classList.remove('loaded');
-                updateBackdrops('');
+                updateBackdrops('', { clear: !lastTrack.image });
             }
 
             const timeAgo = lastTrack.date ? getTimeAgo(lastTrack.date) : 'recently';
@@ -1086,8 +1099,7 @@ function updateNowPlayingCard(track, isPlaying) {
                 elements.albumArt.classList.remove('loaded');
             });
             elements.artistThumbnailContainer.classList.remove('loaded');
-            elements.artistBackdrop.classList.remove('loaded');
-            if (elements.immersiveBg) setBackgroundIfChanged(elements.immersiveBg, '');
+            updateBackdrops('', { clear: true });
             elements.listeningStatus.textContent = 'Silence is golden';
 
             if (elements.card) {
@@ -1242,24 +1254,7 @@ function applyDynamicColors(colors) {
     // Apply to CSS custom properties on the music section
     const root = elements.musicHero || document.documentElement;
 
-    // Create gradient for backdrop using rgba with proper alpha
-    const gradientBlur = `
-        radial-gradient(ellipse at 30% 20%, rgba(${primaryRaw.r}, ${primaryRaw.g}, ${primaryRaw.b}, 0.4) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(${secondaryRaw.r}, ${secondaryRaw.g}, ${secondaryRaw.b}, 0.4) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.3) 0%, transparent 70%)
-    `;
-
-    // Apply to artist backdrop
-    if (elements.artistBackdrop && !elements.artistBackdrop.dataset.bg) {
-        elements.artistBackdrop.style.background = gradientBlur;
-        elements.artistBackdrop.classList.add('loaded');
-    }
-
-    // Apply to Immersive Background (Fallback if no artist image)
-    if (elements.immersiveBg && !elements.immersiveBg.style.backgroundImage) {
-        elements.immersiveBg.style.background = gradientBlur;
-        elements.immersiveBg.classList.add('loaded');
-    }
+    applyColorBackdrops(colors);
 
     // BOOST COLORS for Glow: Ensure highlight is visible even with dark album arts
     const boostColor = (c, minBrightness = 60) => {
@@ -1289,6 +1284,16 @@ function applyDynamicColors(colors) {
     const cards = [elements.card, elements.recentTracksCard, elements.aiSummaryCard].filter(Boolean);
     const borderColor = `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.35)`;
     const glowColor = `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.35)`;
+    const iconGlow = `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.35)`;
+    const iconGlowBright = `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.55)`;
+
+    // Keep the page scrollbar in sync with the current album-derived palette.
+    document.documentElement.style.setProperty('--music-page-scrollbar-color', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.55)`);
+    document.documentElement.style.setProperty('--music-page-scrollbar-color-bright', `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.85)`);
+    document.documentElement.style.setProperty('--music-page-scrollbar-hover-color', `rgba(${secondaryRaw.r}, ${secondaryRaw.g}, ${secondaryRaw.b}, 0.85)`);
+    document.documentElement.style.setProperty('--music-page-scrollbar-glow', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.35)`);
+    document.documentElement.style.setProperty('--music-icon-glow', iconGlow);
+    document.documentElement.style.setProperty('--music-icon-glow-bright', iconGlowBright);
 
     cards.forEach(card => {
         card.style.setProperty('--dynamic-primary', primary);
@@ -1298,6 +1303,8 @@ function applyDynamicColors(colors) {
         card.style.setProperty('--dynamic-border-color-bright', `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.6)`);
         card.style.setProperty('--dynamic-scrollbar-color', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.5)`);
         card.style.setProperty('--dynamic-scrollbar-color-bright', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.8)`);
+        card.style.setProperty('--dynamic-surface-a', `rgba(${boostedPrimary.r}, ${boostedPrimary.g}, ${boostedPrimary.b}, 0.24)`);
+        card.style.setProperty('--dynamic-surface-b', `rgba(${boostedBlended.r}, ${boostedBlended.g}, ${boostedBlended.b}, 0.2)`);
         card.style.borderColor = borderColor;
         
         // Update data attribute for Groq brand compliance (morphing logo color)
@@ -1363,13 +1370,19 @@ function resetDynamicColors() {
         card.style.removeProperty('--dynamic-border-color-bright');
         card.style.removeProperty('--dynamic-scrollbar-color');
         card.style.removeProperty('--dynamic-scrollbar-color-bright');
+        card.style.removeProperty('--dynamic-surface-a');
+        card.style.removeProperty('--dynamic-surface-b');
         card.style.borderColor = '';
     });
 
-    if (elements.artistBackdrop) {
-        elements.artistBackdrop.style.background = '';
-        elements.artistBackdrop.classList.remove('loaded');
-    }
+    updateBackdrops('', { clear: true });
+
+    document.documentElement.style.removeProperty('--music-page-scrollbar-color');
+    document.documentElement.style.removeProperty('--music-page-scrollbar-color-bright');
+    document.documentElement.style.removeProperty('--music-page-scrollbar-hover-color');
+    document.documentElement.style.removeProperty('--music-page-scrollbar-glow');
+    document.documentElement.style.removeProperty('--music-icon-glow');
+    document.documentElement.style.removeProperty('--music-icon-glow-bright');
 
     if (elements.playingIndicator) {
         elements.playingIndicator.querySelectorAll('span').forEach(bar => {

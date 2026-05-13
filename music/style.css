@@ -59,6 +59,37 @@
     box-shadow: 0 0 15px var(--dynamic-glow-color, rgba(var(--neon-gold-rgb), 0.5));
 }
 
+/* Page scrollbar should follow the same dynamic music palette */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 10px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        var(--music-page-scrollbar-color-bright, var(--neon-gold)),
+        var(--music-page-scrollbar-color, var(--neon-amber))
+    );
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 12px var(--music-page-scrollbar-glow, rgba(var(--neon-gold-rgb), 0.25));
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+        180deg,
+        var(--music-page-scrollbar-hover-color, var(--neon-amber)),
+        var(--music-page-scrollbar-color-bright, var(--neon-cyan))
+    );
+}
+
 .music-hero {
     min-height: 100dvh;
     display: flex;
@@ -222,7 +253,10 @@
 .now-playing-card {
     position: relative;
     width: 100%;
-    background: rgba(var(--bg-tertiary-rgb), 0.3);
+    background:
+        radial-gradient(circle at 18% 0%, var(--dynamic-surface-a, rgba(var(--neon-gold-rgb), 0.16)), transparent 48%),
+        radial-gradient(circle at 92% 100%, var(--dynamic-surface-b, rgba(var(--neon-cyan-rgb), 0.14)), transparent 52%),
+        rgba(var(--bg-tertiary-rgb), 0.34);
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
@@ -252,8 +286,8 @@
     inset: 0;
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
-    filter: blur(50px) brightness(0.35) saturate(1.1);
+    background-repeat: no-repeat;
+    filter: blur(50px) brightness(0.52) saturate(1.55);
     opacity: 0;
     transition: opacity var(--spring-smooth), background-image 1s ease-in-out;
     z-index: 0;
@@ -262,7 +296,7 @@
 }
 
 .artist-backdrop.loaded {
-    opacity: 1;
+    opacity: 0.92;
 }
 
 .card-content {
@@ -533,7 +567,10 @@
     overflow: hidden;
     width: 100%;
     padding: var(--space-lg);
-    background: rgba(var(--bg-tertiary-rgb), 0.3);
+    background:
+        radial-gradient(circle at 12% 0%, var(--dynamic-surface-a, rgba(var(--neon-gold-rgb), 0.14)), transparent 46%),
+        radial-gradient(circle at 88% 100%, var(--dynamic-surface-b, rgba(var(--neon-cyan-rgb), 0.12)), transparent 52%),
+        rgba(var(--bg-tertiary-rgb), 0.34);
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
@@ -665,7 +702,10 @@
     max-width: calc(480px * 2 + var(--space-2xl));
     margin: 0 auto;
     
-    background: rgba(var(--bg-tertiary-rgb), 0.3);
+    background:
+        radial-gradient(circle at 16% 0%, var(--dynamic-surface-a, rgba(var(--neon-gold-rgb), 0.14)), transparent 48%),
+        radial-gradient(circle at 90% 100%, var(--dynamic-surface-b, rgba(var(--neon-cyan-rgb), 0.12)), transparent 54%),
+        rgba(var(--bg-tertiary-rgb), 0.34);
     -webkit-backdrop-filter: var(--glass-filter);
     backdrop-filter: var(--glass-filter);
     border: 1px solid var(--dynamic-border-color, rgba(var(--neon-gold-rgb), var(--glass-border-opacity)));
@@ -804,10 +844,6 @@
 }
 
 @media (max-width: 900px) {
-    .artist-backdrop {
-        background-attachment: scroll;
-    }
-
     .ai-summary-card,
     .recent-tracks {
         max-width: 420px;
@@ -873,7 +909,7 @@
     background-position: center;
     background-repeat: no-repeat;
     /* Massive blur for the "universal" feel */
-    filter: blur(80px) brightness(0.4) saturate(1.3);
+    filter: blur(80px) brightness(0.52) saturate(1.55);
     /* Scale up slightly to hide blurred edges */
     transform: scale(1.2) translateZ(0);
     opacity: 0;
@@ -883,7 +919,7 @@
 }
 
 .immersive-bg.loaded {
-    opacity: 0.45;
+    opacity: 0.5;
 }
 
 /* Mobile adjustments */
