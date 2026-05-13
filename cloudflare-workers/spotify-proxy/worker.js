@@ -661,7 +661,8 @@ function pickBestTrackMatch(candidates, trackName, artistName) {
         }
     }
 
-    return bestScore > 0 ? best : null;
+    if (bestScore <= 0 || !best) return null;
+    return { candidate: best, score: bestScore };
 }
 
 async function searchReccoArtist(artistName) {
@@ -678,12 +679,12 @@ async function searchReccoArtist(artistName) {
     return pickBestArtistMatch(data?.content, artistName);
 }
 
-async function getReccoArtistTracks(artistId) {
+async function getReccoArtistTracks(artistId, size = 50, page = 0) {
     if (!artistId) return [];
     const data = await fetchReccoJson(
         `/v1/artist/${artistId}/track`,
-        { size: 100 },
-        buildCachePath(artistId, 'tracks'),
+        { size, page },
+        buildCachePath(artistId, 'tracks', size, page),
         METADATA_CACHE_TTL_SECONDS
     );
     return Array.isArray(data?.content) ? data.content : [];
@@ -730,14 +731,28 @@ async function findReccoTrackByNameAndArtist(trackName, artistName, options = {}
     const artist = await searchReccoArtist(artistName);
     if (!artist?.id) return null;
 
-    const artistTracks = await getReccoArtistTracks(artist.id);
-    if (!artistTracks.length) return null;
+    const pageSize = 50;
+    const maxPages = 3;
+    let allCandidates = [];
+    let bestTrack = null;
+    let bestScore = -1;
 
-    const bestTrack = pickBestTrackMatch(artistTracks, trackName, artistName);
+    for (let page = 0; page < maxPages; page += 1) {
+        const artistTracks = await getReccoArtistTracks(artist.id, pageSize, page);
+        if (!artistTracks.length) break;
+
+        allCandidates = allCandidates.concat(artistTracks);
+        const bestResult = pickBestTrackMatch(allCandidates, trackName, artistName);
+        bestTrack = bestResult?.candidate || null;
+        bestScore = bestResult?.score ?? -1;
+
+        // Exact-ish match reached (title + clean title + artist signals), no need to fetch more pages.
+        if (bestScore >= 100) break;
+    }
+
     if (!bestTrack) return null;
 
-    const spotifyId = extractSpotifyIdFromUrl(bestTrack.href);
-    if (!spotifyId) return null;
+    const spotifyId = extractSpotifyIdFromUrl(bestTrack.href) || null;
 
     let year = 'unknown';
     let albumName = null;
@@ -882,9 +897,15 @@ function classifyMood(features) {
 
 function extractSpotifyIdFromUrl(url) {
     if (!url || typeof url !== 'string') return null;
-    const parts = url.split('/track/');
-    if (parts.length < 2) return null;
-    return parts[1].split('?')[0];
+
+    const trimmed = url.trim();
+    const uriMatch = trimmed.match(/^spotify:track:([a-zA-Z0-9]+)$/i);
+    if (uriMatch?.[1]) return uriMatch[1];
+
+    const webMatch = trimmed.match(/open\.spotify\.com\/(?:intl-[^/]+\/)?track\/([a-zA-Z0-9]+)/i);
+    if (webMatch?.[1]) return webMatch[1];
+
+    return null;
 }
 
 // ==========================================
