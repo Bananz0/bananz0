@@ -29,6 +29,8 @@
 
     <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ asset_version }}">
     <link rel="stylesheet" href="{{ '/assets/css/modal.css' | relative_url }}?v={{ asset_version }}">
+    <!-- v4 neumorphic dark soft-UI override layer (load last) -->
+    <link rel="stylesheet" href="{{ '/assets/css/neumorphic.css' | relative_url }}?v={{ asset_version }}">
 </head>
 
 <body>
@@ -97,6 +99,7 @@
             <div class="footer-section">
                 <h3>CONTACT</h3>
                 <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+                <a href="{{ '/privacy' | relative_url }}">Privacy Policy</a>
             </div>
         </div>
         <div class="footer-bottom">

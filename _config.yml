@@ -31,6 +31,10 @@ exclude:
   - vendor
   - README.md
   - .gitignore
+  # CV working tree is private (job-application docs + cover letters).
+  # The single public CV is served from assets/cv/glen-muthoka-cv.pdf.
+  - cv
+  - tools
 
 # Defaults
 defaults:

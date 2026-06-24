@@ -129,3 +129,21 @@ package-lock.json
 !.env.example
 wrangler.jsonc
 test-regex.js
+
+# Local tool caches / agent dirs
+.antigravitycli/
+.codex/
+.agents/
+.ruby-lsp/
+.playwright-mcp/
+
+# Local Claude settings (machine-specific)
+.claude/settings.local.json
+
+# CV working tree — private job-application docs; never publish.
+# Anchored to repo root so it does NOT catch archived snapshots (e.g. v1/cv/).
+# The single public CV lives under assets/cv/ and stays tracked.
+/cv/
+
+# Backup / old exports
+*_old.json

@@ -192,9 +192,12 @@ function startAutoCollapseTimer() {
 
             if (isExpanded) {
                 manuallyExpanded = false; // Clear manual flag on auto-collapse
-                floatingInner.classList.remove('mini-expanded', 'expanded');
-                floatingInner.classList.add('compact');
-                setFloatingCtasVisible(false);
+                // Go through updateHeroState so isHeroExpanded/isHeroVisible stay
+                // in sync. Manipulating classList directly here left the state
+                // vars stale (true), which made the NEXT expand a no-op via the
+                // early-return guard in updateHeroState — the "expands only once"
+                // bug. updateHeroState handles the classList + CTA visibility too.
+                updateHeroState(false, false);
 
                 // Keep the chevron highlighted if the page has been scrolled past the hero.
                 // Only remove the highlight when the user is inside the hero area.
@@ -287,6 +290,9 @@ function updateHeroState(isExpanded, isVisible) {
 
 function updateFloatingHero() {
     const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    // v4: toggle dynamic glass behind the nav once the page is scrolled
+    document.body.classList.toggle('is-scrolled', currentScroll > 40);
 
     const scrollDelta = currentScroll - lastScroll;
     const isScrollingUp = scrollDelta < -10;

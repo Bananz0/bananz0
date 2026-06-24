@@ -1,0 +1,632 @@
+/* ==========================================================================
+   v4 — Neumorphic Dark Soft-UI override layer
+   --------------------------------------------------------------------------
+   Loads AFTER main.css / modal.css / project.css so equal-specificity rules
+   win on source order. This file is purely additive: remove the <link> to
+   fall straight back to the v3 neon design. Nothing here touches markup or JS,
+   so the adaptive/morphing nav keeps working exactly as before — it just gets
+   soft extruded surfaces instead of neon borders.
+   ========================================================================== */
+
+:root {
+    /* --- Soft-UI material + light/shadow sources ------------------------- */
+    --neu-bg: #1d2026;
+    /* the single "material" everything is extruded from */
+    --neu-bg-hi: #24282f;
+    /* lit (top-left) face of an extrusion */
+    --neu-bg-lo: #171a1f;
+    /* shaded (bottom-right) face of an extrusion */
+    --neu-bg-raised: #20242b;
+    --neu-bg-sunken: #171a1f;
+    /* Highlight must be strong enough to actually read on the dark plate,
+       otherwise only the dark shadow shows and edges look like a fuzzy halo. */
+    --neu-light: rgba(255, 255, 255, 0.075);
+    --neu-light-strong: rgba(255, 255, 255, 0.1);
+    --neu-dark: rgba(0, 0, 0, 0.5);
+    --neu-dark-strong: rgba(0, 0, 0, 0.6);
+
+    /* The diagonal sheen that crisps the edge of a raised surface */
+    --neu-surface: linear-gradient(145deg, var(--neu-bg-hi), var(--neu-bg-lo));
+    /* Reversed sheen for sunken wells */
+    --neu-well: linear-gradient(145deg, var(--neu-bg-lo), var(--neu-bg-hi));
+
+    /* --- Dual shadows — tighter offsets so small controls stay crisp ----- */
+    --neu-out-sm: 3px 3px 7px var(--neu-dark), -3px -3px 6px var(--neu-light);
+    --neu-out: 6px 6px 13px var(--neu-dark), -5px -5px 11px var(--neu-light);
+    --neu-out-lg: 11px 11px 24px var(--neu-dark-strong), -9px -9px 20px var(--neu-light);
+    --neu-in-sm: inset 2px 2px 4px var(--neu-dark), inset -2px -2px 4px var(--neu-light);
+    --neu-in: inset 3px 3px 7px var(--neu-dark), inset -3px -3px 7px var(--neu-light);
+    --neu-in-deep: inset 5px 5px 11px var(--neu-dark-strong), inset -4px -4px 9px var(--neu-light);
+    /* raised but with a hairline gold rim — used for the focused/key element */
+    --neu-ring-gold: 0 0 0 1.5px rgba(var(--neon-gold-rgb), 0.45);
+
+    /* Shared nav glass — every nav surface (G badge, hub buttons, centre box,
+       social badges) uses these so the frost/blur is uniform across them all. */
+    --nav-glass-bg: rgba(18, 21, 27, 0.55);
+    --nav-glass-blur: blur(16px) saturate(125%);
+
+    /* --- Remap the existing palette to a warm, muted gold monochrome ----- */
+    --neon-gold: #e3b15f;
+    --neon-amber: #d99a4e;
+    --neon-yellow: #f0cd8a;
+    --warm-gold: #c98a3c;
+    /* secondary kept but desaturated to a quiet steel so gold stays dominant */
+    --neon-cyan: #8aa6b4;
+    --neon-teal: #7f9b93;
+    --neon-purple: #e3b15f;
+    --neon-magenta: #d99a4e;
+
+    --neon-gold-rgb: 227, 177, 95;
+    --neon-amber-rgb: 217, 154, 78;
+    --neon-cyan-rgb: 138, 166, 180;
+
+    /* Flatten the multi-neon gradients to subtle gold ramps */
+    --gradient-primary: linear-gradient(135deg, #e7b768, #d2913f);
+    --gradient-secondary: linear-gradient(135deg, #c9b083, #ab9259);
+    --gradient-accent: linear-gradient(135deg, #e7b768, #c9a86a);
+    --gradient-warm: linear-gradient(135deg, #c98a3c, #e3b15f);
+    --gradient-aurora: linear-gradient(135deg, #e3b15f 0%, #d99a4e 35%, #f0cd8a 50%, #d99a4e 65%, #e3b15f 100%);
+
+    /* --- Surfaces: every bg token collapses onto the one material -------- */
+    --bg-primary: var(--neu-bg);
+    --bg-secondary: #181b20;
+    --bg-tertiary: var(--neu-bg-raised);
+    --bg-card: var(--neu-bg);
+    --bg-glass: var(--neu-bg);
+    --bg-tertiary-rgb: 32, 36, 43;
+    --bg-primary-rgb: 29, 32, 38;
+    --bg-secondary-rgb: 24, 27, 32;
+    --deep-space-rgb: 22, 25, 30;
+    --night-sky-rgb: 29, 32, 38;
+
+    /* --- Glass: mostly off; soft-UI is opaque + shadow-driven ------------ */
+    --glass-blur: 7px;
+    --glass-saturate: 108%;
+    --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    --glass-border-opacity: 0.05;
+    --glass-bg-opacity: 1;
+
+    /* --- Text ----------------------------------------------------------- */
+    --text-primary: #e7e9ee;
+    --text-secondary: #a8adba;
+    --text-muted: #6e7585;
+
+    /* --- Map legacy shadow/glow tokens onto the soft shadows ------------- */
+    --shadow-sm: var(--neu-out-sm);
+    --shadow-md: var(--neu-out);
+    --shadow-lg: var(--neu-out-lg);
+    --glow-gold: var(--neu-out);
+    --glow-amber: var(--neu-out);
+    --glow-cyan: var(--neu-out);
+
+    /* --- Borders nearly vanish; shadows do the separating --------------- */
+    --border-color: rgba(255, 255, 255, 0.05);
+    --border-color-subtle: rgba(255, 255, 255, 0.035);
+
+    /* Generous radii read as softer extrusions */
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+}
+
+/* ==========================================================================
+   Base canvas — the uniform material with a faint vignette + grain for depth
+   ========================================================================== */
+body {
+    background: var(--neu-bg) !important;
+    color: var(--text-primary);
+}
+
+/* Soft top-down light + corner vignette so the flat plate has atmosphere */
+body::before {
+    background:
+        radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, 0.035), transparent 60%),
+        radial-gradient(140% 110% at 50% 120%, rgba(0, 0, 0, 0.45), transparent 55%) !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+    animation: none !important;
+}
+
+/* Fine grain overlay — premium texture, very low contrast */
+body::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E") !important;
+    opacity: 0.035 !important;
+    mix-blend-mode: overlay !important;
+    animation: none !important;
+}
+
+/* ==========================================================================
+   Adaptive nav — KEEP the morphing behaviour, just extrude it softly
+   (.nav-hub / .header-center-box are the containers the JS morphs)
+   ========================================================================== */
+.header-center-box {
+    /* This IS the morphing dock — it scales with the expanded menu, so the
+       frosted background grows with the buttons. Uses the shared nav glass so
+       its frost matches every other nav surface exactly. */
+    background: var(--nav-glass-bg) !important;
+    border: none !important;
+    -webkit-backdrop-filter: var(--nav-glass-blur);
+    backdrop-filter: var(--nav-glass-blur);
+    box-shadow: var(--neu-out-lg), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* .nav-hub is only a positioning wrapper around the G badge — keep it
+   invisible so we don't draw a second box behind the actual badge. */
+.nav-hub {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* The G badge + hub buttons use the SAME glass as the centre box (uniform frost) */
+.nav-hub .hub-main,
+.nav-hub .hub-btn {
+    background: var(--nav-glass-bg) !important;
+    border: none !important;
+    -webkit-backdrop-filter: var(--nav-glass-blur) !important;
+    backdrop-filter: var(--nav-glass-blur) !important;
+    box-shadow: var(--neu-out-sm), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-hub .hub-main:hover,
+.nav-hub .hub-btn:hover {
+    border: none !important;
+    box-shadow: var(--neu-out);
+    transform: translateY(-2px);
+    color: var(--neon-gold);
+}
+
+.nav-hub .hub-main:active,
+.nav-hub .hub-btn:active {
+    box-shadow: var(--neu-in-sm);
+    transform: translateY(0);
+}
+
+/* Social / icon badges — SAME glass as the rest of the nav (uniform frost) */
+.social-badge,
+.cv-btn,
+.floating-cv-btn {
+    background: var(--nav-glass-bg) !important;
+    -webkit-backdrop-filter: var(--nav-glass-blur) !important;
+    backdrop-filter: var(--nav-glass-blur) !important;
+    border: none !important;
+    box-shadow: var(--neu-out-sm), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast), color var(--transition-fast);
+}
+
+.social-badge:hover,
+.cv-btn:hover,
+.floating-cv-btn:hover {
+    box-shadow: var(--neu-out);
+    transform: translateY(-2px);
+    color: var(--neon-gold);
+}
+
+.social-badge:active,
+.cv-btn:active,
+.floating-cv-btn:active {
+    box-shadow: var(--neu-in-sm);
+    transform: translateY(0);
+}
+
+.social-badge svg {
+    filter: none;
+}
+
+/* Active nav link reads as a pressed-in well */
+.nav-links a.active,
+.nav-link.active {
+    box-shadow: var(--neu-in-sm);
+    color: var(--neon-gold);
+}
+
+/* --- .floating-inner MUST stay a transparent, zero-padding wrapper --------
+   It's the flex row the nav JS measures (getBoundingClientRect) to drive the
+   expand/collapse and the mobile<->desktop badge FLIP morph. Giving it padding
+   or a surface shifts those measured positions and breaks reliable expansion
+   and mobile positioning. The visible frosted dock lives on .header-center-box
+   (which scales with the morph); the full-width behind-blur is the band below. */
+.floating-inner {
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* --- Full-width progressive blur band behind the navbar -------------------
+   A fixed strip across the whole window top. Content scrolling underneath is
+   gently blurred, and a vertical gradient mask feathers the blur out toward the
+   bottom edge so there's no hard line — the "gradient blur lengthwise across
+   the window". Sits behind the dock; pointer-events pass straight through. */
+.floating-hero::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    pointer-events: none;
+    z-index: -1;
+    -webkit-backdrop-filter: blur(7px) saturate(112%);
+    backdrop-filter: blur(7px) saturate(112%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
+}
+
+/* ==========================================================================
+   Buttons — raised plates that depress on press
+   ========================================================================== */
+.cta-btn,
+.cv-download-btn {
+    background: var(--neu-surface) !important;
+    color: var(--neon-gold);
+    border: none !important;
+    box-shadow: var(--neu-out-sm);
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal), color var(--transition-normal);
+}
+
+.cta-btn::before {
+    display: none !important;
+    /* kill the neon gradient sweep overlay */
+}
+
+.cta-btn:hover,
+.cv-download-btn:hover {
+    color: var(--neon-amber);
+    border: none !important;
+    transform: translateY(-2px);
+    box-shadow: var(--neu-out), var(--neu-ring-gold);
+}
+
+.cta-btn:active,
+.cv-download-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--neu-in);
+    color: var(--neon-gold);
+}
+
+/* Primary / submit = the one filled gold key button */
+.cta-btn.primary,
+.submit-btn {
+    background: var(--gradient-primary) !important;
+    color: #1b1e24 !important;
+    border: none !important;
+    box-shadow: var(--neu-out-sm), inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    text-shadow: none;
+}
+
+.cta-btn.primary:hover,
+.submit-btn:hover {
+    background: linear-gradient(135deg, #efc479, #d2913f) !important;
+    color: #15171c !important;
+    border: none !important;
+    transform: translateY(-2px);
+    box-shadow: var(--neu-out), inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 6px 18px rgba(var(--neon-gold-rgb), 0.28);
+}
+
+.cta-btn.primary:active,
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--neu-in-deep);
+}
+
+/* --- Nav-internal CTAs ---------------------------------------------------
+   PROJECTS / DOWNLOAD CV / GET IN TOUCH live INSIDE the frosted centre box.
+   A raised button inside another surface reads as a box-within-a-box, so here
+   they're flattened to ghost buttons. (Hero .cta-btn on the open page keep the
+   raised look — this only targets buttons inside .header-center-box.) */
+.header-center-box .cta-btn,
+.floating-ctas .cta-btn {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: var(--text-secondary);
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.header-center-box .cta-btn:hover,
+.floating-ctas .cta-btn:hover {
+    background: rgba(var(--neon-gold-rgb), 0.1) !important;
+    box-shadow: none !important;
+    transform: none;
+    color: var(--neon-gold);
+}
+
+.header-center-box .cta-btn:active,
+.floating-ctas .cta-btn:active {
+    background: transparent !important;
+    box-shadow: var(--neu-in-sm);
+    transform: none;
+}
+
+.header-center-box .cta-btn.active,
+.floating-ctas .cta-btn.active {
+    background: rgba(var(--neon-gold-rgb), 0.12) !important;
+    color: var(--neon-gold);
+    box-shadow: none !important;
+}
+
+/* DOWNLOAD CV stays a gold key pill, but flat — a thin top sheen, no dual box */
+.header-center-box .cta-btn.primary,
+.floating-ctas .cta-btn.primary {
+    background: var(--gradient-primary) !important;
+    color: #1b1e24 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.header-center-box .cta-btn.primary:hover,
+.floating-ctas .cta-btn.primary:hover {
+    background: linear-gradient(135deg, #efc479, #d2913f) !important;
+    color: #15171c !important;
+    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 4px 12px rgba(var(--neon-gold-rgb), 0.28) !important;
+}
+
+.header-center-box .cta-btn.primary:active,
+.floating-ctas .cta-btn.primary:active {
+    transform: none;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Chevron toggle inside the bar — flat, gold on hover */
+.mini-toggle {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: color var(--transition-fast);
+}
+
+.mini-toggle:hover {
+    color: var(--neon-gold);
+}
+
+/* ==========================================================================
+   Cards & panels — extruded surfaces, soft hover lift, no neon glow
+   ========================================================================== */
+.stat-card,
+.project-card-full,
+.repo-card,
+.repo-card-full,
+.project-card,
+.skill-panel,
+.contact-form-container,
+.contact-info-card,
+.contact-card,
+.now-playing-card,
+.ai-summary-card,
+.carousel-card-inner,
+.tech-card {
+    /* Inset wells: content is carved INTO the material, not popped out. */
+    background: var(--neu-well) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: none !important;
+    box-shadow: var(--neu-in);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal);
+}
+
+/* Hover deepens the well slightly and warms its rim — no lift (it's recessed) */
+.stat-card:hover,
+.project-card-full:hover,
+.repo-card:hover,
+.project-card:hover,
+.skill-panel:hover,
+.contact-card:hover,
+.carousel-card:hover .carousel-card-inner {
+    transform: none;
+    box-shadow: var(--neu-in-deep), inset 0 0 0 1px rgba(var(--neon-gold-rgb), 0.14);
+}
+
+/* Neutralise the decorative neon glow pseudo-elements on cards */
+.project-card::before,
+.project-card::after,
+.repo-card::before,
+.carousel-card::before,
+.stat-card::before,
+.stat-card::after,
+.panel-glow {
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 0 !important;
+}
+
+/* ==========================================================================
+   Uniform card sizing across every viewport
+   --------------------------------------------------------------------------
+   The base grids use `flex: 1 1 520px` with a large max-width, so a lone card
+   on the last row stretches to ~800px while paired cards sit near 520px — the
+   "pyramid" effect makes card widths inconsistent within and between viewports.
+   Dropping flex-grow and capping at the basis pins every card to one width; on
+   narrow screens flex-shrink takes them all to a uniform full-width column.
+   ========================================================================== */
+.projects-grid>*,
+.repo-grid>* {
+    flex: 0 1 520px !important;
+    max-width: 520px !important;
+}
+
+.repo-grid-compact>* {
+    flex: 0 1 480px !important;
+    max-width: 480px !important;
+}
+
+/* ==========================================================================
+   Inputs & progress tracks — sunken wells
+   ========================================================================== */
+.form-group input,
+.form-group textarea {
+    background: var(--neu-well) !important;
+    border: none !important;
+    box-shadow: var(--neu-in);
+    color: var(--text-primary);
+    transition: box-shadow var(--transition-normal);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border: none !important;
+    box-shadow: var(--neu-in), var(--neu-ring-gold);
+}
+
+.skill-bar-animated,
+.skill-bar {
+    background: var(--neu-well) !important;
+    box-shadow: var(--neu-in-sm);
+    overflow: hidden;
+}
+
+.skill-fill-animated,
+.skill-fill {
+    background: var(--gradient-primary) !important;
+    box-shadow: 0 0 8px rgba(var(--neon-gold-rgb), 0.25);
+}
+
+/* ==========================================================================
+   Chips / badges — tiny raised or pressed pills, muted gold
+   ========================================================================== */
+.skill-badge,
+.project-badge,
+.favorite-badge {
+    background: var(--neu-surface) !important;
+    border: none !important;
+    box-shadow: var(--neu-out-sm);
+    color: var(--neon-gold) !important;
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.skill-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--neu-out);
+}
+
+/* Gradient-clipped headings stay, just in the muted gold ramp */
+.skill-header h3,
+.section-title {
+    filter: saturate(0.95);
+}
+
+/* ==========================================================================
+   Footer — a grounded, gently recessed base, NOT a floating raised slab.
+   (.footer-content is just the inner 3-column grid; it stays transparent.)
+   ========================================================================== */
+.footer-content {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.site-footer {
+    border-top: none !important;
+    background: linear-gradient(180deg, #191c21, var(--neu-bg)) !important;
+    /* soft inner shadow at the very top reads as the page settling into a base */
+    box-shadow: inset 0 9px 16px -10px rgba(0, 0, 0, 0.55);
+}
+
+/* keep the centered gold accent line, just soften it */
+.site-footer::before {
+    opacity: 0.7;
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--border-color-subtle) !important;
+}
+
+/* ==========================================================================
+   Modal & project detail (loaded before this file, so we win on order)
+   ========================================================================== */
+.modal-content,
+.modal-body,
+.project-hero,
+.project-content {
+    background: var(--neu-bg) !important;
+    border: 1px solid var(--border-color-subtle) !important;
+    box-shadow: var(--neu-out-lg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.modal-close,
+.modal-nav,
+.carousel-dot {
+    background: var(--neu-surface) !important;
+    border: none !important;
+    box-shadow: var(--neu-out-sm);
+    color: var(--text-secondary);
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast), color var(--transition-fast);
+}
+
+.modal-close:hover,
+.modal-nav:hover {
+    box-shadow: var(--neu-out);
+    color: var(--neon-gold);
+}
+
+.modal-close:active,
+.modal-nav:active {
+    box-shadow: var(--neu-in-sm);
+}
+
+.carousel-dot.active {
+    box-shadow: var(--neu-in-sm);
+    background: var(--neon-gold) !important;
+}
+
+/* ==========================================================================
+   Kill the pulsating / glowing / glitch animations — soft-UI stays calm.
+   Light-sweep pseudo-elements are also hidden so no moving highlight remains.
+   ========================================================================== */
+/* The pulsing amber radial glow behind the hero — removed entirely */
+.hero::before {
+    display: none !important;
+}
+
+/* Other pulsing glows / light sweeps off (the title glitch is intentionally kept) */
+.carousel-card-inner::after,
+.favorite-project::after,
+.favorite-badge,
+.section-divider::after,
+.status-dot.active {
+    animation: none !important;
+}
+
+/* Shimmer light-sweeps on the skill bars — remove the moving highlight */
+.skill-fill-animated::after,
+.skill-fill::after {
+    animation: none !important;
+    opacity: 0 !important;
+    background: none !important;
+}
+
+/* The favorite badge keeps its shape but loses the pulsing glow */
+.favorite-badge {
+    box-shadow: var(--neu-out-sm) !important;
+}
+
+/* ==========================================================================
+   Accessibility — honour reduced-motion for the new transitions
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+
+    .nav-hub,
+    .header-center-box,
+    .cta-btn,
+    .cv-download-btn,
+    .social-badge,
+    .stat-card,
+    .project-card,
+    .project-card-full,
+    .repo-card,
+    .skill-panel {
+        transition: none !important;
+    }
+}
