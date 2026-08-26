@@ -10,8 +10,8 @@
     "stargazers_count": 711,
     "forks_count": 46,
     "open_issues_count": 24,
-    "download_count": 14560,
-    "score": 123510,
+    "download_count": 14576,
+    "score": 123526,
     "pushed_at": "2026-05-09T12:37:05Z",
     "created_at": "2023-11-05T09:51:09Z",
     "topics": [
@@ -98,6 +98,32 @@
     "topics": []
   },
   {
+    "name": "OpenTVBridge",
+    "full_name": "Bananz0/OpenTVBridge",
+    "html_url": "https://github.com/Bananz0/OpenTVBridge",
+    "description": "Free and open-source Android TV launcher recommendation bridge for Nuvio, Stremio, Plex and Jellyfin",
+    "language": "Kotlin",
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 1,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 7,
+    "score": 157,
+    "pushed_at": "2026-08-24T15:09:29Z",
+    "created_at": "2026-08-24T13:23:29Z",
+    "topics": [
+      "accessibility",
+      "android-tv",
+      "foss",
+      "google-tv",
+      "jellyfin",
+      "kotlin",
+      "plex",
+      "stremio"
+    ]
+  },
+  {
     "name": "GramSMC",
     "full_name": "Bananz0/GramSMC",
     "html_url": "https://github.com/Bananz0/GramSMC",
@@ -127,7 +153,7 @@
     "open_issues_count": 0,
     "download_count": 0,
     "score": 150,
-    "pushed_at": "2026-08-24T02:56:22Z",
+    "pushed_at": "2026-08-25T02:52:02Z",
     "created_at": "2025-11-13T00:26:20Z",
     "topics": []
   },
@@ -181,32 +207,6 @@
     "pushed_at": "2025-10-06T17:28:35Z",
     "created_at": "2024-04-19T21:44:32Z",
     "topics": []
-  },
-  {
-    "name": "OpenTVBridge",
-    "full_name": "Bananz0/OpenTVBridge",
-    "html_url": "https://github.com/Bananz0/OpenTVBridge",
-    "description": "Free and open-source Android TV launcher recommendation bridge for Nuvio, Stremio, Plex and Jellyfin",
-    "language": "Kotlin",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 5,
-    "score": 5,
-    "pushed_at": "2026-08-24T15:09:29Z",
-    "created_at": "2026-08-24T13:23:29Z",
-    "topics": [
-      "accessibility",
-      "android-tv",
-      "foss",
-      "google-tv",
-      "jellyfin",
-      "kotlin",
-      "plex",
-      "stremio"
-    ]
   },
   {
     "name": "440-x360-G1-Hackintosh",
