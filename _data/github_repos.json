@@ -7,11 +7,11 @@
     "language": "PowerShell",
     "fork": false,
     "hidden": false,
-    "stargazers_count": 734,
-    "forks_count": 47,
+    "stargazers_count": 735,
+    "forks_count": 48,
     "open_issues_count": 28,
-    "download_count": 15082,
-    "score": 127532,
+    "download_count": 15101,
+    "score": 127751,
     "pushed_at": "2026-05-09T12:37:05Z",
     "created_at": "2023-11-05T09:51:09Z",
     "topics": [
@@ -38,6 +38,23 @@
     ]
   },
   {
+    "name": "WinStream",
+    "full_name": "Bananz0/WinStream",
+    "html_url": "https://github.com/Bananz0/WinStream",
+    "description": null,
+    "language": "C#",
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 5,
+    "forks_count": 4,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 950,
+    "pushed_at": "2026-09-22T19:50:46Z",
+    "created_at": "2024-06-19T00:23:09Z",
+    "topics": []
+  },
+  {
     "name": "eGPUae",
     "full_name": "Bananz0/eGPUae",
     "html_url": "https://github.com/Bananz0/eGPUae",
@@ -62,23 +79,6 @@
       "nvidia",
       "nvidia-gpu"
     ]
-  },
-  {
-    "name": "WinStream",
-    "full_name": "Bananz0/WinStream",
-    "html_url": "https://github.com/Bananz0/WinStream",
-    "description": null,
-    "language": "C#",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 4,
-    "forks_count": 4,
-    "open_issues_count": 1,
-    "download_count": 0,
-    "score": 800,
-    "pushed_at": "2024-06-22T09:31:52Z",
-    "created_at": "2024-06-19T00:23:09Z",
-    "topics": []
   },
   {
     "name": "Opencore-Lenovo-Thinkpad-G50-80-80E5",
@@ -187,7 +187,7 @@
     "open_issues_count": 2,
     "download_count": 0,
     "score": 150,
-    "pushed_at": "2026-09-21T07:28:39Z",
+    "pushed_at": "2026-09-22T07:07:16Z",
     "created_at": "2025-11-13T00:26:20Z",
     "topics": []
   },
@@ -223,23 +223,6 @@
     "score": 25,
     "pushed_at": "2025-10-06T17:28:35Z",
     "created_at": "2024-04-19T21:44:32Z",
-    "topics": []
-  },
-  {
-    "name": "fincord-lyrics-studio",
-    "full_name": "Bananz0/fincord-lyrics-studio",
-    "html_url": "https://github.com/Bananz0/fincord-lyrics-studio",
-    "description": "Word-level lyric timing for a music library. Separates vocals, picks the right lyrics, aligns them to the audio, writes Enhanced LRC - across CUDA, Intel NPU, Apple Silicon or CPU, chosen per stage.",
-    "language": "C#",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2026-09-14T21:53:15Z",
-    "created_at": "2026-09-07T16:38:17Z",
     "topics": []
   },
   {
@@ -333,6 +316,23 @@
     "topics": []
   },
   {
+    "name": "P4",
+    "full_name": "Bananz0/P4",
+    "html_url": "https://github.com/Bananz0/P4",
+    "description": "This is the working of the P4 lab ",
+    "language": "C++",
+    "fork": false,
+    "hidden": true,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 0,
+    "pushed_at": "2026-08-16T22:44:01Z",
+    "created_at": "2024-02-21T17:14:53Z",
+    "topics": []
+  },
+  {
     "name": "DisplayAssistant",
     "full_name": "Bananz0/DisplayAssistant",
     "html_url": "https://github.com/Bananz0/DisplayAssistant",
@@ -347,6 +347,23 @@
     "score": 0,
     "pushed_at": "2025-10-05T10:58:58Z",
     "created_at": "2025-10-05T10:58:58Z",
+    "topics": []
+  },
+  {
+    "name": "P3",
+    "full_name": "Bananz0/P3",
+    "html_url": "https://github.com/Bananz0/P3",
+    "description": "P3 Lab ",
+    "language": "C++",
+    "fork": false,
+    "hidden": true,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 0,
+    "pushed_at": "2026-08-16T22:23:22Z",
+    "created_at": "2024-02-14T17:49:38Z",
     "topics": []
   },
   {
@@ -367,23 +384,6 @@
     "topics": []
   },
   {
-    "name": "MIPSquare",
-    "full_name": "Bananz0/MIPSquare",
-    "html_url": "https://github.com/Bananz0/MIPSquare",
-    "description": null,
-    "language": "C++",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2025-11-15T14:16:52Z",
-    "created_at": "2025-03-20T19:41:21Z",
-    "topics": []
-  },
-  {
     "name": "BluetoothDeviceCacheFix",
     "full_name": "Bananz0/BluetoothDeviceCacheFix",
     "html_url": "https://github.com/Bananz0/BluetoothDeviceCacheFix",
@@ -401,20 +401,37 @@
     "topics": []
   },
   {
-    "name": "P4",
-    "full_name": "Bananz0/P4",
-    "html_url": "https://github.com/Bananz0/P4",
-    "description": "This is the working of the P4 lab ",
-    "language": "C++",
+    "name": "fincord-lyrics-studio",
+    "full_name": "Bananz0/fincord-lyrics-studio",
+    "html_url": "https://github.com/Bananz0/fincord-lyrics-studio",
+    "description": "Word-level lyric timing for a music library. Separates vocals, picks the right lyrics, aligns them to the audio, writes Enhanced LRC - across CUDA, Intel NPU, Apple Silicon or CPU, chosen per stage.",
+    "language": "C#",
     "fork": false,
-    "hidden": true,
+    "hidden": false,
     "stargazers_count": 0,
     "forks_count": 0,
     "open_issues_count": 0,
     "download_count": 0,
     "score": 0,
-    "pushed_at": "2026-08-16T22:44:01Z",
-    "created_at": "2024-02-21T17:14:53Z",
+    "pushed_at": "2026-09-14T21:53:15Z",
+    "created_at": "2026-09-07T16:38:17Z",
+    "topics": []
+  },
+  {
+    "name": "Sudoku-Solver",
+    "full_name": "Bananz0/Sudoku-Solver",
+    "html_url": "https://github.com/Bananz0/Sudoku-Solver",
+    "description": "P6 and P7 Lab - GUI Qt Sodoku ",
+    "language": "C++",
+    "fork": false,
+    "hidden": false,
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "download_count": 0,
+    "score": 0,
+    "pushed_at": "2026-08-16T22:25:36Z",
+    "created_at": "2024-03-05T22:14:06Z",
     "topics": []
   },
   {
@@ -436,23 +453,6 @@
       "config",
       "github-config"
     ]
-  },
-  {
-    "name": "Sudoku-Solver",
-    "full_name": "Bananz0/Sudoku-Solver",
-    "html_url": "https://github.com/Bananz0/Sudoku-Solver",
-    "description": "P6 and P7 Lab - GUI Qt Sodoku ",
-    "language": "C++",
-    "fork": false,
-    "hidden": false,
-    "stargazers_count": 0,
-    "forks_count": 0,
-    "open_issues_count": 0,
-    "download_count": 0,
-    "score": 0,
-    "pushed_at": "2026-08-16T22:25:36Z",
-    "created_at": "2024-03-05T22:14:06Z",
-    "topics": []
   },
   {
     "name": "Samsung-Scalable-Codec",
@@ -529,20 +529,20 @@
     ]
   },
   {
-    "name": "P3",
-    "full_name": "Bananz0/P3",
-    "html_url": "https://github.com/Bananz0/P3",
-    "description": "P3 Lab ",
+    "name": "MIPSquare",
+    "full_name": "Bananz0/MIPSquare",
+    "html_url": "https://github.com/Bananz0/MIPSquare",
+    "description": null,
     "language": "C++",
     "fork": false,
-    "hidden": true,
+    "hidden": false,
     "stargazers_count": 0,
     "forks_count": 0,
     "open_issues_count": 0,
     "download_count": 0,
     "score": 0,
-    "pushed_at": "2026-08-16T22:23:22Z",
-    "created_at": "2024-02-14T17:49:38Z",
+    "pushed_at": "2025-11-15T14:16:52Z",
+    "created_at": "2025-03-20T19:41:21Z",
     "topics": []
   },
   {
