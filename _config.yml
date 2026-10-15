@@ -23,6 +23,10 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 
+# Dot-dirs are skipped by Jekyll unless listed (security.txt, webfinger, atproto-did)
+include:
+  - .well-known
+
 # Exclude from processing
 exclude:
   - Gemfile

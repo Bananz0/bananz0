@@ -1,0 +1,15 @@
+---
+layout: null
+sitemap: false
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- for p in site.pages %}
+{%- assign last = p.url | slice: -1 %}
+{%- assign ext = p.url | slice: -5, 5 %}
+{%- if p.sitemap == false %}{% continue %}{% endif %}
+{%- if last != '/' and ext != '.html' %}{% continue %}{% endif %}
+{%- if p.url contains '/v1/' or p.url contains '404' %}{% continue %}{% endif %}
+  <url><loc>{{ p.url | replace: 'index.html', '' | absolute_url }}</loc></url>
+{%- endfor %}
+</urlset>
