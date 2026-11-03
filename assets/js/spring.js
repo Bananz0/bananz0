@@ -217,8 +217,14 @@ class SpringAnimation {
                     `box-shadow ${t}`,
                     `max-width ${t}`,
                     `max-height ${t}`,
+                    `min-height ${t}`,
                     `margin ${t}`,
-                    `padding ${t}`
+                    `padding ${t}`,
+                    // inline transitions replace the stylesheet's, so hover
+                    // colour changes would otherwise snap
+                    `color ${t}`,
+                    `background-color ${t}`,
+                    `border-color ${t}`
                 ];
                 if (includeSize) {
                     props.push(`width ${t}`, `height ${t}`);

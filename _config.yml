@@ -1,9 +1,8 @@
 title: Glen Muthoka | Embedded Systems Engineer
 email: theglenmuthoka@gmail.com
 description: >-
-  Electrical & Electronics Engineering student from Kenya, based in Southampton, UK.
-  Specializing in embedded systems, IC design, and homelabbing. 
-  Building at the intersection of hardware and software.
+  Electronics engineer from Kenya, starting a PhD in sustainable electronics at the
+  University of Southampton. IC design, hardware security and embedded systems.
 baseurl: ""
 url: "https://glenmuthoka.com"
 version: "2.0.1"
@@ -39,6 +38,8 @@ exclude:
   # The single public CV is served from assets/cv/glen-muthoka-cv.pdf.
   - cv
   - tools
+  # Local-only task list (git-excluded via .git/info/exclude)
+  - TODO.md
 
 # Defaults
 defaults:

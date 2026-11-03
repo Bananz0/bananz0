@@ -1,0 +1,23 @@
+{% comment %}
+One public repository as a row. Pass repo=<github_repos entry>.
+Rich previews (images / iframe) from _data/project_previews.yml open in the modal.
+{% endcomment %}
+{% assign repo = include.repo %}
+{% assign preview = site.data.project_previews[repo.name] %}
+<li class="ed-repo" data-project-link="{{ repo.html_url }}" data-project-link-target="_blank" {% if preview
+    %}data-modal-images="{{ preview.images | join: ',' }}" data-modal-captions="{{ preview.captions | join: '|' }}"
+    data-modal-title="{{ preview.title | default: repo.name }}" {% if preview.iframe %}data-modal-iframe="{{ preview.iframe }}"
+    {% endif %}{% if preview.iframe_caption %}data-modal-iframe-caption="{{ preview.iframe_caption }}" {% endif %}{% endif %}>
+    <h3 class="ed-repo-name">{{ repo.name }}</h3>
+    <p class="ed-repo-desc">{% if repo.description %}{{ repo.description }}{% else %}<span class="ed-muted">No description.</span>{% endif %}</p>
+    <p class="ed-repo-meta">
+        {% if repo.language %}<span>{{ repo.language }}</span>{% endif %}
+        <span>&#9733; {{ repo.stargazers_count | default: 0 }}</span>
+        {% if repo.forks_count and repo.forks_count > 0 %}<span>&#x2442; {{ repo.forks_count }}</span>{% endif %}
+        {% if repo.download_count and repo.download_count >= 1000 %}<span>{{ repo.download_count | divided_by: 1000.0 | round: 1 }}K downloads</span>
+        {% elsif repo.download_count and repo.download_count > 0 %}<span>{{ repo.download_count }} downloads</span>{% endif %}
+        {% if include.show_updated and repo.pushed_at %}<span>{{ repo.pushed_at | date: "%b %Y" }}</span>{% endif %}
+        {% if repo.fork %}<span>fork</span>{% endif %}
+    </p>
+    <a class="ed-repo-link" href="{{ repo.html_url }}" target="_blank" rel="noopener" aria-label="{{ repo.name }} on GitHub">&nearr;</a>
+</li>

@@ -115,10 +115,23 @@ let lastScroll = 0;
 let ticking = false;
 let autoCollapseTimer = null;
 let ctaCollapseTimer = null;
-const CONTENT_COLLAPSE_EXIT_MS = 320;
+let ctaSettleTimer = null;
+// Must cover the close in nav-motion.css: the row springs shut over
+// --spring-bouncy (~420ms) while its buttons fade.
+const CONTENT_COLLAPSE_EXIT_MS = 480;
+// Open is the reverse: the row springs open and the last button finishes
+// fading in after ~--nav-in-delay + 2 * --nav-stagger + --nav-fade-in.
+const CONTENT_OPEN_SETTLE_MS = 520;
 let manuallyExpanded = false; // Track if user manually expanded the bar
 let isHeroExpanded = null;
 let isHeroVisible = null;
+// A scroll-driven open/close is never reversed before the previous one has
+// finished animating; the newer request is deferred instead.
+const MIN_STATE_MS = 480;
+let lastStateChangeAt = 0;
+let pendingStateTimer = null;
+const SCROLL_UP_EXPAND_PX = 24;
+let scrollUpDistance = 0;
 
 // Detect if we're on the music page
 const isMusicPage = window.location.pathname.includes('/music');
@@ -140,11 +153,11 @@ if (floatingInner && miniToggle) {
         if (isExpanded) {
             // Collapse
             manuallyExpanded = false;
-            updateHeroState(false, false);
+            updateHeroState(false, false, { immediate: true });
         } else {
             // Expand
             manuallyExpanded = true;
-            updateHeroState(true, true);
+            updateHeroState(true, true, { immediate: true });
         }
 
         // reset auto-collapse timer whenever user manually toggles
@@ -223,12 +236,17 @@ function clearAutoCollapseTimer() {
 function setFloatingCtasVisible(isVisible, options = {}) {
     if (!floatingCtas) return;
 
+    clearTimeout(ctaSettleTimer);
+    floatingCtas.classList.remove('is-settled');
+
     if (isVisible) {
         clearTimeout(ctaCollapseTimer);
         ctaCollapseTimer = null;
         floatingCtas.style.pointerEvents = '';
         floatingCtas.classList.remove('leaving');
         floatingCtas.classList.add('visible');
+        // Entrance delays end here, so hover feedback isn't held back by them
+        ctaSettleTimer = setTimeout(() => floatingCtas.classList.add('is-settled'), CONTENT_OPEN_SETTLE_MS);
         return;
     }
 
@@ -251,9 +269,83 @@ function setFloatingCtasVisible(isVisible, options = {}) {
     }, CONTENT_COLLAPSE_EXIT_MS);
 }
 
-// Helper for smooth state updates - accessible globally for toggle and scroll
-function updateHeroState(isExpanded, isVisible) {
+// Natural widths of the dock's collapsible content (name, tagline, each CTA,
+// the CTA row), exposed as CSS custom properties. nav-motion.css uses them as
+// the open max-widths, so open/close transitions start resizing on the first
+// frame. With generous fixed caps (280px for a 155px name, 180px buttons) the
+// first part of every transition only used up slack and the dock lurched late.
+function measureDockContent() {
     if (!floatingInner) return;
+
+    // Combined horizontal scale of transforms from el up to the dock. Hidden
+    // CTAs sit at scale(0.96) inside a scale(0.94) row, and on-screen rects
+    // include transforms, which measured the labels ~10% narrow.
+    const scaleOf = (el) => {
+        let scale = 1;
+        for (let n = el; n && n !== floatingInner.parentElement; n = n.parentElement) {
+            const t = getComputedStyle(n).transform;
+            if (t && t !== 'none') {
+                const m = new DOMMatrixReadOnly(t);
+                scale *= Math.hypot(m.a, m.b) || 1;
+            }
+        }
+        return scale;
+    };
+    // Text width even while clipped to max-width: 0 (it's nowrap, so it still
+    // lays out at full width inside the clip), with transforms undone
+    const textWidth = (el) => {
+        if (!el) return 0;
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return range.getBoundingClientRect().width / scaleOf(el);
+    };
+    const lengthToPx = (value, el) => {
+        const v = (value || '').trim();
+        if (v.endsWith('em')) return parseFloat(v) * parseFloat(getComputedStyle(el).fontSize);
+        return parseFloat(v) || 0;
+    };
+
+    const title = floatingInner.querySelector('.site-title');
+    const sub = floatingInner.querySelector('.site-sub');
+    if (title) floatingInner.style.setProperty('--nav-title-w', `${Math.ceil(textWidth(title))}px`);
+    if (sub) floatingInner.style.setProperty('--nav-sub-w', `${Math.ceil(textWidth(sub))}px`);
+
+    if (!floatingCtas) return;
+    let rowWidth = 0;
+    const buttons = floatingCtas.querySelectorAll('.cta-btn');
+    buttons.forEach((btn) => {
+        const label = [...btn.children].find((c) => getComputedStyle(c).display !== 'none') || btn;
+        const padX = lengthToPx(getComputedStyle(btn).getPropertyValue('--floating-cta-padding-x'), btn);
+        const w = Math.ceil(textWidth(label) + 2 * padX);
+        btn.style.setProperty('--nav-btn-w', `${w}px`);
+        rowWidth += w;
+    });
+    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-sm')) * 16 || 8;
+    floatingCtas.style.setProperty('--nav-ctas-w', `${Math.ceil(rowWidth + gap * Math.max(0, buttons.length - 1))}px`);
+}
+
+measureDockContent();
+// fonts.ready can resolve before the Google Fonts stylesheet has queued its
+// faces, which measured the labels in the fallback font (~7px narrow), so
+// also re-measure whenever any font finishes loading. updateHeroState()
+// measures again right before every open.
+if (document.fonts) {
+    document.fonts.ready.then(measureDockContent);
+    document.fonts.addEventListener?.('loadingdone', measureDockContent);
+}
+let dockMeasureTimer = null;
+window.addEventListener('resize', () => {
+    clearTimeout(dockMeasureTimer);
+    dockMeasureTimer = setTimeout(measureDockContent, 150);
+}, { passive: true });
+
+// Helper for smooth state updates - accessible globally for toggle and scroll
+function updateHeroState(isExpanded, isVisible, options = {}) {
+    if (!floatingInner) return;
+
+    // Latest request wins: drop any deferred change it supersedes
+    clearTimeout(pendingStateTimer);
+    pendingStateTimer = null;
 
     if (isMusicPage) {
         if (isHeroExpanded === false && isHeroVisible === false) return;
@@ -270,9 +362,20 @@ function updateHeroState(isExpanded, isVisible) {
     }
 
     if (isHeroExpanded === isExpanded && isHeroVisible === isVisible) return;
+
+    const wait = lastStateChangeAt + MIN_STATE_MS - performance.now();
+    if (wait > 0 && !options.immediate) {
+        pendingStateTimer = setTimeout(() => updateHeroState(isExpanded, isVisible), wait);
+        return;
+    }
+    lastStateChangeAt = performance.now();
+
     isHeroExpanded = isExpanded;
     isHeroVisible = isVisible;
-    
+
+    // Open max-widths must match the content exactly (see measureDockContent)
+    if (isExpanded) measureDockContent();
+
     requestAnimationFrame(() => {
         if (isExpanded) {
             floatingInner.classList.remove('compact');
@@ -314,6 +417,14 @@ function updateFloatingHero() {
         return;
     }
 
+    // Accumulate upward travel so small jitters (momentum tails, iOS bounce)
+    // don't count as an intent to scroll up.
+    if (scrollDelta < 0) {
+        scrollUpDistance -= scrollDelta;
+    } else if (scrollDelta > 0) {
+        scrollUpDistance = 0;
+    }
+
     if (currentScroll > heroHeight) {
         // PAST HERO
         if (!isMiniMode) {
@@ -322,7 +433,7 @@ function updateFloatingHero() {
             clearAutoCollapseTimer();
         } else {
             // Mobile past hero
-            if (isScrollingUp) {
+            if (scrollUpDistance >= SCROLL_UP_EXPAND_PX) {
                 updateHeroState(true, true);
                 manuallyExpanded = false;
             } else if (isScrollingDown) {
@@ -330,7 +441,7 @@ function updateFloatingHero() {
                 manuallyExpanded = false;
             }
         }
-        
+
         if (miniToggle && isMiniMode) {
             if (floatingInner && (floatingInner.classList.contains('mini-expanded') || floatingInner.classList.contains('expanded'))) {
                 miniToggle.classList.remove('highlight');
@@ -339,20 +450,15 @@ function updateFloatingHero() {
     } else {
         // IN HERO SECTION
         if (isMiniMode) {
-            if (isScrollingUp && currentScroll > 50) {
-                updateHeroState(true, true);
-                if (miniToggle) miniToggle.classList.remove('highlight');
-                manuallyExpanded = false;
-            } else if (isScrollingDown && currentScroll > 50) {
+            // The hero's own CTAs are on screen here, so scrolling never opens
+            // the pill. If it is already open (scrolled up from below), leave
+            // it: collapsing mid-fling made it open then snap shut. The
+            // scroll-stop handler closes it once the page comes to rest.
+            if (isScrollingDown) {
                 updateHeroState(false, false);
-                if (miniToggle) miniToggle.classList.add('highlight');
                 manuallyExpanded = false;
-            } else if (currentScroll < 50) {
-                manuallyExpanded = false;
-                updateHeroState(false, false);
-                if (miniToggle) miniToggle.classList.remove('highlight');
-                clearAutoCollapseTimer();
             }
+            if (miniToggle) miniToggle.classList.toggle('highlight', currentScroll > 50 && !isHeroExpanded);
         } else {
             // Desktop/Tablet
             updateHeroState(false, false);
@@ -381,6 +487,15 @@ function handleScroll() {
     // Start timer when scrolling stops (debounced)
     clearTimeout(window.scrollStopTimer);
     window.scrollStopTimer = setTimeout(() => {
+        // Came to rest inside the hero with the pill still open from a
+        // scroll-up: the hero CTAs are visible, so close it now.
+        const isMiniMode = window.innerWidth <= 900 || window.innerHeight <= 660;
+        const heroHeight = heroSection ? heroSection.offsetHeight * 0.6 : 500;
+        if (isMiniMode && !manuallyExpanded && !isMusicPage && window.pageYOffset <= heroHeight && isHeroExpanded) {
+            updateHeroState(false, false);
+            if (miniToggle) miniToggle.classList.toggle('highlight', window.pageYOffset > 50);
+            return;
+        }
         startAutoCollapseTimer();
     }, 150); // Wait 150ms after scroll stops before starting the 2-second timer
 }
@@ -413,9 +528,19 @@ window.addEventListener('scroll', handleScroll, { passive: true });
         }, 2000);
     };
 
+    // Open = toggled by a tap/click, or held open by hover/focus on a
+    // hover-capable device (the CSS only honours hover/focus there).
+    const canHover = window.matchMedia('(hover: hover)');
+    const isHubOpen = () =>
+        navHub.classList.contains('touch-active') ||
+        (canHover.matches && !navHub.classList.contains('hub-dismissed') &&
+            navHub.matches(':hover, :focus-within'));
+
     const expandForTouch = () => {
-        const isActive = navHub.classList.contains('touch-active');
-        if (!isActive) {
+        // Touch never uses hover: a tap leaves a sticky :hover behind on
+        // hybrid laptops, so suppress it and let touch-active alone decide.
+        navHub.classList.add('hub-dismissed');
+        if (!isHubOpen()) {
             navHub.classList.add('touch-active');
             navHubMain._justExpanded = true;
             touchStartScroll = window.scrollY;
@@ -441,18 +566,39 @@ window.addEventListener('scroll', handleScroll, { passive: true });
             return;
         }
 
-        const isActive = navHub.classList.contains('touch-active');
         e.preventDefault();
         e.stopPropagation();
 
-        if (isActive) {
+        if (isHubOpen()) {
+            // Close the menu and act as the home button — back to the top
+            // here, or navigate home from other pages. `hub-dismissed` keeps
+            // hover/focus from holding it open (mouse still over the G, or
+            // the sticky hover a finger tap leaves on touch laptops).
             navHub.classList.remove('touch-active');
+            navHub.classList.add('hub-dismissed');
+            clearTimeout(autoCollapseTimer);
+            navHubMain.blur();
+            if (window.location.pathname === new URL(navHubMain.href).pathname) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.location.href = navHubMain.href;
+            }
         } else {
+            navHub.classList.remove('hub-dismissed');
             navHub.classList.add('touch-active');
             touchStartScroll = window.scrollY;
             scheduleAutoCollapse();
         }
     });
+
+    // A mouse leaving or re-entering the hub ends the dismissal so hover
+    // works normally again. Touch pointers fire pointerleave right after
+    // every tap, so they're ignored here.
+    const endDismissForMouse = (e) => {
+        if (e.pointerType === 'mouse') navHub.classList.remove('hub-dismissed');
+    };
+    navHub.addEventListener('pointerleave', endDismissForMouse);
+    navHub.addEventListener('pointerenter', endDismissForMouse);
 
     // 2. Collapse on scroll for touch devices
     window.addEventListener('scroll', () => {

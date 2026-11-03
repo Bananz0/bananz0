@@ -1,0 +1,647 @@
+/* ==========================================================================
+   Floating nav motion
+   --------------------------------------------------------------------------
+   Opening and closing are mirror images, at every breakpoint:
+
+     opening  the dock starts springing open at once; content fades in just
+              behind it, once there is room
+     closing  the dock starts springing shut at once; content fades out over
+              the spring's slow first ~160ms, so it is gone before it would
+              be squeezed
+
+   Before this file, spring.js stamped one inline `transition` on every
+   [data-spring] nav element. Inline styles beat the stylesheet, so the
+   per-state timing in main.css never applied: closing ran the opening
+   transition backwards, squeezing the CTAs while they were still opaque, and
+   hover colours snapped. The nav markup no longer carries data-spring; this
+   file owns its transitions and still uses the spring curves spring.js
+   computes (--spring-*-duration / --spring-*-timing).
+
+   Loads after main.css and neumorphic.css.
+   ========================================================================== */
+
+:root {
+    --nav-spring-d: var(--spring-bouncy-duration, 420ms);
+    --nav-spring-t: var(--spring-bouncy-timing, cubic-bezier(0.32, 0, 0.55, 1.08));
+    --nav-spring: var(--nav-spring-d) var(--nav-spring-t);
+    /* front-loaded fade for leaving content: most of the opacity is gone in
+       the first frames, while the spring's slow start has barely moved */
+    --nav-ease-exit: cubic-bezier(0.2, 0.6, 0.35, 1);
+    --nav-ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --nav-fade-out: 160ms;
+    --nav-fade-in: 220ms;
+    /* sizes no longer wait on close: the close runs in sync with the spring,
+       mirroring the open. Kept as a token so it can be tuned in one place. */
+    --nav-hold: 0ms;
+    /* how long content waits on open, so it never appears inside a sliver */
+    --nav-in-delay: 140ms;
+    /* the tagline coming back on close: it starts as the name has mostly
+       faded and finishes with the spring, so the swap runs alongside the
+       collapse instead of after it */
+    --nav-swap-delay: 60ms;
+    --nav-swap-in: 320ms;
+    --nav-stagger: 35ms;
+    --nav-hover: 180ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   The dock (frosted pill) and its row
+   -------------------------------------------------------------------------- */
+.floating-inner,
+.floating-inner.expanded,
+.floating-inner.mini-expanded {
+    transition:
+        gap var(--nav-spring),
+        min-height var(--nav-spring),
+        top var(--spring-smooth);
+}
+
+.floating-inner.compact {
+    transition:
+        gap var(--nav-spring) var(--nav-hold),
+        min-height var(--nav-spring) var(--nav-hold),
+        top var(--spring-smooth);
+}
+
+.header-center-box,
+.floating-inner.expanded .header-center-box,
+.floating-inner.mini-expanded .header-center-box {
+    transition:
+        padding var(--nav-spring),
+        gap var(--nav-spring),
+        width var(--nav-spring),
+        min-width var(--nav-spring),
+        min-height var(--nav-spring),
+        box-shadow 300ms ease;
+}
+
+.floating-inner.compact .header-center-box {
+    transition:
+        padding var(--nav-spring) var(--nav-hold),
+        gap var(--nav-spring) var(--nav-hold),
+        width var(--nav-spring) var(--nav-hold),
+        min-width var(--nav-spring) var(--nav-hold),
+        min-height var(--nav-spring) var(--nav-hold),
+        box-shadow 300ms ease;
+}
+
+.header-reveal,
+.floating-inner.expanded .header-reveal,
+.floating-inner.mini-expanded .header-reveal {
+    transition:
+        gap var(--nav-spring),
+        min-height var(--nav-spring),
+        margin var(--nav-spring);
+}
+
+.floating-inner.compact .header-reveal {
+    transition:
+        gap var(--nav-spring) var(--nav-hold),
+        min-height var(--nav-spring) var(--nav-hold),
+        margin var(--nav-spring) var(--nav-hold);
+}
+
+.title-group,
+.floating-inner.expanded .title-group,
+.floating-inner.mini-expanded .title-group {
+    transition:
+        gap var(--nav-spring),
+        max-width var(--nav-spring),
+        opacity var(--nav-fade-in) var(--nav-ease-out),
+        transform var(--nav-spring);
+}
+
+.floating-inner.compact .title-group {
+    transition:
+        gap var(--nav-spring) var(--nav-hold),
+        max-width var(--nav-spring) var(--nav-hold),
+        opacity var(--nav-fade-out) var(--nav-ease-exit),
+        transform var(--nav-spring) var(--nav-hold);
+}
+
+/* --------------------------------------------------------------------------
+   Title and tagline
+   The name shows when the dock is open; the tagline shows when it is closed
+   (and alongside the name on wide screens). Whichever is leaving fades first;
+   whichever is arriving fades in once there is room. Every width change
+   rides the same clock as the rest of the dock,
+   so the dock never grows and then shrinks back.
+   -------------------------------------------------------------------------- */
+
+/* closing: the name leaves */
+.floating-inner.compact .site-title {
+    transition:
+        opacity var(--nav-fade-out) var(--nav-ease-exit),
+        transform var(--nav-fade-out) var(--nav-ease-exit),
+        max-width var(--nav-spring) var(--nav-hold),
+        max-height var(--nav-spring) var(--nav-hold),
+        margin var(--nav-spring) var(--nav-hold),
+        font-size var(--nav-spring) var(--nav-hold);
+}
+
+/* closing: the tagline returns while the dock shrinks around it */
+.floating-inner.compact .site-sub {
+    transition:
+        opacity var(--nav-swap-in) var(--nav-ease-out) var(--nav-swap-delay),
+        transform var(--nav-spring) var(--nav-swap-delay),
+        max-width var(--nav-spring) var(--nav-hold),
+        max-height var(--nav-spring) var(--nav-hold),
+        margin var(--nav-spring) var(--nav-hold),
+        font-size var(--nav-spring) var(--nav-hold);
+}
+
+/* opening: the name arrives */
+.floating-inner.expanded .site-title,
+.floating-inner.mini-expanded .site-title {
+    transition:
+        opacity var(--nav-fade-in) var(--nav-ease-out) var(--nav-in-delay),
+        transform var(--nav-spring) var(--nav-in-delay),
+        max-width var(--nav-spring),
+        max-height var(--nav-spring),
+        margin var(--nav-spring),
+        font-size var(--nav-spring);
+}
+
+/* opening: the tagline (where it doesn't fit) fades and gives up its width
+   while the name and CTAs grow */
+.floating-inner.expanded .site-sub,
+.floating-inner.mini-expanded .site-sub {
+    transition:
+        opacity var(--nav-fade-out) var(--nav-ease-exit),
+        transform var(--nav-fade-out) var(--nav-ease-exit),
+        max-width var(--nav-spring),
+        max-height var(--nav-spring),
+        margin var(--nav-spring),
+        font-size var(--nav-spring);
+}
+
+/* 601-900: main.css gives the name height: var(--badge-size-md) (56px), but it
+   shares a grid cell with the tagline inside a 28px, overflow-hidden row.
+   Both centred on the 56px track, i.e. on the row's bottom edge, so the
+   tagline sat low and half-clipped when closed and the name was cut at the
+   top when open. Phones (<=600px) already use height: 100%; match that. */
+@media (min-width: 601px) and (max-width: 900px) {
+    .floating-inner .title-group .site-title {
+        height: 100%;
+    }
+}
+
+/* In the stacked (mini) layout the name and tagline share one grid cell.
+   A short vertical slide keeps the swap readable instead of a double-exposure. */
+@media (max-width: 900px) {
+    .floating-inner.compact .site-title {
+        transform: translateY(-5px);
+    }
+
+    .floating-inner.expanded .site-title,
+    .floating-inner.mini-expanded .site-title {
+        transform: translateY(0);
+    }
+
+    .floating-inner.expanded .site-sub,
+    .floating-inner.mini-expanded .site-sub {
+        transform: translateY(5px);
+    }
+
+    .floating-inner.compact .site-sub {
+        transform: translateY(0);
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Nav CTAs (Projects / CV / Contact)
+   -------------------------------------------------------------------------- */
+.floating-ctas .cta-btn:nth-child(1) { --i: 0; --ri: 2; }
+.floating-ctas .cta-btn:nth-child(2) { --i: 1; --ri: 1; }
+.floating-ctas .cta-btn:nth-child(3) { --i: 2; --ri: 0; }
+
+/* Hidden (resting) state: already zero-sized, so nothing left to animate */
+.floating-ctas {
+    transition: opacity 120ms linear;
+}
+
+/* Open: the row springs to width, then buttons fade in left to right */
+.floating-ctas.visible {
+    transition:
+        width var(--nav-spring),
+        max-width var(--nav-spring),
+        max-height var(--nav-spring),
+        margin-left var(--nav-spring),
+        margin-top var(--nav-spring),
+        gap var(--nav-spring),
+        opacity 160ms var(--nav-ease-out),
+        transform var(--nav-spring);
+}
+
+.floating-ctas.visible .cta-btn {
+    transition:
+        max-width var(--nav-spring),
+        max-height var(--nav-spring),
+        min-height var(--nav-spring),
+        padding var(--nav-spring),
+        font-size var(--nav-spring),
+        opacity var(--nav-fade-in) var(--nav-ease-out) calc(var(--nav-in-delay) + var(--i, 0) * var(--nav-stagger)),
+        transform var(--nav-spring) calc(var(--nav-in-delay) + var(--i, 0) * var(--nav-stagger)),
+        background-color var(--nav-hover),
+        color var(--nav-hover),
+        box-shadow var(--nav-hover);
+}
+
+/* Once the open animation has landed (main.js adds .is-settled), drop the
+   entrance delays so hover feedback is immediate. */
+.floating-ctas.visible.is-settled .cta-btn {
+    transition:
+        max-width var(--nav-spring),
+        max-height var(--nav-spring),
+        min-height var(--nav-spring),
+        padding var(--nav-spring),
+        font-size var(--nav-spring),
+        opacity var(--nav-fade-in) var(--nav-ease-out),
+        transform var(--nav-hover),
+        background-color var(--nav-hover),
+        color var(--nav-hover),
+        box-shadow var(--nav-hover);
+}
+
+/* While closing the row carries both .visible and .leaving. Several
+   breakpoint rules in main.css set .floating-ctas.visible { max-width } and
+   (at <=1024px) come later than the base .leaving rule, holding the row open
+   until main.js removed the classes, so it snapped shut at the end. */
+.floating-ctas.visible.leaving {
+    max-width: 0;
+}
+
+/* Close: the row springs shut while the buttons fade with it */
+.floating-ctas.leaving {
+    transition:
+        width var(--nav-spring) var(--nav-hold),
+        max-width var(--nav-spring) var(--nav-hold),
+        max-height var(--nav-spring) var(--nav-hold),
+        margin-left var(--nav-spring) var(--nav-hold),
+        margin-top var(--nav-spring) var(--nav-hold),
+        gap var(--nav-spring) var(--nav-hold),
+        opacity 0s,
+        transform 0s;
+}
+
+.floating-ctas.leaving .cta-btn {
+    transition:
+        opacity var(--nav-fade-out) var(--nav-ease-exit),
+        transform var(--nav-spring),
+        max-width var(--nav-spring) var(--nav-hold),
+        max-height var(--nav-spring) var(--nav-hold),
+        min-height var(--nav-spring) var(--nav-hold),
+        padding var(--nav-spring) var(--nav-hold),
+        font-size var(--nav-spring) var(--nav-hold),
+        background-color 0s,
+        color 0s,
+        box-shadow 0s;
+}
+
+/* Stacked layout: buttons drop in from the title instead of sliding sideways */
+@media (max-width: 900px) {
+    .floating-ctas .cta-btn,
+    .floating-ctas.leaving .cta-btn {
+        transform: translateY(-6px) scale(0.97);
+    }
+
+    .floating-ctas.visible .cta-btn {
+        transform: translateY(0) scale(1);
+    }
+
+    .floating-ctas.leaving .cta-btn:nth-child(1) { --ri: 2; }
+    .floating-ctas.leaving .cta-btn:nth-child(3) { --ri: 0; }
+}
+
+/* Stacked layout size. The CTA column used to be a fixed 280px (plus the
+   pill's padding), far wider than the name + chevron row, so the open pill
+   was oversized with a long CV slab. Now the column is no wider than the
+   title row, so opening only grows the pill downward: no width change to
+   animate, and nothing for the shrink-to-fit sizing to snap on. */
+@media (max-width: 900px) {
+    .floating-inner.compact .header-center-box {
+        min-width: 200px;
+    }
+
+    .floating-inner.expanded .header-center-box,
+    .floating-inner.mini-expanded .header-center-box {
+        min-width: 0;
+        padding: 12px var(--space-md) 14px;
+    }
+
+    .floating-ctas.visible,
+    .floating-ctas.leaving {
+        width: 200px;
+    }
+
+    .floating-ctas.visible:not(.leaving) {
+        max-width: 200px;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    /* every button fills the column (phones already did; 601-900 shrink-
+       wrapped them, so the CV pill changed shape between breakpoints) */
+    .floating-ctas .cta-btn {
+        --floating-cta-height: 40px;
+        --floating-cta-padding-y: 0.6em;
+        --floating-cta-max-width: 100%;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Fit: the open dock (G + name + tagline + 3 CTAs + 5 badges) needs ~1330px,
+   but the row is capped at 95vw. Between ~1025px and ~1400px the title row
+   was squeezed and clipped on both sides ("LEN MUTHOK"). Drop the tagline
+   from the open dock below 1420px and use the short CTA labels below 1200px
+   (the same labels <=1024px already uses).
+   -------------------------------------------------------------------------- */
+.header-reveal {
+    justify-content: flex-start;
+}
+
+/* Button max-widths exist only so the row can animate from 0; at 118/142px
+   they were narrower than the labels and clipped them. The open row is sized
+   to the labels' natural widths (115 + 156 + 146 + 2 gaps of 8px) with a
+   tighter 1.25em side padding. */
+.floating-ctas .cta-btn,
+.floating-ctas .cta-btn:first-child,
+.floating-ctas .cta-btn.primary,
+.floating-ctas .cta-btn:last-child {
+    --floating-cta-max-width: 180px;
+}
+
+@media (min-width: 1201px) {
+    .floating-ctas .cta-btn,
+    .floating-ctas .cta-btn.primary,
+    .floating-ctas .cta-btn:last-child {
+        --floating-cta-padding-x: 1.25em;
+    }
+
+    .floating-ctas.visible,
+    .floating-ctas.leaving {
+        width: 436px;
+    }
+
+    /* :not(.leaving): while closing the row has both classes, and this must
+       not hold it open against .leaving's max-width: 0 */
+    .floating-ctas.visible:not(.leaving) {
+        max-width: 436px;
+    }
+}
+
+/* With the tagline the open row needs ~1330px; the row is capped at 95vw */
+@media (min-width: 901px) and (max-width: 1420px) {
+    .floating-inner.expanded .site-sub,
+    .floating-inner.mini-expanded .site-sub {
+        max-width: 0;
+        max-height: 0;
+        opacity: 0;
+        margin: 0;
+    }
+}
+
+/* 901-1024: the short labels alone don't make room, so the whole bar steps
+   down to the tablet size. Done through the shared size tokens (not per
+   element) so the G, the pill's min-height, the hub menu offset and the
+   badges all stay the same height and on one centre line. */
+@media (min-width: 901px) and (max-width: 1024px) {
+    :root {
+        --badge-size-lg: var(--badge-size-md);
+        --badge-icon-lg: var(--badge-icon-md);
+    }
+
+    .floating-inner.expanded .header-center-box,
+    .floating-inner.mini-expanded .header-center-box {
+        padding-left: var(--space-md);
+        padding-right: var(--space-md);
+    }
+
+    /* 40px CTAs + the pill's 8px padding = the 56px bar height */
+    .floating-ctas .cta-btn {
+        --floating-cta-height: 40px;
+        --floating-cta-padding-y: 9px;
+    }
+
+    /* main.css gives the fixed bar width: 96% here while it is pinned to
+       left: 0, which pushed the centred row ~2vw to the left */
+    .floating-hero {
+        width: 100%;
+    }
+}
+
+/* Measured content widths (set by measureDockContent() in main.js).
+   Open max-widths equal the real content width, so a collapse starts
+   shrinking on its first frame and runs evenly with the spring; generous
+   fixed caps meant nothing moved for ~200ms and then the dock lurched.
+   The fallbacks are the old fixed values, used until main.js has measured. */
+@media (min-width: 901px) {
+    .floating-inner .site-sub,
+    .floating-inner.compact .site-sub {
+        max-width: calc(var(--nav-sub-w, 300px) + 2px);
+    }
+
+    .floating-inner.expanded .site-title,
+    .floating-inner.mini-expanded .site-title {
+        max-width: calc(var(--nav-title-w, 280px) + 2px);
+    }
+
+    .floating-ctas .cta-btn,
+    .floating-ctas .cta-btn:first-child,
+    .floating-ctas .cta-btn.primary,
+    .floating-ctas .cta-btn:last-child {
+        --floating-cta-max-width: calc(var(--nav-btn-w, 180px) + 2px);
+    }
+
+    .floating-ctas.visible,
+    .floating-ctas.leaving {
+        width: calc(var(--nav-ctas-w, 436px) + 2px);
+    }
+
+    .floating-ctas.visible:not(.leaving) {
+        max-width: calc(var(--nav-ctas-w, 436px) + 2px);
+    }
+}
+
+/* 601-760: G + open dock + five flanking badges can't fit in one row, so
+   the badges move to the bottom-right column early (the phone layout below
+   600px does the same, with the G moving too) */
+@media (min-width: 601px) and (max-width: 760px) {
+    .social-badges-inline {
+        display: none;
+    }
+
+    .social-badges-mobile {
+        display: flex;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+    .floating-ctas .desktop-text {
+        display: none;
+    }
+
+    .floating-ctas .mobile-text {
+        display: inline;
+    }
+
+    .floating-ctas.visible:not(.leaving) {
+        max-width: 280px;
+    }
+
+    .floating-ctas .cta-btn {
+        --floating-cta-padding-x: 18px;
+    }
+
+    .floating-ctas .cta-btn.primary,
+    .floating-ctas .cta-btn:last-child {
+        --floating-cta-padding-x: 20px;
+    }
+}
+
+/* Chevron */
+.mini-toggle {
+    transition:
+        color var(--nav-hover),
+        background-color var(--nav-hover),
+        transform var(--nav-spring),
+        opacity var(--spring-smooth);
+}
+
+.mini-toggle svg {
+    transition: transform var(--nav-spring);
+}
+
+/* --------------------------------------------------------------------------
+   G hub and its menu
+   Buttons arrive one after another, nearest the G first; they leave together.
+   -------------------------------------------------------------------------- */
+.nav-hub {
+    transition:
+        opacity var(--spring-smooth),
+        transform var(--spring-smooth),
+        bottom var(--nav-spring),
+        left var(--nav-spring),
+        top var(--nav-spring);
+}
+
+.nav-hub .hub-main,
+.nav-hub .hub-btn,
+.social-badge {
+    transition:
+        width var(--nav-spring),
+        height var(--nav-spring),
+        transform var(--nav-spring),
+        box-shadow var(--nav-hover),
+        color var(--nav-hover);
+}
+
+.nav-hub .hub-secondary {
+    transition:
+        opacity 160ms var(--nav-ease-out),
+        visibility 0s linear 240ms,
+        transform var(--nav-spring);
+}
+
+.nav-hub .hub-secondary .hub-btn {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.94);
+    transition:
+        opacity 120ms var(--nav-ease-exit),
+        transform 160ms var(--nav-ease-exit),
+        box-shadow var(--nav-hover),
+        color var(--nav-hover);
+}
+
+.nav-hub .hub-secondary .hub-btn:nth-child(1) { --i: 0; }
+.nav-hub .hub-secondary .hub-btn:nth-child(2) { --i: 1; }
+.nav-hub .hub-secondary .hub-btn:nth-child(3) { --i: 2; }
+.nav-hub .hub-secondary .hub-btn:nth-child(4) { --i: 3; }
+
+.nav-hub.touch-active .hub-secondary {
+    transition:
+        opacity 160ms var(--nav-ease-out),
+        visibility 0s,
+        transform var(--nav-spring);
+}
+
+.nav-hub.touch-active .hub-secondary .hub-btn {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity 200ms var(--nav-ease-out) calc(var(--i, 0) * var(--nav-stagger)),
+        transform var(--nav-spring) calc(var(--i, 0) * var(--nav-stagger)),
+        box-shadow var(--nav-hover),
+        color var(--nav-hover);
+}
+
+@media (hover: hover) {
+    .nav-hub:not(.hub-dismissed):hover .hub-secondary,
+    .nav-hub:not(.hub-dismissed):focus-within .hub-secondary {
+        transition:
+            opacity 160ms var(--nav-ease-out),
+            visibility 0s,
+            transform var(--nav-spring);
+    }
+
+    .nav-hub:not(.hub-dismissed):hover .hub-secondary .hub-btn,
+    .nav-hub:not(.hub-dismissed):focus-within .hub-secondary .hub-btn {
+        opacity: 1;
+        transform: none;
+        transition:
+            opacity 200ms var(--nav-ease-out) calc(var(--i, 0) * var(--nav-stagger)),
+            transform var(--nav-spring) calc(var(--i, 0) * var(--nav-stagger)),
+            box-shadow var(--nav-hover),
+            color var(--nav-hover);
+    }
+
+    /* hover lift on an already-open menu button: no stagger delay */
+    .nav-hub:not(.hub-dismissed):hover .hub-secondary .hub-btn:hover,
+    .nav-hub.touch-active .hub-secondary .hub-btn:hover {
+        transform: translateY(-2px);
+        transition:
+            transform var(--nav-hover),
+            box-shadow var(--nav-hover),
+            color var(--nav-hover);
+    }
+}
+
+/* On phones the menu opens upward from the G in the bottom corner, so the
+   nearest button is the last one */
+@media (max-width: 600px) {
+    .nav-hub .hub-secondary .hub-btn {
+        transform: translateY(6px) scale(0.94);
+    }
+
+    .nav-hub .hub-secondary .hub-btn:nth-child(1) { --i: 3; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(2) { --i: 2; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(3) { --i: 1; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(4) { --i: 0; }
+}
+
+/* Breakpoint morph helpers must still be able to jump instantly */
+.nav-hub.setup-morph,
+.social-badges-mobile.setup-morph,
+.social-badges-inline.setup-morph {
+    transition: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: states switch with a short crossfade, nothing moves
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .floating-hero *,
+    .nav-hub,
+    .nav-hub *,
+    .social-badges-mobile,
+    .social-badges-mobile * {
+        transition-property: opacity, color, background-color !important;
+        transition-duration: 120ms !important;
+        transition-delay: 0s !important;
+        transform: none !important;
+    }
+}

@@ -32,6 +32,9 @@
     <!-- v4 neumorphic dark soft-UI override layer (load last) -->
     <link rel="stylesheet" href="{{ '/assets/css/neumorphic.css' | relative_url }}?v={{ asset_version }}">
     {% include identity.html %}
+    <link rel="stylesheet" href="{{ '/assets/css/nav-motion.css' | relative_url }}?v={{ asset_version }}">
+    <!-- v5 refinement layer: quieter type, fewer effects, silicon artwork (load last) -->
+    <link rel="stylesheet" href="{{ '/assets/css/refine.css' | relative_url }}?v={{ asset_version }}">
 </head>
 
 <body>
@@ -88,31 +91,35 @@
     <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>GLEN MUTHOKA</h3>
-                <p>Embedded Systems // Digital Design // Homelabbing</p>
+                <h3>Glen Muthoka</h3>
+                <p>Embedded systems, digital design, homelabbing.</p>
+                <canvas class="wafer-canvas" data-wafer role="img"
+                    aria-label="Generated wafer map: dies binned pass or fail"></canvas>
             </div>
             <div class="footer-section">
-                <h3>LINKS</h3>
-                <a href="https://github.com/{{ site.github_username }}" target="_blank">GitHub</a>
-                <a href="https://linkedin.com/in/{{ site.linkedin_username }}" target="_blank">LinkedIn</a>
-                <a href="https://twitter.com/{{ site.twitter_username }}" target="_blank">Twitter</a>
-                <a rel="me" href="https://mastodon.social/@bananz0" target="_blank">Mastodon</a>
-                <a rel="me" href="https://bsky.app/profile/glenmuthoka.com" target="_blank">Bluesky</a>
+                <h3>Elsewhere</h3>
+                <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://linkedin.com/in/{{ site.linkedin_username }}" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://twitter.com/{{ site.twitter_username }}" target="_blank" rel="noopener">X</a>
+                <a rel="me noopener" href="https://mastodon.social/@bananz0" target="_blank">Mastodon</a>
+                <a rel="me noopener" href="https://bsky.app/profile/glenmuthoka.com" target="_blank">Bluesky</a>
             </div>
             <div class="footer-section">
-                <h3>CONTACT</h3>
+                <h3>Contact</h3>
                 <a href="mailto:{{ site.email }}">{{ site.email }}</a>
                 <a href="{{ '/privacy' | relative_url }}">Privacy Policy</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; {{ 'now' | date: "%Y" }} Glen Muthoka. All systems operational.</p>
+            <p>&copy; {{ 'now' | date: "%Y" }} Glen Muthoka. Built with Jekyll, hosted on GitHub Pages.</p>
         </div>
     </footer>
 
     <script src="{{ '/assets/js/spring.js' | relative_url }}?v={{ asset_version }}"></script>
     <script src="{{ '/assets/js/modal.js' | relative_url }}?v={{ asset_version }}"></script>
     <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ asset_version }}" defer></script>
+    <script src="{{ '/assets/js/silicon.js' | relative_url }}?v={{ asset_version }}" defer></script>
+    <script src="{{ '/assets/js/editorial.js' | relative_url }}?v={{ asset_version }}" defer></script>
 </body>
 
 </html>

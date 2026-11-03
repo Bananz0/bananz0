@@ -23,6 +23,8 @@
     <!-- v4 neumorphic dark soft-UI override layer (load last) -->
     <link rel="stylesheet" href="{{ '/assets/css/neumorphic.css' | relative_url }}?v={{ asset_version }}">
     {% include identity.html %}
+    <link rel="stylesheet" href="{{ '/assets/css/nav-motion.css' | relative_url }}?v={{ asset_version }}">
+    <link rel="stylesheet" href="{{ '/assets/css/refine.css' | relative_url }}?v={{ asset_version }}">
 </head>
 
 <body>
@@ -40,7 +42,7 @@
 
                 <div class="project-title-section fade-in">
                     <span class="project-badge-large">{{ page.category }}</span>
-                    <h1 class="glitch" data-text="{{ page.title }}">{{ page.title }}</h1>
+                    <h1 class="glitch">{{ page.title }}</h1>
                     <p class="project-tagline">{{ page.tagline }}</p>
                 </div>
 
@@ -120,7 +122,7 @@
         {% if page.related_projects %}
         <section class="related-projects">
             <div class="container">
-                <h2 class="section-title fade-in">RELATED_PROJECTS</h2>
+                <h2 class="section-title fade-in">Related projects</h2>
                 <div class="related-grid">
                     {% for project in page.related_projects %}
                     <a href="{{ project.url | relative_url }}" class="related-card fade-in">

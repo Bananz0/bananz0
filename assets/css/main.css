@@ -577,15 +577,28 @@ nav.scrolled {
     z-index: 1;
 }
 
-/* Show secondary buttons on hover, keyboard focus, or touch toggle */
-.nav-hub:hover .hub-secondary,
-.nav-hub:focus-within .hub-secondary,
+/* Show secondary buttons on hover, keyboard focus, or touch toggle.
+   Hover/focus only count on hover-capable devices: a tap leaves the logo
+   "hovered" and focused on phones, which kept the menu stuck open. */
 .nav-hub.touch-active .hub-secondary {
     opacity: 1;
     visibility: visible;
     pointer-events: all;
     transform: translateY(0);
     transition-delay: 0ms;
+}
+
+/* .hub-dismissed (set by JS) ignores hover/focus after a click closes the
+   menu or while it's being used by touch */
+@media (hover: hover) {
+    .nav-hub:not(.hub-dismissed):hover .hub-secondary,
+    .nav-hub:not(.hub-dismissed):focus-within .hub-secondary {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+        transform: translateY(0);
+        transition-delay: 0ms;
+    }
 }
 
 /* Individual Secondary Buttons */
@@ -655,10 +668,15 @@ nav.scrolled {
 }
 
 /* Keep the hover bridge open while moving into the secondary buttons */
-.nav-hub:hover::after,
-.nav-hub:focus-within::after,
 .nav-hub.touch-active::after {
     bottom: -250px;
+}
+
+@media (hover: hover) {
+    .nav-hub:not(.hub-dismissed):hover::after,
+    .nav-hub:not(.hub-dismissed):focus-within::after {
+        bottom: -250px;
+    }
 }
 
 
@@ -1482,11 +1500,26 @@ body.badge-morph-to-desktop .social-badges-inline {
         height: 28px;
     }
 
+    /* Title and tagline share one grid cell and crossfade, so swapping
+       them never changes the pill's width mid-animation. */
+    .floating-inner .header-reveal .title-group {
+        display: grid;
+        justify-items: center;
+        align-items: center;
+    }
+
+    .floating-inner .title-group .site-title,
+    .floating-inner .title-group .site-sub {
+        grid-area: 1 / 1;
+        max-width: none;
+        max-height: none;
+    }
+
     .floating-inner .site-title {
         font-size: 0.95rem;
         text-align: center;
         line-height: 1;
-        height: var(--badge-size-md); 
+        height: var(--badge-size-md);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1557,10 +1590,13 @@ body.badge-morph-to-desktop .social-badges-inline {
         transform: none;
     }
 
-    /* CTAs expand downward below title when visible */
+    /* CTAs expand downward below title when visible.
+       Width is driven by a px max-width (0 -> 280px) so the pill grows
+       smoothly; a % max-width is ignored for shrink-to-fit sizing and
+       made the pill jump at the start and end of the transition. */
     .floating-ctas {
         width: 100%;
-        max-width: 100%;
+        max-width: 0;
         flex-direction: column;
         align-items: center;
         align-self: center;
@@ -1579,6 +1615,8 @@ body.badge-morph-to-desktop .social-badges-inline {
     }
 
     .floating-ctas.visible {
+        width: 280px;
+        max-width: 280px;
         max-height: 150px;
         margin-top: var(--space-sm);
         opacity: 1;
@@ -1586,8 +1624,8 @@ body.badge-morph-to-desktop .social-badges-inline {
     }
 
     .floating-ctas.leaving {
-        width: 100%;
-        max-width: 100%;
+        width: 280px;
+        max-width: 0;
         max-height: 0;
         margin-top: 0;
         margin-left: 0 !important;
@@ -1616,6 +1654,11 @@ body.badge-morph-to-desktop .social-badges-inline {
 @media (max-width: 600px) {
     /* Social Badge Toggle: Swap inline for mobile corner ones */
     .social-badges-inline {
+        /* Out of flow so the invisible row can't widen the header column
+           (it made the expanded pill snap wider on the first frame) */
+        position: absolute;
+        top: 0;
+        right: 0;
         opacity: 0;
         transform: translate3d(24px, 0, 0) scale(0.85);
         pointer-events: none;
@@ -1651,7 +1694,6 @@ body.badge-morph-to-desktop .social-badges-inline {
         transform: translateY(10px);
     }
 
-    .nav-hub:focus-within .hub-secondary,
     .nav-hub.touch-active .hub-secondary {
         transform: translateY(0);
     }
@@ -1719,6 +1761,7 @@ body.badge-morph-to-desktop .social-badges-inline {
         overflow: visible;
         transition:
             padding var(--spring-bouncy),
+            gap var(--spring-bouncy),
             width var(--spring-bouncy),
             min-width var(--spring-bouncy),
             min-height var(--spring-bouncy),
@@ -1737,6 +1780,10 @@ body.badge-morph-to-desktop .social-badges-inline {
         gap: var(--space-sm);
         visibility: visible;
         margin: 0;
+        transition:
+            gap var(--spring-smooth),
+            min-height var(--spring-smooth),
+            margin var(--spring-bouncy);
     }
 
     .title-group {
@@ -1821,8 +1868,8 @@ body.badge-morph-to-desktop .social-badges-inline {
     }
 
     .floating-ctas.leaving {
-        width: 100%;
-        max-width: 100%;
+        width: 280px;
+        max-width: 0;
         max-height: 0;
         opacity: 1;
         margin-top: 0;

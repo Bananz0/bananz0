@@ -8,91 +8,42 @@ permalink: /projects/
 {% assign repo_stats = site.data.github_repo_stats %}
 {% assign total_repo_count = repo_stats.total_count | default: public_repo_count %}
 
-<section class="projects-hero">
-    <div class="container projects-container-wide">
-        <h1 class="glitch fade-in" data-text="PROJECTS">PROJECTS</h1>
-        <p class="hero-subtitle fade-in">{{ total_repo_count }} REPOSITORIES ACROSS PUBLIC, PRIVATE, AND FORKED WORK. THIS PAGE LISTS ONLY PUBLIC REPOS THAT LOOK ACTIVELY MAINTAINED.</p>
-        <div class="projects-hero-cta fade-in" data-spring="snappy" data-bounce="1">
-            <a href="{{ '/' | relative_url }}#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">FEATURED HIGHLIGHTS</a>
-            <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" data-spring="snappy" data-bounce="1" target="_blank" rel="noopener">GITHUB PROFILE</a>
-        </div>
+<section class="ed-page-hero">
+    <p class="hero-kicker fade-in">Archive</p>
+    <h1 class="hero-name fade-in">Projects</h1>
+    <p class="tagline fade-in">{{ total_repo_count }} repositories across public, private and forked work. This page
+        lists the public ones that are still maintained.</p>
+    <div class="cta-buttons fade-in">
+        <a href="{{ '/' | relative_url }}#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">Selected work</a>
+        <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" data-spring="snappy" data-bounce="1"
+            target="_blank" rel="noopener">GitHub profile</a>
     </div>
 </section>
 
-<section class="open-source-section">
-    <div class="container projects-container-wide">
-        <div class="section-intro fade-in">
-            <h2 class="section-title"><span>PUBLIC_REPOS</span></h2>
-            <p class="section-subtitle">Auto-generated from GitHub Pages-safe data in <strong>_data/github_repos.json</strong>. Some work is private, and some forks aren’t mirrored.</p>
-        </div>
+<section id="repositories" class="ed-section">
+    <header class="ed-head fade-in">
+        <span class="ed-no">&mdash;</span>
+        <h2 class="ed-title">Public repositories</h2>
+    </header>
+
+    <div class="ed-body">
+        <p class="ed-note fade-in">Synced nightly from GitHub. Some work is private, and some forks aren&rsquo;t
+            mirrored.</p>
 
         {% assign repos = site.data.github_repos | where_exp: "r", "r.hidden != true" %}
         {% if repos and repos.size > 0 %}
         {% assign repos_sorted = repos | sort_natural: 'score' | reverse %}
-
-        <div class="repo-grid fade-in">
+        <ul class="ed-repos fade-in">
             {% for repo in repos_sorted %}
-            {% assign preview = site.data.project_previews[repo.name] %}
-            <div class="project-card-full repo-card-full" data-spring="default" data-bounce="1"
-                data-project-link="{{ repo.html_url }}" data-project-link-target="_blank"
-                {% if preview %}data-modal-images="{{ preview.images | join: ',' }}"
-                data-modal-captions="{{ preview.captions | join: '|' }}"
-                data-modal-title="{{ preview.title | default: repo.name }}"
-                {% if preview.iframe %}data-modal-iframe="{{ preview.iframe }}"{% endif %}
-                {% if preview.iframe_caption %}data-modal-iframe-caption="{{ preview.iframe_caption }}"{% endif %}{% endif %}>
-                <div class="project-header">
-                    <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif %}</span>
-                    <div class="project-meta">
-                        <span>★ {{ repo.stargazers_count | default: 0 }}</span>
-                        <span></span>
-                        <span>⑂ {{ repo.forks_count | default: 0 }}</span>
-                        {% if repo.pushed_at %}<span></span><span>{{ repo.pushed_at | date: "%b %Y" }}</span>{% endif %}
-                    </div>
-                </div>
-
-                <h3>{{ repo.name }}</h3>
-
-                {% if repo.description %}
-                <p>{{ repo.description }}</p>
-                {% else %}
-                <p class="repo-desc-muted">No description provided.</p>
-                {% endif %}
-
-                <div class="project-stats">
-                    {% if repo.download_count and repo.download_count >= 1000 %}
-                    <span class="stat"><strong>{{ repo.download_count | divided_by: 1000.0 | round: 1 }}K</strong> Downloads</span>
-                    {% elsif repo.download_count and repo.download_count > 0 %}
-                    <span class="stat"><strong>{{ repo.download_count }}</strong> Downloads</span>
-                    {% endif %}
-                    <span class="stat"><strong>★ {{ repo.stargazers_count | default: 0 }}</strong> Stars</span>
-                    {% if repo.forks_count and repo.forks_count > 0 %}<span class="stat"><strong>⑂ {{ repo.forks_count }}</strong> Forks</span>{% endif %}
-                    {% if repo.pushed_at %}<span class="stat">Updated <strong>{{ repo.pushed_at | date: "%b %Y" }}</strong></span>{% endif %}
-                </div>
-
-                {% assign topics = repo.topics | default: empty %}
-                <div class="tech-tags">
-                    {% if topics and topics.size > 0 %}
-                    {% for topic in topics limit: 10 %}
-                    <span class="tech-tag">{{ topic }}</span>
-                    {% endfor %}
-                    {% endif %}
-                    {% if repo.fork %}<span class="tech-tag tech-tag-muted">Fork</span>{% endif %}
-                </div>
-
-                <div class="project-links">
-                    <a class="project-link" href="{{ repo.html_url }}" target="_blank" rel="noopener">VIEW ON GITHUB</a>
-                </div>
-            </div>
+            {% include repo-row.html repo=repo show_updated=true %}
             {% endfor %}
-        </div>
+        </ul>
 
-        <div class="view-all-projects fade-in">
-            <a href="https://github.com/Bananz0?tab=repositories" class="cta-btn" data-spring="snappy" data-bounce="1" target="_blank" rel="noopener">BROWSE ON GITHUB</a>
-        </div>
+        <a href="https://github.com/Bananz0?tab=repositories" class="ed-more fade-in" target="_blank"
+            rel="noopener">Browse on GitHub <span aria-hidden="true">&nearr;</span></a>
         {% else %}
-        <div class="holo-panel fade-in" style="text-align:center; padding: var(--space-2xl);">
-            <p>Repo list not available yet. Run <code>tools/update-github-repos.ps1</code> to generate <code>_data/github_repos.json</code>.</p>
-        </div>
+        <p class="ed-note">Repo list not available yet. Run <code>tools/update-github-repos.ps1</code> to generate
+            <code>_data/github_repos.json</code>.</p>
         {% endif %}
     </div>
 </section>

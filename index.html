@@ -3,837 +3,447 @@ layout: default
 title: Home
 ---
 
-<!-- HERO SECTION -->
-<section id="home" class="hero">
+<!-- HERO -->
+<section id="home" class="hero hero-die">
     <div class="hero-content">
-        <h1 class="glitch" data-text="GLEN MUTHOKA">GLEN MUTHOKA</h1>
-        <p class="tagline">// EMBEDDED SYSTEMS // IC DESIGN // HOMELABBING //</p>
-        <div class="cta-buttons" data-spring="snappy" data-bounce="1">
-            <a href="#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">VIEW PROJECTS</a>
-            <a href="#contact" class="cta-btn" data-spring="snappy" data-bounce="1">GET IN TOUCH</a>
+        <p class="hero-kicker">Incoming PhD researcher &middot; University of Southampton</p>
+        <h1 class="hero-name">Glen Muthoka</h1>
+        <p class="tagline">IC design, hardware security and embedded systems.</p>
+        <div class="cta-buttons">
+            <a href="#projects" class="cta-btn primary" data-spring="snappy" data-bounce="1">Selected work</a>
+            <a href="#contact" class="cta-btn" data-spring="snappy" data-bounce="1">Get in touch</a>
         </div>
     </div>
 
-    <!-- 3D IC Chip container removed (Three.js disabled) -->
+    <figure class="die-figure">
+        <canvas class="die-canvas" data-die role="img"
+            aria-label="Generated illustration of a silicon die: a gold pad ring, SRAM arrays, standard-cell rows and a five-stage ring oscillator"></canvas>
+        <figcaption>
+            <span class="fig-no">Fig. 1</span> Generated die, seed <code data-die-seed>&hellip;</code>
+            <button type="button" class="die-respin" data-die-respin>Re-spin</button>
+        </figcaption>
+    </figure>
 </section>
 
-<!-- ABOUT SECTION -->
-<section id="about" class="page-section about-section">
-    <div class="container">
-        <h2 class="section-title fade-in"><span>ABOUT_ME</span></h2>
+<!-- ABOUT -->
+<section id="about" class="ed-section">
+    <header class="ed-head fade-in">
+        <span class="ed-no">01</span>
+        <h2 class="ed-title">About</h2>
+    </header>
 
-        <div class="about-grid">
-            <!-- Main Profile Panel -->
-            <div class="holo-panel main-panel fade-in">
-                <div class="panel-header">
-                    <span class="panel-icon"></span>
-                    <h2>PROFILE</h2>
-                </div>
-                <div class="panel-content">
-                    <p class="lead">Final-year <strong>Electrical & Electronics Engineering</strong> student at the
-                        <strong>University of Southampton</strong>, with focus on embedded systems, IC design, and
-                        cybersecurity.
-                    </p>
+    <div class="ed-body">
+        <p class="ed-lead fade-in">Electronics engineer starting a <strong>PhD in sustainable electronics</strong> at the
+            <strong>University of Southampton</strong>, where I took my BEng. I work on IC design, hardware security
+            and embedded systems.</p>
 
-                    <p>My journey spans the entire technology stack; developing <strong>AI-driven optical authentication
-                            frameworks</strong> using GPU-accelerated Python, to designing <strong>Ring Oscillator
-                            circuits for real-time clock chips at TSMC 65nm</strong>, to developing space-grade software
-                        for <strong>lunar CubeSat missions</strong>. I thrive where hardware meets software.</p>
-                </div>
-            </div>
+        <p class="ed-text fade-in">I like work that crosses the hardware&ndash;software line: flight software for a
+            <strong>lunar CubeSat</strong>, a <strong>ring-oscillator real-time clock</strong> designed in TSMC 65nm
+            and tested on silicon, and <strong>optical PUF authentication</strong>, the BEng project my PhD builds
+            on.</p>
 
-            <!-- Experience Panel -->
-            <div class="holo-panel fade-in">
-                <div class="panel-header">
-                    <span class="panel-icon"><i class="ph ph-briefcase"></i></span>
-                    <h2>CURRENT_WORK</h2>
-                </div>
-                <div class="panel-content">
-                    <div class="work-item">
-                        <h3>Junior Software Engineer</h3>
-                        <h4>ARTEMIS Small Sat-1 Lunar CubeSat Mission</h4>
-                        <p class="work-period">Sep 2023 → Present</p>
-                        <ul>
-                            <li>Developing <strong>space-grade flight software</strong> in C/C++ following NASA cFS
-                                (Core Flight System) architecture for lunar orbit operations</li>
-                            <li>Implemented <strong>real-time telemetry processing</strong> modules with embedded
-                                systems constraints (limited memory/power)</li>
-                            <li>Optimized system latency by <strong>6%</strong> through algorithm refinement and buffer
-                                management improvements</li>
-                            <li>Enhanced mission reliability by <strong>20%</strong> with comprehensive unit testing,
-                                integration testing, and fault injection scenarios</li>
-                            <li>Collaborated with cross-functional team on <strong>CubeSat subsystem
-                                    integration</strong> (ADCS, comms, power)</li>
-                        </ul>
-                    </div>
-                    <div class="work-item space-grotesk">
-                        <h3>Open Source Contributor</h3>
-                        <h4>Various Projects</h4>
-                        <p class="work-period">2023 → Present</p>
-                        <ul>
-                            <li>Maintained <strong>GalaxyBookEnabler</strong> (430+ stars): PowerShell automation for
-                                Samsung ecosystem interoperability on Windows</li>
-                            <li>Developed <strong>eGPU Auto-Enabler</strong>: Hot-plug solution for external GPU
-                                management with sub-50ms latency</li>
-                            <li>Built <strong>GramSMC</strong>: macOS kernel extensions using DriverKit for LG Gram
-                                hardware control via reverse-engineered EC protocols</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <div class="ed-block">
+            <h3 class="ed-kicker">Work</h3>
 
-            <!-- Education Panel -->
-            <div class="holo-panel fade-in">
-                <div class="panel-header">
-                    <span class="panel-icon"><i class="ph ph-graduation-cap"></i></span>
-                    <h2>EDUCATION</h2>
+            <article class="ed-entry fade-in">
+                <p class="ed-when">Sep 2023 &ndash; Jun 2026</p>
+                <div class="ed-what">
+                    <h4>Junior Software Engineer</h4>
+                    <p class="ed-where">ARTEMIS Small Sat-1 Lunar CubeSat Mission</p>
+                    <ul class="ed-list">
+                        <li>Wrote <strong>flight software</strong> in C/C++ on NASA&rsquo;s core Flight System (cFS) for
+                            lunar-orbit operations</li>
+                        <li><strong>Real-time telemetry processing</strong> within a CubeSat&rsquo;s memory and power
+                            budget</li>
+                        <li>Cut system latency by <strong>6%</strong> by reworking algorithms and buffer management</li>
+                        <li>Raised mission reliability by <strong>20%</strong> with unit, integration and
+                            fault-injection testing</li>
+                        <li>Integration with the <strong>ADCS, comms and power</strong> subsystem teams</li>
+                    </ul>
                 </div>
-                <div class="panel-content">
-                    <div class="edu-item">
-                        <h3>BEng Electrical & Electronics Engineering</h3>
-                        <h4>University of Southampton</h4>
-                        <p class="edu-period">2023 → 2026 (Final Year)</p>
-                        <p><strong>Final Year Project:</strong> AI-Driven Optical Physical Unclonable Function (OPUF)
-                            Authentication Framework</p>
-                        <ul>
-                            <li>GPU-accelerated spectral analysis using <strong>CUDA/CuPy</strong> for real-time device
-                                authentication</li>
-                            <li>Machine learning pipelines for pattern recognition in optical fingerprints</li>
-                            <li>Novel anti-counterfeiting security framework for hardware authentication</li>
-                        </ul>
-                        <p class="key-modules"><strong>Key Modules:</strong></p>
-                        <ul>
-                            <li><strong>D2 IC Design & Test (ELEC2210):</strong> Complete IC design flow from RTL to
-                                silicon validation, DRC/LVS verification, and chip testing</li>
-                            <li><strong>Computer Engineering (ELEC2204):</strong> CPU architecture, pipelining, and
-                                processor simulation</li>
-                            <li><strong>Embedded Systems:</strong> Real-time operating systems, ARM Cortex-M
-                                programming, bare-metal development</li>
-                            <li><strong>Digital Signal Processing:</strong> FFT/DFT, filter design, spectral analysis in
-                                Python/MATLAB</li>
-                            <li><strong>Computer Architecture:</strong> CPU microarchitecture, pipelining, cache
-                                optimization, SystemVerilog HDL</li>
-                            <li><strong>Cybersecurity:</strong> Cryptography, network security, hardware security
-                                modules</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            </article>
 
-            <!-- Interests Panel -->
-            <div class="holo-panel fade-in">
-                <div class="panel-header">
-                    <span class="panel-icon"><i class="ph ph-house"></i></span>
-                    <h2>INTERESTS & HOME LAB</h2>
+            <article class="ed-entry fade-in">
+                <p class="ed-when">2023 &ndash; present</p>
+                <div class="ed-what">
+                    <h4>Open Source Maintainer</h4>
+                    <p class="ed-where">GalaxyBookEnabler (600+ stars), eGPU Auto-Enabler, GramSMC &middot; see
+                        <a href="#projects">Projects</a></p>
                 </div>
-                <div class="panel-content">
-                    <div class="interests-grid">
-                        <div class="interest-item">
-                            <span class="interest-icon"><i class="ph ph-radio"></i></span>
-                            <h4>Amateur Radio</h4>
-                        </div>
-                        <div class="interest-item">
-                            <span class="interest-icon"><i class="ph ph-lock-key"></i></span>
-                            <h4>IoT Security</h4>
-                        </div>
-                        <div class="interest-item">
-                            <span class="interest-icon"><i class="ph ph-code"></i></span>
-                            <h4>Open Source</h4>
-                        </div>
-                        <div class="interest-item">
-                            <span class="interest-icon"><i class="ph ph-hard-drives"></i></span>
-                            <h4>Homelabbing</h4>
-                        </div>
-                    </div>
-                    <p class="muted-lead">
-                        <strong>Home Lab Stack:</strong> OPNsense, HomeNet, UniFi Network, AdGuard, CCTV, Plex, Sonarr,
-                        Radarr, Lidarr, Readarr, homarr, Overseerr, Uptime Kuma, Portainer, Tautulli, Bazarr, Prowlarr,
-                        CasaOS, Grafana, Prometheus, balena dashboard, OpenObserve, Cockpit, qBittorrent. Expert in SSH
-                        tunneling and Ubuntu Server LTS management.
-                    </p>
-                </div>
-            </div>
+            </article>
         </div>
-    </div>
-</section>
 
-<div class="section-divider"></div>
+        <div class="ed-block">
+            <h3 class="ed-kicker">Education</h3>
 
-<!-- PROJECTS SECTION - ALL PROJECTS -->
-<section id="projects" class="page-section projects-section">
-    <div class="container">
-        <h2 class="section-title fade-in"><span>PROJECTS</span></h2>
-
-        <!-- Featured Projects -->
-        <div class="project-category fade-in">
-            <h3 class="category-label"> FEATURED</h3>
-            <div class="projects-grid">
-
-                {% assign gbe_repo = site.data.github_repos | where: "name", "GalaxyBookEnabler" | first %}
-                {% if gbe_repo %}
-                {% assign gbe_preview = site.data.project_previews[gbe_repo.name] %}
-                <!-- Galaxy Book Enabler -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="{{ gbe_repo.html_url }}" data-project-link-target="_blank" {% if gbe_preview
-                    %}data-modal-images="{{ gbe_preview.images | join: ',' }}"
-                    data-modal-captions="{{ gbe_preview.captions | join: '|' }}"
-                    data-modal-title="{{ gbe_preview.title | default: gbe_repo.name }}" {% if gbe_preview.iframe
-                    %}data-modal-iframe="{{ gbe_preview.iframe }}" {% endif %} {% if gbe_preview.iframe_caption
-                    %}data-modal-iframe-caption="{{ gbe_preview.iframe_caption }}" {% endif %}{% endif %}>
-                    <div class="project-header">
-                        <span class="project-badge">WINDOWS</span>
-                        <div class="project-meta">
-                            <span>{{ gbe_repo.language }}</span>
-                            <span></span>
-                            <span>2024-2025</span>
-                        </div>
-                    </div>
-                    <h3>{{ gbe_repo.name }}</h3>
-                    <p>{{ gbe_repo.description }}</p>
-                    <div class="project-stats">
-                        {% if gbe_repo.download_count and gbe_repo.download_count > 0 %}
-                        <span class="stat"><strong>{{ gbe_repo.download_count | divided_by: 1000.0 | round: 1
-                                }}K+</strong> Downloads</span>
-                        {% endif %}
-                        <span class="stat"><strong>{{ gbe_repo.stargazers_count }}+</strong> Stars</span>
-                        <span class="stat"><strong>21</strong> Device Profiles</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">PowerShell 7</span>
-                        <span class="tech-tag">Registry</span>
-                        <span class="tech-tag">WinGet</span>
-                        <span class="tech-tag">Task Scheduler</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="{{ gbe_repo.html_url }}" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% assign egpu_repo = site.data.github_repos | where: "name", "eGPUae" | first %}
-                {% if egpu_repo %}
-                {% assign egpu_preview = site.data.project_previews[egpu_repo.name] %}
-                <!-- eGPU Auto-Enabler -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="{{ egpu_repo.html_url }}" data-project-link-target="_blank" {% if egpu_preview
-                    %}data-modal-images="{{ egpu_preview.images | join: ',' }}"
-                    data-modal-captions="{{ egpu_preview.captions | join: '|' }}"
-                    data-modal-title="{{ egpu_preview.title | default: egpu_repo.name }}" {% if egpu_preview.iframe
-                    %}data-modal-iframe="{{ egpu_preview.iframe }}" {% endif %} {% if egpu_preview.iframe_caption
-                    %}data-modal-iframe-caption="{{ egpu_preview.iframe_caption }}" {% endif %}{% endif %}>
-                    <div class="project-header">
-                        <span class="project-badge">eGPU</span>
-                        <div class="project-meta">
-                            <span>{{ egpu_repo.language }}</span>
-                            <span></span>
-                            <span>2024-2025</span>
-                        </div>
-                    </div>
-                    <h3>eGPU Auto-Enabler</h3>
-                    <p>{{ egpu_repo.description }}</p>
-                    <div class="project-stats">
-                        {% if egpu_repo.download_count and egpu_repo.download_count > 0 %}
-                        <span class="stat"><strong>{{ egpu_repo.download_count | divided_by: 1000.0 | round: 1
-                                }}K+</strong> Downloads</span>
-                        {% endif %}
-                        <span class="stat"><strong>{{ egpu_repo.stargazers_count }}+</strong> Stars</span>
-                        <span class="stat"><strong>&lt;50ms</strong> Latency</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">PowerShell 7</span>
-                        <span class="tech-tag">PnP Utilities</span>
-                        <span class="tech-tag">Power Management</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="{{ egpu_repo.html_url }}" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% assign gramsmc_repo = site.data.github_repos | where: "name", "GramSMC" | first %}
-                {% if gramsmc_repo %}
-                {% assign gramsmc_preview = site.data.project_previews[gramsmc_repo.name] %}
-                <!-- GramSMC + GramControlCenter -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="{{ gramsmc_repo.html_url }}" data-project-link-target="_blank" {% if
-                    gramsmc_preview %}data-modal-images="{{ gramsmc_preview.images | join: ',' }}"
-                    data-modal-captions="{{ gramsmc_preview.captions | join: '|' }}"
-                    data-modal-title="{{ gramsmc_preview.title | default: gramsmc_repo.name }}" {% if
-                    gramsmc_preview.iframe %}data-modal-iframe="{{ gramsmc_preview.iframe }}" {% endif %} {% if
-                    gramsmc_preview.iframe_caption %}data-modal-iframe-caption="{{ gramsmc_preview.iframe_caption }}" {%
-                    endif %}{% endif %}>
-                    <div class="project-header">
-                        <span class="project-badge">HACKINTOSH</span>
-                        <div class="project-meta">
-                            <span>{{ gramsmc_repo.language }}</span>
-                            <span></span>
-                            <span>2026</span>
-                        </div>
-                    </div>
-                    <h3>GramSMC + GramControlCenter</h3>
-                    <p>VirtualSMC plugin providing native macOS support for LG Gram 13Z990-R. Custom ACPI tables and
-                        DriverKit-based kext using macOS Kernel SDK for hardware control via reverse-engineered embedded
-                        controller.</p>
-                    <div class="project-stats">
-                        {% if gramsmc_repo.download_count and gramsmc_repo.download_count > 0 %}
-                        <span class="stat"><strong>{{ gramsmc_repo.download_count | divided_by: 1000.0 | round: 1
-                                }}K+</strong> Downloads</span>
-                        {% endif %}
-                        <span class="stat"><strong>{{ gramsmc_repo.stargazers_count }}+</strong> Stars</span>
-                        <span class="stat"><strong>DriverKit</strong> Based</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">DriverKit</span>
-                        <span class="tech-tag">macOS Kernel SDK</span>
-                        <span class="tech-tag">ACPI</span>
-                        <span class="tech-tag">EC Reverse Engineering</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="{{ gramsmc_repo.html_url }}" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- AI-Driven OPUF -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
-                    <div class="project-header">
-                        <span class="project-badge">FINAL YEAR PROJECT</span>
-                        <div class="project-meta">
-                            <span>Python / CUDA</span>
-                            <span></span>
-                            <span>2025-2026</span>
-                        </div>
-                    </div>
-                    <h3>AI-Driven Optical Authentication Framework</h3>
-                    <p>Novel anti-counterfeiting security framework leveraging Optical Physical Unclonable Functions
-                        (OPUFs). GPU-accelerated spectral analysis with machine learning pipelines for device
+            <article class="ed-entry fade-in">
+                <p class="ed-when">Incoming</p>
+                <div class="ed-what">
+                    <h4>PhD, Sustainable Electronics</h4>
+                    <p class="ed-where">University of Southampton</p>
+                    <p>Continuing my BEng work on optical physically unclonable functions (OPUFs) for hardware
                         authentication.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>OPUF</strong> Based</span>
-                        <span class="stat"><strong>CUDA</strong> Accelerated</span>
-                        <span class="stat"><strong>ML</strong> Pipelines</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">CuPy/CUDA</span>
-                        <span class="tech-tag">NumPy</span>
-                        <span class="tech-tag">Scipy</span>
-                        <span class="tech-tag">Spectral Analysis</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="{{ '/projects/' | relative_url }}" class="project-link dim"
-                            title="View project details">University Research Project</a>
-                    </div>
                 </div>
+            </article>
 
-                <!-- TSMC 65nm RTC IC Design & Testing -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1">
-                    <div class="project-header">
-                        <span class="project-badge">IC DESIGN</span>
-                        <div class="project-meta">
-                            <span>Hardware/Verilog</span>
-                            <span></span>
-                            <span>2023-2025</span>
+            <article class="ed-entry fade-in">
+                <p class="ed-when">2023 &ndash; 2026</p>
+                <div class="ed-what">
+                    <h4>BEng (Hons) Electrical &amp; Electronics Engineering</h4>
+                    <p class="ed-where">University of Southampton &middot; Upper Second-Class Honours (2:1)</p>
+                    <p><strong>BEng project:</strong> AI-Driven Optical Physical Unclonable Function (OPUF)
+                        Authentication Framework</p>
+                    <ul class="ed-list">
+                        <li>GPU-accelerated spectral analysis (<strong>CUDA/CuPy</strong>) for real-time device
+                            authentication</li>
+                        <li>Machine-learning pipelines that recognise devices by their optical fingerprints</li>
+                        <li>An anti-counterfeiting scheme for hardware, built on optical PUFs</li>
+                    </ul>
+
+                    <h5 class="ed-subkicker">Key modules</h5>
+                    <dl class="ed-modules">
+                        <div>
+                            <dt>D2 IC Design &amp; Test <span>ELEC2210</span></dt>
+                            <dd>Complete IC design flow from RTL to silicon validation, DRC/LVS verification, and chip
+                                testing</dd>
                         </div>
-                    </div>
-                    <h3>TSMC 65nm Real-Time Clock: Complete IC Design & Test Flow</h3>
-                    <p>Led complete IC design from RTL to silicon validation for TSMC 65nm Ring Oscillator-based RTC
-                        chip. <strong>Design Phase:</strong> Schematic capture (S-Edit), SPICE simulation (T-Spice),
-                        physical layout (L-Edit), and full DRC/LVS verification (Calibre) achieving 15% area reduction
-                        and zero violations. <strong>Test Phase:</strong> Extracted Verilog golden model from
-                        hierarchical schematics, developed comprehensive test vectors for functional/timing validation,
-                        and successfully applied vectors to physical silicon via IC tester achieving 100% test pass
-                        rate. System validated through rigorous functional testing and timing characterization.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>65nm</strong> Process</span>
-                        <span class="stat"><strong>0</strong> DRC Errors</span>
-                        <span class="stat"><strong>-15%</strong> Area</span>
-                        <span class="stat"><strong>100%</strong> Test Pass</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Cadence S-Edit</span>
-                        <span class="tech-tag">T-Spice</span>
-                        <span class="tech-tag">L-Edit</span>
-                        <span class="tech-tag">Calibre DRC/LVS</span>
-                        <span class="tech-tag">Verilog</span>
-                        <span class="tech-tag">IC Testing</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="{{ '/projects/' | relative_url }}" class="project-link dim"
-                            title="View project details">University Group Project (Team Lead)</a>
-                    </div>
-                </div>
-
-                <!-- WattsApp: Embedded System Management Platform -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="https://github.com/Bananz0/WattsApp" data-project-link-target="_blank"
-                    data-modal-images="/assets/images/projects/wattsapp-dashboard.jpg,/assets/images/projects/wattsapp-circuit.jpg,/assets/images/projects/wattsapp-grafana.jpg"
-                    data-modal-captions="Real-time monitoring dashboard|ATMega644p circuit with sensors|Grafana visualization interface"
-                    data-modal-title="WattsApp: Smart System Management Platform">
-                    <div class="project-header">
-                        <span class="project-badge">EMBEDDED SYSTEMS</span>
-                        <div class="project-meta">
-                            <span>AVR C</span>
-                            <span></span>
-                            <span>2025</span>
+                        <div>
+                            <dt>Computer Engineering <span>ELEC2204</span></dt>
+                            <dd>CPU architecture, pipelining, and processor simulation</dd>
                         </div>
-                    </div>
-                    <h3>WattsApp: Smart System Management Platform</h3>
-                    <p>Designed comprehensive embedded system management platform for real-time monitoring and control
-                        on AVR ATMega644p microcontroller. Developed bare-metal C firmware implementing sensor polling,
-                        data acquisition, and serial communication for telemetry streaming. Integrated InfluxDB
-                        time-series database for efficient historical data storage and Grafana dashboards for live
-                        system visualization and analytics. Implemented sensor interfaces for temperature (I2C),
-                        voltage/current monitoring (ADC), and GPIO control. Achieved sub-millisecond response times with
-                        interrupt-driven architecture and optimized data structures. Successfully demonstrated in IC
-                        testing coursework for chip validation and system integration.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>&lt; 1ms</strong> Response</span>
-                        <span class="stat"><strong>Real-time</strong> Telemetry</span>
-                        <span class="stat"><strong>I2C/ADC</strong> Sensors</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">AVR C</span>
-                        <span class="tech-tag">ATMega644p</span>
-                        <span class="tech-tag">InfluxDB</span>
-                        <span class="tech-tag">Grafana</span>
-                        <span class="tech-tag">UART</span>
-                        <span class="tech-tag">I2C</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/WattsApp" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span>→</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- MIPSquare++ MIPS Simulator -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="https://github.com/Bananz0/MIPSquare" data-project-link-target="_blank"
-                    data-modal-images="/assets/images/projects/mipsquare-pipeline.jpg,/assets/images/projects/mipsquare-hazards.jpg"
-                    data-modal-captions="5-stage pipeline architecture diagram|Hazard detection and forwarding logic"
-                    data-modal-title="MIPSquare++: 5-Stage Pipelined MIPS Simulator">
-                    <div class="project-header">
-                        <span class="project-badge">COMPUTER ARCH</span>
-                        <div class="project-meta">
-                            <span>C++</span>
-                            <span></span>
-                            <span>2025</span>
+                        <div>
+                            <dt>Embedded Systems</dt>
+                            <dd>Real-time operating systems, ARM Cortex-M programming, bare-metal development</dd>
                         </div>
-                    </div>
-                    <h3>MIPSquare++: 5-Stage Pipelined MIPS Simulator</h3>
-                    <p>Comprehensive MIPS CPU simulator implementing realistic 5-stage pipeline (IF/ID/EX/MEM/WB) with
-                        intelligent hazard mitigation. Built custom assembly parser with label resolution supporting
-                        R-type, I-type, and J-type instructions. Engineered EX/MEM and MEM/WB data forwarding paths to
-                        minimize pipeline stalls. Implemented load-use hazard detection with automatic stalling and
-                        branch hazard handling with pipeline flushing. Developed showcase program calculating squares
-                        0-200 using odd-number summation optimized for minimal stalls. Achieved near 1 CPI with
-                        comprehensive test suite validating RAW hazards, control hazards, and memory operations.</p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>5</strong> Pipeline Stages</span>
-                        <span class="stat"><strong>~1.0</strong> CPI</span>
-                        <span class="stat"><strong>17</strong> Instructions</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">C++23</span>
-                        <span class="tech-tag">CMake</span>
-                        <span class="tech-tag">Data Forwarding</span>
-                        <span class="tech-tag">Hazard Detection</span>
-                        <span class="tech-tag">MIPS ISA</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/MIPSquare" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span>→</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Personal Portfolio & Technical Playground -->
-                <div class="project-card-full fade-in" data-spring="smooth" data-bounce="1"
-                    data-project-link="https://github.com/Bananz0/bananz0" data-project-link-target="_blank"
-                    data-modal-images="/assets/images/projects/portfolio-home.jpg,/assets/images/projects/portfolio-music.jpg,/assets/images/projects/portfolio-worker.jpg"
-                    data-modal-captions="Clean, responsive homepage design|Real-time AI music consciousness|Cloudflare Worker backend architecture"
-                    data-modal-title="Personal Portfolio & Technical Playground">
-                    <div class="project-header">
-                        <span class="project-badge">FULL STACK / DEVOPS</span>
-                        <div class="project-meta">
-                            <span>Jekyll / Workers</span>
-                            <span></span>
-                            <span>2026</span>
+                        <div>
+                            <dt>Digital Signal Processing</dt>
+                            <dd>FFT/DFT, filter design, spectral analysis in Python/MATLAB</dd>
                         </div>
-                    </div>
-                    <h3>Personal Portfolio & Technical Playground</h3>
-                    <p>A high-performance personal portfolio and CSS playground engineered as a testing ground for
-                        <strong>CI/CD</strong>, <strong>Dependabot</strong> automation, and <strong>Cloudflare</strong>
-                        infrastructure. Built with a unified <strong>DNS and Workers-based</strong> backend, this site
-                        serves as both a creative showcase and a technical experiment. Integrated
-                        <strong>Groq Llama 3</strong> models via Cloudflare Workers to create "Glen"—an AI personality
-                        that analyzes real-time listening habits from <strong>Last.fm</strong> and
-                        <strong>Spotify</strong>
-                        APIs, achieving sub-200ms latency for streaming music roasts.
-                    </p>
-                    <div class="project-stats">
-                        <span class="stat"><strong>6K+</strong> Spotify Req (189ms)</span>
-                        <span class="stat"><strong>4K+</strong> Last.fm Req (376ms)</span>
-                        <span class="stat"><strong>283</strong> Groq AI Req (87ms)</span>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Cloudflare Workers</span>
-                        <span class="tech-tag">CI/CD</span>
-                        <span class="tech-tag">Groq API</span>
-                        <span class="tech-tag">Jekyll</span>
-                        <span class="tech-tag">DNS Management</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/Bananz0/bananz0" class="project-link" target="_blank">
-                            <span>VIEW ON GITHUB</span>
-                            <span>→</span>
-                        </a>
-                    </div>
+                        <div>
+                            <dt>Computer Architecture</dt>
+                            <dd>CPU microarchitecture, pipelining, cache optimization, SystemVerilog HDL</dd>
+                        </div>
+                        <div>
+                            <dt>Cybersecurity</dt>
+                            <dd>Cryptography, network security, hardware security modules</dd>
+                        </div>
+                    </dl>
                 </div>
-
-            </div>
+            </article>
         </div>
 
-        <!-- Open Source (Public) - Auto-generated -->
-        <div class="project-category fade-in open-source-preview">
-            <h3 class="category-label">OPEN SOURCE (PUBLIC)</h3>
-            <p class="section-subtitle centered-override">
-                I maintain <strong>69</strong> repositories across public, private, and forked work.
-                The list below is pulled from public repos only.
+        <div class="ed-block fade-in">
+            <h3 class="ed-kicker">Interests &amp; home lab</h3>
+            <p class="ed-inline">
+                <span>Amateur Radio</span><span>IoT Security</span><span>Open Source</span><span>Homelabbing</span>
             </p>
+            <p class="ed-text ed-small"><strong>Network:</strong> OPNsense, UniFi, AdGuard, HomeNet.
+                <strong>Media:</strong> Plex, Sonarr, Radarr, Lidarr, Readarr, Bazarr, Prowlarr, Overseerr, Tautulli,
+                qBittorrent. <strong>Ops:</strong> Grafana, Prometheus, OpenObserve, Uptime Kuma, Portainer, CasaOS,
+                Cockpit, homarr, balena dashboard. Plus CCTV, on Ubuntu Server LTS over SSH tunnels.</p>
+        </div>
+    </div>
+</section>
 
+<!-- PROJECTS -->
+<section id="projects" class="ed-section">
+    <header class="ed-head fade-in">
+        <span class="ed-no">02</span>
+        <h2 class="ed-title">Projects</h2>
+    </header>
+
+    <div class="ed-body">
+        <h3 class="ed-kicker">Selected work</h3>
+
+        <ol class="ed-index">
+            {% assign gbe_repo = site.data.github_repos | where: "name", "GalaxyBookEnabler" | first %}
+            {% if gbe_repo %}
+            {% assign gbe_preview = site.data.project_previews[gbe_repo.name] %}
+            <li class="ed-item fade-in" data-project-link="{{ gbe_repo.html_url }}" data-project-link-target="_blank" {%
+                if gbe_preview %}data-modal-images="{{ gbe_preview.images | join: ',' }}"
+                data-modal-captions="{{ gbe_preview.captions | join: '|' }}"
+                data-modal-title="{{ gbe_preview.title | default: gbe_repo.name }}" {% if gbe_preview.iframe
+                %}data-modal-iframe="{{ gbe_preview.iframe }}" {% endif %}{% if gbe_preview.iframe_caption
+                %}data-modal-iframe-caption="{{ gbe_preview.iframe_caption }}" {% endif %}{% endif %}>
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>Windows</span><span>{{ gbe_repo.language }}</span><span>2024&ndash;2025</span></p>
+                    <h3 class="ed-item-title">{{ gbe_repo.name }}</h3>
+                    <p class="ed-item-desc">{{ gbe_repo.description }}</p>
+                    <p class="ed-item-stats">
+                        {% if gbe_repo.download_count >= 1000 %}<span><b>{{ gbe_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</b> downloads</span>
+                        {% elsif gbe_repo.download_count > 0 %}<span><b>{{ gbe_repo.download_count }}</b> downloads</span>{% endif %}
+                        {% if gbe_repo.stargazers_count > 0 %}<span><b>{{ gbe_repo.stargazers_count }}</b> stars</span>{% endif %}
+                        <span><b>21</b> device profiles</span>
+                    </p>
+                    <p class="ed-item-tags">PowerShell 7 / Registry / WinGet / Task Scheduler</p>
+                </div>
+                <a href="{{ gbe_repo.html_url }}" class="ed-item-link" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a>
+            </li>
+            {% endif %}
+
+            {% assign egpu_repo = site.data.github_repos | where: "name", "eGPUae" | first %}
+            {% if egpu_repo %}
+            {% assign egpu_preview = site.data.project_previews[egpu_repo.name] %}
+            <li class="ed-item fade-in" data-project-link="{{ egpu_repo.html_url }}" data-project-link-target="_blank" {%
+                if egpu_preview %}data-modal-images="{{ egpu_preview.images | join: ',' }}"
+                data-modal-captions="{{ egpu_preview.captions | join: '|' }}"
+                data-modal-title="{{ egpu_preview.title | default: egpu_repo.name }}" {% if egpu_preview.iframe
+                %}data-modal-iframe="{{ egpu_preview.iframe }}" {% endif %}{% if egpu_preview.iframe_caption
+                %}data-modal-iframe-caption="{{ egpu_preview.iframe_caption }}" {% endif %}{% endif %}>
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>eGPU</span><span>{{ egpu_repo.language }}</span><span>2024&ndash;2025</span></p>
+                    <h3 class="ed-item-title">eGPU Auto-Enabler</h3>
+                    <p class="ed-item-desc">{{ egpu_repo.description }}</p>
+                    <p class="ed-item-stats">
+                        {% if egpu_repo.download_count >= 1000 %}<span><b>{{ egpu_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</b> downloads</span>
+                        {% elsif egpu_repo.download_count > 0 %}<span><b>{{ egpu_repo.download_count }}</b> downloads</span>{% endif %}
+                        {% if egpu_repo.stargazers_count > 0 %}<span><b>{{ egpu_repo.stargazers_count }}</b> stars</span>{% endif %}
+                        <span><b>&lt;50ms</b> latency</span>
+                    </p>
+                    <p class="ed-item-tags">PowerShell 7 / PnP Utilities / Power Management</p>
+                </div>
+                <a href="{{ egpu_repo.html_url }}" class="ed-item-link" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a>
+            </li>
+            {% endif %}
+
+            {% assign gramsmc_repo = site.data.github_repos | where: "name", "GramSMC" | first %}
+            {% if gramsmc_repo %}
+            {% assign gramsmc_preview = site.data.project_previews[gramsmc_repo.name] %}
+            <li class="ed-item fade-in" data-project-link="{{ gramsmc_repo.html_url }}" data-project-link-target="_blank"
+                {% if gramsmc_preview %}data-modal-images="{{ gramsmc_preview.images | join: ',' }}"
+                data-modal-captions="{{ gramsmc_preview.captions | join: '|' }}"
+                data-modal-title="{{ gramsmc_preview.title | default: gramsmc_repo.name }}" {% if gramsmc_preview.iframe
+                %}data-modal-iframe="{{ gramsmc_preview.iframe }}" {% endif %}{% if gramsmc_preview.iframe_caption
+                %}data-modal-iframe-caption="{{ gramsmc_preview.iframe_caption }}" {% endif %}{% endif %}>
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>Hackintosh</span><span>{{ gramsmc_repo.language }}</span><span>2026</span></p>
+                    <h3 class="ed-item-title">GramSMC + GramControlCenter</h3>
+                    <p class="ed-item-desc">A VirtualSMC plugin that gives the LG Gram 13Z990-R native macOS hardware support:
+                        custom ACPI tables, plus a DriverKit kext that talks to the reverse-engineered embedded
+                        controller.</p>
+                    <p class="ed-item-stats">
+                        {% if gramsmc_repo.download_count >= 1000 %}<span><b>{{ gramsmc_repo.download_count | divided_by: 1000.0 | round: 1 }}K+</b> downloads</span>
+                        {% elsif gramsmc_repo.download_count > 0 %}<span><b>{{ gramsmc_repo.download_count }}</b> downloads</span>{% endif %}
+                        {% if gramsmc_repo.stargazers_count > 0 %}<span><b>{{ gramsmc_repo.stargazers_count }}</b> stars</span>{% endif %}
+                    </p>
+                    <p class="ed-item-tags">DriverKit / macOS Kernel SDK / ACPI / EC Reverse Engineering</p>
+                </div>
+                <a href="{{ gramsmc_repo.html_url }}" class="ed-item-link" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a>
+            </li>
+            {% endif %}
+
+            <li class="ed-item fade-in">
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>BEng project, continuing in PhD</span><span>Python / CUDA</span><span>2025&ndash;</span></p>
+                    <h3 class="ed-item-title">Optical PUF Authentication</h3>
+                    <p class="ed-item-desc">Anti-counterfeiting authentication using optical physically unclonable functions
+                        (OPUFs): GPU-accelerated spectral analysis feeding machine-learning pipelines that tell individual
+                        devices apart.</p>
+                    <p class="ed-item-tags">Python / CuPy/CUDA / NumPy / Scipy / Spectral Analysis</p>
+                </div>
+                <span class="ed-item-link ed-item-link--muted">Research</span>
+            </li>
+
+            <li class="ed-item fade-in">
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>IC design</span><span>Hardware / Verilog</span><span>2023&ndash;2025</span></p>
+                    <h3 class="ed-item-title">TSMC 65nm Real-Time Clock</h3>
+                    <p class="ed-item-desc">Led the team taking a ring-oscillator real-time clock from RTL to tested silicon in
+                        TSMC 65nm. Schematics in S-Edit, SPICE in T-Spice, layout in L-Edit, and DRC/LVS-clean in
+                        Calibre after cutting the layout area by 15%. For test we extracted a Verilog golden model from the
+                        schematics, wrote functional and timing vectors, and ran them on the fabricated chip on an IC
+                        tester: every vector passed.</p>
+                    <p class="ed-item-stats">
+                        <span><b>65nm</b> process</span>
+                        <span><b>0</b> DRC errors</span>
+                        <span><b>&minus;15%</b> area</span>
+                        <span><b>100%</b> test pass</span>
+                    </p>
+                    <p class="ed-item-tags">S-Edit / T-Spice / L-Edit / Calibre DRC/LVS / Verilog / IC Testing</p>
+                </div>
+                <span class="ed-item-link ed-item-link--muted">Group project, team lead</span>
+            </li>
+
+            <li class="ed-item fade-in" data-project-link="https://github.com/Bananz0/WattsApp"
+                data-project-link-target="_blank"
+                data-modal-images="/assets/images/projects/wattsapp-dashboard.jpg,/assets/images/projects/wattsapp-circuit.jpg,/assets/images/projects/wattsapp-grafana.jpg"
+                data-modal-captions="Real-time monitoring dashboard|ATMega644p circuit with sensors|Grafana visualization interface"
+                data-modal-title="WattsApp: Smart System Management Platform">
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>Embedded systems</span><span>AVR C</span><span>2025</span></p>
+                    <h3 class="ed-item-title">WattsApp: Smart System Management Platform</h3>
+                    <p class="ed-item-desc">Bare-metal C firmware for an ATmega644P that reads temperature over I2C and
+                        voltage/current through the ADC, drives GPIO, and streams telemetry over UART into InfluxDB,
+                        with Grafana dashboards on top. Interrupt-driven, with sub-millisecond response. Demonstrated as
+                        part of the IC testing coursework, covering chip validation and system integration.</p>
+                    <p class="ed-item-stats">
+                        <span><b>&lt;1ms</b> response</span>
+                        <span><b>I2C/ADC</b> sensors</span>
+                    </p>
+                    <p class="ed-item-tags">AVR C / ATMega644p / InfluxDB / Grafana / UART / I2C</p>
+                </div>
+                <a href="https://github.com/Bananz0/WattsApp" class="ed-item-link" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a>
+            </li>
+
+            <li class="ed-item fade-in" data-project-link="https://github.com/Bananz0/MIPSquare"
+                data-project-link-target="_blank"
+                data-modal-images="/assets/images/projects/mipsquare-pipeline.jpg,/assets/images/projects/mipsquare-hazards.jpg"
+                data-modal-captions="5-stage pipeline architecture diagram|Hazard detection and forwarding logic"
+                data-modal-title="MIPSquare++: 5-Stage Pipelined MIPS Simulator">
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>Computer architecture</span><span>C++</span><span>2025</span></p>
+                    <h3 class="ed-item-title">MIPSquare++: 5-Stage Pipelined MIPS Simulator</h3>
+                    <p class="ed-item-desc">A 5-stage pipelined MIPS simulator (IF/ID/EX/MEM/WB) in C++23. It has its own
+                        assembler with label resolution for R-, I- and J-type instructions, EX/MEM and MEM/WB
+                        forwarding, load-use stalls and branch flushing. The demo program computes the squares of
+                        0&ndash;200 by summing odd numbers and runs at close to 1 CPI, with tests covering RAW and
+                        control hazards.</p>
+                    <p class="ed-item-stats">
+                        <span><b>5</b> pipeline stages</span>
+                        <span><b>~1.0</b> CPI</span>
+                        <span><b>17</b> instructions</span>
+                    </p>
+                    <p class="ed-item-tags">C++23 / CMake / Data Forwarding / Hazard Detection / MIPS ISA</p>
+                </div>
+                <a href="https://github.com/Bananz0/MIPSquare" class="ed-item-link" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a>
+            </li>
+
+            <li class="ed-item fade-in" data-project-link="https://github.com/Bananz0/bananz0"
+                data-project-link-target="_blank"
+                data-modal-images="/assets/images/projects/portfolio-home.jpg,/assets/images/projects/portfolio-music.jpg,/assets/images/projects/portfolio-worker.jpg"
+                data-modal-captions="Clean, responsive homepage design|Real-time AI music consciousness|Cloudflare Worker backend architecture"
+                data-modal-title="Personal Portfolio & Technical Playground">
+                <div class="ed-item-main">
+                    <p class="ed-item-meta"><span>Web / DevOps</span><span>Jekyll / Workers</span><span>2026</span></p>
+                    <h3 class="ed-item-title">This site</h3>
+                    <p class="ed-item-desc">Jekyll on GitHub Pages, with <strong>Cloudflare Workers</strong> handling DNS and
+                        APIs. A <strong>Groq Llama 3</strong> persona, &ldquo;Glen&rdquo;, roasts my Last.fm and Spotify
+                        listening in under 200ms. It&rsquo;s also where I try out CI/CD and Dependabot
+                        automation.</p>
+                    <p class="ed-item-stats">
+                        <span><b>6K+</b> Spotify req (189ms)</span>
+                        <span><b>4K+</b> Last.fm req (376ms)</span>
+                        <span><b>283</b> Groq AI req (87ms)</span>
+                    </p>
+                    <p class="ed-item-tags">Cloudflare Workers / CI/CD / Groq API / Jekyll / DNS Management</p>
+                </div>
+                <a href="https://github.com/Bananz0/bananz0" class="ed-item-link" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a>
+            </li>
+        </ol>
+
+        <div class="ed-block">
+            <h3 class="ed-kicker">More open source</h3>
+            <p class="ed-note fade-in">69 repositories across public, private and forked work. These are the most active
+                public ones not already listed above.</p>
+
+            {% assign featured_names = "GalaxyBookEnabler,eGPUae,GramSMC,WattsApp,MIPSquare,bananz0" | split: "," %}
             {% assign repos = site.data.github_repos | where_exp: "r", "r.hidden != true" %}
             {% if repos and repos.size > 0 %}
             {% assign repos_sorted = repos | sort_natural: 'score' | reverse %}
-            <div class="repo-grid repo-grid-compact">
-                {% for repo in repos_sorted limit: 12 %}
-                {% assign preview = site.data.project_previews[repo.name] %}
-                <div class="project-card-full repo-card-full repo-card-full-compact" data-spring="default"
-                    data-bounce="1" data-project-link="{{ repo.html_url }}" data-project-link-target="_blank" {% if
-                    preview %}data-modal-images="{{ preview.images | join: ',' }}"
-                    data-modal-captions="{{ preview.captions | join: '|' }}"
-                    data-modal-title="{{ preview.title | default: repo.name }}" {% if preview.iframe
-                    %}data-modal-iframe="{{ preview.iframe }}" {% endif %} {% if preview.iframe_caption
-                    %}data-modal-iframe-caption="{{ preview.iframe_caption }}" {% endif %}{% endif %}>
-                    <div class="project-header">
-                        <span class="project-badge">{% if repo.language %}{{ repo.language }}{% else %}REPO{% endif
-                            %}</span>
-                        <div class="project-meta">
-                            <span>★ {{ repo.stargazers_count | default: 0 }}</span>
-                            <span></span>
-                            <span>⑂ {{ repo.forks_count | default: 0 }}</span>
-                        </div>
-                    </div>
-
-                    <h3>{{ repo.name }}</h3>
-                    {% if repo.description %}
-                    <p>{{ repo.description }}</p>
-                    {% else %}
-                    <p class="repo-desc-muted">No description provided.</p>
-                    {% endif %}
-
-                    <div class="project-stats">
-                        {% if repo.download_count and repo.download_count >= 1000 %}
-                        <span class="stat"><strong>{{ repo.download_count | divided_by: 1000.0 | round: 1 }}K</strong>
-                            Downloads</span>
-                        {% elsif repo.download_count and repo.download_count > 0 %}
-                        <span class="stat"><strong>{{ repo.download_count }}</strong> Downloads</span>
-                        {% endif %}
-                        <span class="stat"><strong>★ {{ repo.stargazers_count | default: 0 }}</strong> Stars</span>
-                        {% if repo.forks_count and repo.forks_count > 0 %}<span class="stat"><strong>⑂ {{
-                                repo.forks_count }}</strong> Forks</span>{% endif %}
-                    </div>
-
-                    {% assign topics = repo.topics | default: empty %}
-                    <div class="tech-tags">
-                        {% if topics and topics.size > 0 %}
-                        {% for topic in topics limit: 6 %}
-                        <span class="tech-tag">{{ topic }}</span>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    <div class="project-links">
-                        <a class="project-link" href="{{ repo.html_url }}" target="_blank" rel="noopener">VIEW ON
-                            GITHUB</a>
-                    </div>
-                </div>
+            {% assign shown = 0 %}
+            <ul class="ed-repos fade-in">
+                {% for repo in repos_sorted %}
+                {% if featured_names contains repo.name %}{% continue %}{% endif %}
+                {% if shown >= 10 %}{% break %}{% endif %}
+                {% assign shown = shown | plus: 1 %}
+                {% include repo-row.html repo=repo %}
                 {% endfor %}
-            </div>
+            </ul>
             {% endif %}
 
-            <div class="view-all-projects">
-                <a href="{{ '/projects/' | relative_url }}" class="cta-btn primary" data-spring="snappy"
-                    data-bounce="1">FULL PROJECT ARCHIVE</a>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- SKILLS SECTION -->
-<section id="skills" class="page-section skills-section">
-    <div class="container">
-        <h2 class="section-title fade-in"><span>TECH_STACK</span></h2>
-
-        <div class="skills-grid">
-            <!-- Hardware & Digital Design -->
-            <div class="skill-panel fade-in" data-category="hardware">
-                <div class="panel-glow"></div>
-                <div class="skill-header">
-                    <span class="skill-icon"></span>
-                    <h3>HARDWARE & DIGITAL DESIGN</h3>
-                </div>
-                <div class="skill-content">
-                    <div class="skill-group">
-                        <h4>IC Design & FPGA</h4>
-                        <div class="skill-tags">
-                            <span class="skill-badge">TSMC 65nm</span>
-                            <span class="skill-badge">Cadence</span>
-                            <span class="skill-badge">SystemVerilog</span>
-                            <span class="skill-badge">Quartus</span>
-                            <span class="skill-badge">Vivado</span>
-                        </div>
-                    </div>
-                    <div class="skill-group">
-                        <h4>Embedded Platforms</h4>
-                        <div class="skill-tags">
-                            <span class="skill-badge">ESP32</span>
-                            <span class="skill-badge">STM32</span>
-                            <span class="skill-badge">Raspberry Pi</span>
-                            <span class="skill-badge">Arduino</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Software Development -->
-            <div class="skill-panel fade-in" data-category="software">
-                <div class="panel-glow"></div>
-                <div class="skill-header">
-                    <span class="skill-icon"></span>
-                    <h3>SOFTWARE DEVELOPMENT</h3>
-                </div>
-                <div class="skill-content">
-                    <div class="skill-group">
-                        <h4>Languages</h4>
-                        <div class="skill-tags">
-                            <span class="skill-badge">C/C++</span>
-                            <span class="skill-badge">Python</span>
-                            <span class="skill-badge">JavaScript</span>
-                            <span class="skill-badge">PowerShell</span>
-                            <span class="skill-badge">Kotlin</span>
-                        </div>
-                    </div>
-                    <div class="skill-group">
-                        <h4>Frameworks</h4>
-                        <div class="skill-tags">
-                            <span class="skill-badge">React.js</span>
-                            <span class="skill-badge">Node.js</span>
-                            <span class="skill-badge">Qt</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Infrastructure & Security -->
-            <div class="skill-panel fade-in" data-category="infrastructure">
-                <div class="panel-glow"></div>
-                <div class="skill-header">
-                    <span class="skill-icon"></span>
-                    <h3>INFRASTRUCTURE & SECURITY</h3>
-                </div>
-                <div class="skill-content">
-                    <div class="skill-group">
-                        <h4>Network & DevOps</h4>
-                        <div class="skill-tags">
-                            <span class="skill-badge">OPNsense</span>
-                            <span class="skill-badge">Docker</span>
-                            <span class="skill-badge">Proxmox</span>
-                            <span class="skill-badge">HAProxy</span>
-                        </div>
-                    </div>
-                    <div class="skill-group">
-                        <h4>Monitoring</h4>
-                        <div class="skill-tags">
-                            <span class="skill-badge">InfluxDB</span>
-                            <span class="skill-badge">Grafana</span>
-                            <span class="skill-badge">Suricata</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Certifications -->
-        <div class="cert-grid fade-in">
-            <div class="cert-card">
-                <span class="cert-icon"></span>
-                <h4 class="cert-title">IEEE Member</h4>
-                <span class="cert-year">2024</span>
-            </div>
-            <div class="cert-card">
-                <span class="cert-icon"></span>
-                <h4 class="cert-title">ISACA Member</h4>
-                <span class="cert-year">2024</span>
-            </div>
-            <div class="cert-card">
-                <span class="cert-icon"></span>
-                <h4 class="cert-title">RAeS AMRAeS</h4>
-                <span class="cert-year">2024</span>
-            </div>
-            <div class="cert-card">
-                <span class="cert-icon"></span>
-                <h4 class="cert-title">Amateur Radio</h4>
-                <span class="cert-year">2025</span>
-            </div>
+            <a href="{{ '/projects/' | relative_url }}" class="ed-more fade-in">Full project archive <span aria-hidden="true">&rarr;</span></a>
         </div>
     </div>
 </section>
 
-<div class="section-divider"></div>
+<!-- TOOLKIT -->
+<section id="skills" class="ed-section">
+    <header class="ed-head fade-in">
+        <span class="ed-no">03</span>
+        <h2 class="ed-title">Toolkit</h2>
+    </header>
 
-<!-- CONTACT SECTION -->
-<section id="contact" class="page-section contact-section">
-    <div class="container">
-        <h2 class="section-title fade-in"><span>GET_IN_TOUCH</span></h2>
-
-        <div class="contact-grid">
-            <!-- Terminal-Style Contact Form -->
-            <div class="contact-form-container fade-in">
-                <div class="terminal-window">
-                    <div class="terminal-header">
-                        <div class="terminal-btn red"></div>
-                        <div class="terminal-btn yellow"></div>
-                        <div class="terminal-btn green"></div>
-                        <span class="terminal-title">contact_form.sh</span>
-                    </div>
-                    <div class="terminal-body">
-                        <div class="terminal-line-typing">
-                            <span class="terminal-prompt">user@glenmuthoka:~$</span> ./send_message.sh
-                        </div>
-
-                        <form id="contact-form" class="terminal-form" action="https://formspree.io/f/mldaokke"
-                            method="POST">
-                            <input type="hidden" name="_subject" value="New contact from glenmuthoka.com" />
-                            <div class="form-group">
-                                <label class="terminal-label" for="contact-name">
-                                    <span class="terminal-prompt">&gt;</span> Enter your name:
-                                </label>
-                                <input id="contact-name" type="text" name="name" autocomplete="name"
-                                    class="terminal-input" placeholder="Amara Njeri" required />
-                            </div>
-
-                            <div class="form-group">
-                                <label class="terminal-label" for="contact-email">
-                                    <span class="terminal-prompt">&gt;</span> Enter your email:
-                                </label>
-                                <input id="contact-email" type="email" name="email" autocomplete="email"
-                                    class="terminal-input" placeholder="john@example.com" required />
-                            </div>
-
-                            <div class="form-group">
-                                <label class="terminal-label" for="contact-message">
-                                    <span class="terminal-prompt">&gt;</span> Your message:
-                                </label>
-                                <textarea id="contact-message" name="message" autocomplete="on"
-                                    class="terminal-textarea" rows="5" placeholder="Tell me about your project..."
-                                    required></textarea>
-                            </div>
-
-                            <button type="submit" class="cta-btn primary" data-spring="snappy" data-bounce="1">SEND
-                                MESSAGE</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contact Info Cards -->
-            <div class="contact-info-section">
-                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
-                    <div class="contact-icon"></div>
-                    <h3>EMAIL</h3>
-                    <a href="mailto:theglenmuthoka@gmail.com" class="contact-link">theglenmuthoka@gmail.com</a>
-                </div>
-
-                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
-                    <div class="contact-icon"></div>
-                    <h3>LINKEDIN</h3>
-                    <a href="https://linkedin.com/in/glenmuthoka" target="_blank"
-                        class="contact-link">/in/glen-muthoka</a>
-                </div>
-
-                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
-                    <div class="contact-icon"></div>
-                    <h3>GITHUB</h3>
-                    <a href="https://github.com/Bananz0" target="_blank" class="contact-link">github.com/Bananz0</a>
-                </div>
-
-                <div class="contact-card fade-in" data-spring="smooth" data-bounce="1">
-                    <div class="contact-icon"></div>
-                    <h3>LOCATION</h3>
-                    <span class="contact-text">Southampton, UK From Kenya</span>
-                </div>
-            </div>
+    <div class="ed-body">
+        <div class="ed-spec fade-in">
+            <h3 class="ed-kicker">Hardware &amp; digital design</h3>
+            <dl>
+                <div><dt>IC design &amp; FPGA</dt><dd>TSMC 65nm, Cadence, SystemVerilog, Quartus, Vivado</dd></div>
+                <div><dt>Embedded platforms</dt><dd>ESP32, STM32, Raspberry Pi, Arduino</dd></div>
+            </dl>
         </div>
 
-        <!-- Availability Status -->
-        <div class="availability-section fade-in" data-spring="smooth" data-bounce="1">
-            <div class="availability-card" data-spring="smooth" data-bounce="1">
-                <div class="status-indicator">
-                    <span class="status-dot active"></span>
-                    <span class="status-text">CURRENTLY AVAILABLE FOR OPPORTUNITIES</span>
-                </div>
-                <div class="availability-info">
-                    <div class="info-item">
-                        <span class="icon"></span>
-                        <span>Response Time: <strong>&lt; 24 hours</strong></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="icon"></span>
-                        <span>Focus: <strong>Embedded Systems, IC Design, Full-Stack</strong></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="icon"></span>
-                        <span>Time Zone: <strong>GMT/BST</strong></span>
-                    </div>
-                </div>
-            </div>
+        <div class="ed-spec fade-in">
+            <h3 class="ed-kicker">Software</h3>
+            <dl>
+                <div><dt>Languages</dt><dd>C/C++, Python, JavaScript, PowerShell, Kotlin</dd></div>
+                <div><dt>Frameworks</dt><dd>React.js, Node.js, Qt</dd></div>
+            </dl>
         </div>
 
-        <!-- CV Download -->
-        <div class="cv-section fade-in" data-spring="smooth" data-bounce="1">
-            <a href="{{ '/assets/cv/glen-muthoka-cv.pdf' | relative_url }}" class="cv-download-btn"
-                download="Glen_Muthoka_CV.pdf" data-spring="smooth" data-bounce="1">
-                <span class="cv-icon"></span>
-                <span class="cv-text">
-                    <strong>DOWNLOAD CV</strong>
-                    <small>PDF Updated Nov 2025</small>
-                </span>
-            </a>
+        <div class="ed-spec fade-in">
+            <h3 class="ed-kicker">Infrastructure &amp; security</h3>
+            <dl>
+                <div><dt>Network &amp; DevOps</dt><dd>OPNsense, Docker, Proxmox, HAProxy</dd></div>
+                <div><dt>Monitoring</dt><dd>InfluxDB, Grafana, Suricata</dd></div>
+            </dl>
+        </div>
+
+        <div class="ed-spec fade-in">
+            <h3 class="ed-kicker">Memberships</h3>
+            <dl>
+                <div><dt>IEEE</dt><dd>Member &middot; 2024</dd></div>
+                <div><dt>ISACA</dt><dd>Member &middot; 2024</dd></div>
+                <div><dt>RAeS</dt><dd>AMRAeS &middot; 2024</dd></div>
+                <div><dt>Amateur radio</dt><dd>2025</dd></div>
+            </dl>
         </div>
     </div>
 </section>
 
-<!-- INLINE STYLES FOR SINGLE PAGE SECTIONS -->
-<!-- Styles moved to assets/css/main.css -->
+<!-- CONTACT -->
+<section id="contact" class="ed-section">
+    <header class="ed-head fade-in">
+        <span class="ed-no">04</span>
+        <h2 class="ed-title">Contact</h2>
+    </header>
 
-<!-- Three.js chip script removed -->
+    <div class="ed-body ed-contact">
+        <div class="ed-contact-info fade-in">
+            <p class="ed-lead">Open to research and engineering roles in semiconductors and hardware, and to software
+                engineering.</p>
+            <a class="ed-email" href="mailto:theglenmuthoka@gmail.com">theglenmuthoka@<wbr>gmail.com</a>
+            <dl class="ed-details">
+                <div><dt>LinkedIn</dt><dd><a href="https://linkedin.com/in/glenmuthoka" target="_blank" rel="noopener">/in/glenmuthoka</a></dd></div>
+                <div><dt>GitHub</dt><dd><a href="https://github.com/Bananz0" target="_blank" rel="noopener">github.com/Bananz0</a></dd></div>
+                <div><dt>Location</dt><dd>Southampton, UK &middot; from Kenya</dd></div>
+                <div><dt>Replies</dt><dd>Usually within a day &middot; GMT/BST</dd></div>
+            </dl>
+            <a href="{{ '/assets/cv/glen-muthoka-cv.pdf' | relative_url }}" class="cta-btn primary ed-cv"
+                download="Glen_Muthoka_CV.pdf" data-spring="snappy" data-bounce="1">Download CV
+                <small>PDF &middot; Nov 2025</small></a>
+        </div>
 
+        <form id="contact-form" class="ed-form fade-in" action="https://formspree.io/f/mldaokke" method="POST">
+            <input type="hidden" name="_subject" value="New contact from glenmuthoka.com" />
+            <div class="ed-field">
+                <label for="contact-name">Name</label>
+                <input id="contact-name" type="text" name="name" autocomplete="name" placeholder="Amara Njeri"
+                    required />
+            </div>
+            <div class="ed-field">
+                <label for="contact-email">Email</label>
+                <input id="contact-email" type="email" name="email" autocomplete="email"
+                    placeholder="amara@example.com" required />
+            </div>
+            <div class="ed-field">
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" name="message" rows="5" placeholder="What are you working on?"
+                    required></textarea>
+            </div>
+            <button type="submit" class="cta-btn" data-spring="snappy" data-bounce="1">Send message</button>
+        </form>
+    </div>
+</section>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -845,13 +455,10 @@ title: Home
             if (disposableDomains || isFetching) return;
 
             isFetching = true;
-            console.log('Fetching disposable domains list...');
-
             fetch('/assets/data/disposable_domains.json')
                 .then(response => response.json())
                 .then(data => {
                     disposableDomains = new Set(data);
-                    console.log('Disposable domains list loaded:', disposableDomains.size);
                     validateEmail();
                 })
                 .catch(error => {
