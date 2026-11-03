@@ -561,6 +561,24 @@
 .nav-hub .hub-secondary .hub-btn:nth-child(2) { --i: 1; }
 .nav-hub .hub-secondary .hub-btn:nth-child(3) { --i: 2; }
 .nav-hub .hub-secondary .hub-btn:nth-child(4) { --i: 3; }
+.nav-hub .hub-secondary .hub-btn:nth-child(5) { --i: 4; }
+
+/* five buttons outgrow main.css's 250px hover bridge; keep it as long as the menu */
+@media (hover: hover) {
+    .nav-hub:not(.hub-dismissed):hover::after,
+    .nav-hub:not(.hub-dismissed):focus-within::after {
+        bottom: calc(-5 * (var(--badge-size-lg) + 8px));
+    }
+}
+
+/* the theme toggle is a <button> among links */
+.nav-hub button.hub-btn {
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
 
 .nav-hub.touch-active .hub-secondary {
     transition:
@@ -617,10 +635,11 @@
         transform: translateY(6px) scale(0.94);
     }
 
-    .nav-hub .hub-secondary .hub-btn:nth-child(1) { --i: 3; }
-    .nav-hub .hub-secondary .hub-btn:nth-child(2) { --i: 2; }
-    .nav-hub .hub-secondary .hub-btn:nth-child(3) { --i: 1; }
-    .nav-hub .hub-secondary .hub-btn:nth-child(4) { --i: 0; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(1) { --i: 4; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(2) { --i: 3; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(3) { --i: 2; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(4) { --i: 1; }
+    .nav-hub .hub-secondary .hub-btn:nth-child(5) { --i: 0; }
 }
 
 /* Breakpoint morph helpers must still be able to jump instantly */

@@ -1,0 +1,527 @@
+/* ==========================================================================
+   Cybercore theme (opt-in)
+   --------------------------------------------------------------------------
+   Everything is scoped to [data-theme="cyber"] on <html>, so with no
+   attribute this file does nothing and the editorial look is untouched.
+   It swaps tokens (colour, type, rules) and adds surface effects; it never
+   changes layout, so the nav measurement and motion keep working as-is.
+   Toggled by assets/js/theme.js; silicon.js redraws the die and wafer in
+   the matching palette. Chakra Petch is in the shared Google Fonts link and
+   only downloads once this theme uses it.
+   ========================================================================== */
+
+[data-theme="cyber"] {
+    --cy-bg: #04060a;
+    --cy-acid: #39ff88;
+    --cy-acid-rgb: 57, 255, 136;
+    --cy-mag: #ff2bd6;
+    --cy-mag-rgb: 255, 43, 214;
+    --cy-cyan: #22e6ff;
+    --cy-cyan-rgb: 34, 230, 255;
+
+    /* remap the shared tokens the rest of the site is built on */
+    --neu-bg: var(--cy-bg);
+    --neu-bg-hi: #0b1015;
+    --neu-bg-lo: #020305;
+    --text-primary: #e4fff0;
+    --text-secondary: #8ec7a8;
+    --text-muted: #4f7d66;
+    --neon-gold: var(--cy-acid);
+    --neon-gold-rgb: var(--cy-acid-rgb);
+    --neon-amber: var(--cy-acid);
+    --neon-amber-rgb: var(--cy-acid-rgb);
+    --gold: var(--cy-acid);
+    --rule: rgba(var(--cy-acid-rgb), 0.14);
+    --rule-strong: rgba(var(--cy-acid-rgb), 0.38);
+    --display-font: 'Chakra Petch', 'JetBrains Mono', monospace;
+    --nav-glass-bg: rgba(4, 12, 9, 0.62);
+    --gradient-primary: linear-gradient(135deg, #39ff88, #22e6ff);
+
+    color-scheme: dark;
+}
+
+[data-theme="cyber"] body {
+    background: var(--cy-bg) !important;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.95rem;
+}
+
+[data-theme="cyber"] ::selection {
+    background: rgba(var(--cy-mag-rgb), 0.45);
+}
+
+/* Bottom layer: blueprint grid with a cyan glow from the top, magenta from below */
+[data-theme="cyber"] body::after {
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(var(--cy-cyan-rgb), 0.09), transparent 60%),
+        radial-gradient(ellipse 70% 45% at 50% 115%, rgba(var(--cy-mag-rgb), 0.08), transparent 60%),
+        linear-gradient(rgba(var(--cy-acid-rgb), 0.04) 1px, transparent 1px) 0 0 / 40px 40px,
+        linear-gradient(90deg, rgba(var(--cy-acid-rgb), 0.04) 1px, transparent 1px) 0 0 / 40px 40px !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+}
+
+/* Top layer: scanlines and a CRT vignette (pointer-events already off) */
+[data-theme="cyber"] body::before {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+        radial-gradient(120% 100% at 50% 50%, transparent 62%, rgba(0, 0, 0, 0.55) 100%) !important;
+    opacity: 1 !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero
+   --------------------------------------------------------------------------- */
+[data-theme="cyber"] .hero-kicker {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .hero-kicker::before {
+    content: '> ';
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .hero-name {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    line-height: 0.9;
+    color: #eafff3;
+    text-shadow:
+        -2px 0 rgba(var(--cy-mag-rgb), 0.75),
+        2px 0 rgba(var(--cy-cyan-rgb), 0.75),
+        0 0 28px rgba(var(--cy-acid-rgb), 0.35);
+    animation: cy-flicker 7s steps(1) infinite;
+}
+
+[data-theme="cyber"] .hero-die .tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--text-secondary);
+    /* the uppercase name + glow sits taller than the editorial one */
+    margin-top: 2.25rem;
+}
+
+[data-theme="cyber"] .hero-die .tagline::after,
+[data-theme="cyber"] .ed-page-hero .tagline::after {
+    content: '';
+    display: inline-block;
+    width: 0.55em;
+    height: 1.05em;
+    margin-left: 0.35em;
+    vertical-align: -0.15em;
+    background: var(--cy-acid);
+    box-shadow: 0 0 10px rgba(var(--cy-acid-rgb), 0.8);
+    animation: cy-blink 1.05s steps(1) infinite;
+}
+
+/* Page CTAs: cut-corner terminal buttons */
+[data-theme="cyber"] .hero .cta-btn,
+[data-theme="cyber"] .ed-page-hero .cta-btn,
+[data-theme="cyber"] .ed-section .cta-btn {
+    background: rgba(var(--cy-acid-rgb), 0.04) !important;
+    color: var(--cy-acid) !important;
+    border-radius: 0;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    box-shadow: inset 0 0 0 1px rgba(var(--cy-acid-rgb), 0.55) !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+[data-theme="cyber"] .hero .cta-btn.primary,
+[data-theme="cyber"] .ed-page-hero .cta-btn.primary,
+[data-theme="cyber"] .ed-section .cta-btn.primary {
+    background: var(--cy-acid) !important;
+    color: #02130a !important;
+    box-shadow: 0 0 22px rgba(var(--cy-acid-rgb), 0.45) !important;
+}
+
+[data-theme="cyber"] .hero .cta-btn:hover,
+[data-theme="cyber"] .ed-page-hero .cta-btn:hover,
+[data-theme="cyber"] .ed-section .cta-btn:hover {
+    background: rgba(var(--cy-mag-rgb), 0.12) !important;
+    color: var(--cy-mag) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--cy-mag-rgb), 0.7) !important;
+}
+
+[data-theme="cyber"] .hero .cta-btn.primary:hover,
+[data-theme="cyber"] .ed-page-hero .cta-btn.primary:hover,
+[data-theme="cyber"] .ed-section .cta-btn.primary:hover {
+    background: var(--cy-mag) !important;
+    color: #16000f !important;
+    box-shadow: 0 0 26px rgba(var(--cy-mag-rgb), 0.5) !important;
+}
+
+/* Die shot as a HUD scan: corner brackets, neon recolour, glow */
+[data-theme="cyber"] .die-figure {
+    padding: 14px;
+    background:
+        linear-gradient(var(--cy-acid), var(--cy-acid)) top left / 20px 1px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) top left / 1px 20px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) top right / 20px 1px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) top right / 1px 20px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) bottom left / 20px 1px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) bottom left / 1px 20px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) bottom right / 20px 1px no-repeat,
+        linear-gradient(var(--cy-acid), var(--cy-acid)) bottom right / 1px 20px no-repeat;
+}
+
+[data-theme="cyber"] .die-canvas,
+[data-theme="cyber"] .wafer-canvas {
+    filter: drop-shadow(0 0 7px rgba(var(--cy-acid-rgb), 0.28));
+}
+
+[data-theme="cyber"] .die-figure figcaption {
+    color: var(--text-muted);
+}
+
+[data-theme="cyber"] .die-figure .fig-no {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .die-figure .fig-no::before {
+    content: '[';
+}
+
+[data-theme="cyber"] .die-figure .fig-no::after {
+    content: ']';
+}
+
+/* ---------------------------------------------------------------------------
+   Sections
+   --------------------------------------------------------------------------- */
+[data-theme="cyber"] .ed-no {
+    color: var(--cy-acid);
+    text-shadow: 0 0 10px rgba(var(--cy-acid-rgb), 0.6);
+}
+
+[data-theme="cyber"] .ed-no::before {
+    content: '[';
+}
+
+[data-theme="cyber"] .ed-no::after {
+    content: ']';
+}
+
+[data-theme="cyber"] .ed-title {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 22px rgba(var(--cy-acid-rgb), 0.3);
+}
+
+/* rules become traces with a lit node at the start. .ed-head is already a
+   containing block on desktop (sticky); on narrow screens it's static with a
+   leftover top: 7.5rem, so it gets relative + top: 0 there */
+[data-theme="cyber"] .ed-body {
+    position: relative;
+}
+
+@media (max-width: 860px) {
+    [data-theme="cyber"] .ed-head {
+        position: relative;
+        top: 0;
+    }
+
+    /* the body loses its top rule here, so its node would float alone */
+    [data-theme="cyber"] .ed-body::before {
+        content: none;
+    }
+}
+
+[data-theme="cyber"] .ed-body::before,
+[data-theme="cyber"] .ed-head::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    background: var(--cy-acid);
+    box-shadow: 0 0 10px var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-lead {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+[data-theme="cyber"] .ed-lead strong,
+[data-theme="cyber"] .ed-text strong,
+[data-theme="cyber"] .ed-what strong {
+    color: var(--cy-cyan);
+    font-weight: 500;
+}
+
+[data-theme="cyber"] .ed-kicker {
+    color: var(--text-secondary);
+}
+
+[data-theme="cyber"] .ed-kicker::before,
+[data-theme="cyber"] .ed-subkicker::before {
+    content: '// ';
+    color: var(--cy-mag);
+}
+
+[data-theme="cyber"] .ed-when {
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-what h4 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+[data-theme="cyber"] .ed-where {
+    color: var(--cy-mag);
+}
+
+[data-theme="cyber"] .ed-list li::before {
+    content: '>';
+    top: 0;
+    width: auto;
+    height: auto;
+    background: none;
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-modules dt {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+}
+
+[data-theme="cyber"] .ed-modules dt span {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .ed-inline {
+    font-family: 'Chakra Petch', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+[data-theme="cyber"] .ed-inline span+span::before {
+    content: '/';
+    color: var(--cy-mag);
+}
+
+/* ---------------------------------------------------------------------------
+   Selected work, open source, toolkit, contact
+   --------------------------------------------------------------------------- */
+[data-theme="cyber"] .ed-item::before {
+    content: '[' counter(ed-item, decimal-leading-zero) ']';
+    color: var(--cy-acid);
+    text-shadow: 0 0 8px rgba(var(--cy-acid-rgb), 0.55);
+}
+
+[data-theme="cyber"] .ed-item-title,
+[data-theme="cyber"] .ed-repo-name {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+[data-theme="cyber"] .ed-item:hover .ed-item-title,
+[data-theme="cyber"] .ed-repo:hover .ed-repo-name {
+    color: var(--cy-mag);
+    text-shadow: 0 0 16px rgba(var(--cy-mag-rgb), 0.45);
+}
+
+[data-theme="cyber"] .ed-item-meta {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .ed-item-meta span+span::before,
+[data-theme="cyber"] .ed-item-tags {
+    color: var(--cy-mag);
+}
+
+[data-theme="cyber"] .ed-item-stats b {
+    font-family: 'Chakra Petch', sans-serif;
+    color: var(--cy-acid);
+    text-shadow: 0 0 10px rgba(var(--cy-acid-rgb), 0.5);
+}
+
+[data-theme="cyber"] .ed-item-desc strong {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .ed-item-link,
+[data-theme="cyber"] .ed-repo-link,
+[data-theme="cyber"] .ed-more-toggle {
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-item:hover a.ed-item-link,
+[data-theme="cyber"] .ed-repo:hover .ed-repo-link,
+[data-theme="cyber"] .ed-more-toggle:hover {
+    color: var(--cy-mag);
+}
+
+[data-theme="cyber"] .ed-spec dt {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .ed-spec dt::before {
+    content: '> ';
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-email {
+    font-family: 'Chakra Petch', sans-serif;
+    color: var(--cy-acid);
+    text-shadow: 0 0 18px rgba(var(--cy-acid-rgb), 0.35);
+}
+
+[data-theme="cyber"] .ed-email:hover {
+    color: var(--cy-mag);
+    text-shadow: 0 0 18px rgba(var(--cy-mag-rgb), 0.45);
+}
+
+[data-theme="cyber"] .ed-details dt,
+[data-theme="cyber"] .ed-field label {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .ed-details a:hover {
+    color: var(--cy-mag);
+}
+
+[data-theme="cyber"] .ed-field label::before {
+    content: '$ ';
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-field input,
+[data-theme="cyber"] .ed-field textarea {
+    font-family: 'JetBrains Mono', monospace;
+    caret-color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .ed-field input:focus,
+[data-theme="cyber"] .ed-field textarea:focus {
+    border-color: var(--cy-acid);
+    box-shadow: 0 1px 0 0 var(--cy-acid), 0 8px 18px -12px rgba(var(--cy-acid-rgb), 0.7);
+}
+
+/* ---------------------------------------------------------------------------
+   Footer and the project modal
+   --------------------------------------------------------------------------- */
+[data-theme="cyber"] .footer-section h3 {
+    color: var(--cy-cyan);
+}
+
+[data-theme="cyber"] .footer-section h3::before {
+    content: '// ';
+    color: var(--cy-mag);
+}
+
+[data-theme="cyber"] .footer-section a:hover {
+    color: var(--cy-acid);
+}
+
+[data-theme="cyber"] .modal-content {
+    background: rgba(4, 10, 8, 0.94) !important;
+    border-radius: 0 !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--cy-acid-rgb), 0.35),
+        0 0 40px rgba(var(--cy-acid-rgb), 0.12),
+        0 30px 60px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="cyber"] .modal-content h2,
+[data-theme="cyber"] .modal-content h3 {
+    font-family: 'Chakra Petch', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ---------------------------------------------------------------------------
+   Nav: same shapes and motion, lit edges
+   --------------------------------------------------------------------------- */
+[data-theme="cyber"] .header-center-box,
+[data-theme="cyber"] .nav-hub .hub-main,
+[data-theme="cyber"] .nav-hub .hub-btn,
+[data-theme="cyber"] .social-badge {
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--cy-acid-rgb), 0.3),
+        0 0 18px rgba(var(--cy-acid-rgb), 0.1),
+        0 10px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="cyber"] .floating-inner .site-title {
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: 0.06em;
+    color: var(--cy-acid);
+}
+
+/* the toggle shows its state: lit while cyber is on */
+[data-theme="cyber"] .nav-hub .hub-theme {
+    color: var(--cy-acid);
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--cy-acid-rgb), 0.8),
+        0 0 18px rgba(var(--cy-acid-rgb), 0.35) !important;
+}
+
+[data-theme="cyber"] .nav-hub .hub-theme svg {
+    filter: drop-shadow(0 0 4px rgba(var(--cy-acid-rgb), 0.8));
+}
+
+[data-theme="cyber"] .floating-inner .site-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------------------- */
+@keyframes cy-blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Mostly steady; two short brownouts per cycle */
+@keyframes cy-flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    41% {
+        opacity: 0.86;
+    }
+
+    42% {
+        opacity: 1;
+    }
+
+    77% {
+        opacity: 0.9;
+    }
+
+    77.6% {
+        opacity: 1;
+    }
+}
+
+/* theme switch crossfade (View Transitions, where supported) */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 280ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="cyber"] .hero-name,
+    [data-theme="cyber"] .hero-die .tagline::after,
+    [data-theme="cyber"] .ed-page-hero .tagline::after {
+        animation: none;
+    }
+}

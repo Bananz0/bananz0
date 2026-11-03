@@ -333,6 +333,8 @@ if (document.fonts) {
     document.fonts.ready.then(measureDockContent);
     document.fonts.addEventListener?.('loadingdone', measureDockContent);
 }
+// the cyber theme swaps the dock's fonts
+document.addEventListener('themechange', measureDockContent);
 let dockMeasureTimer = null;
 window.addEventListener('resize', () => {
     clearTimeout(dockMeasureTimer);

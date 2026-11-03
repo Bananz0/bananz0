@@ -16,7 +16,35 @@
     const STEEL = [138, 166, 180];
     const SUBSTRATE = '#15171c';
 
-    const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
+    // Cyber theme palette (theme-cyber.css): acid traces, green-cyan ink,
+    // magenta signal pulses on a near-black body
+    const ACID = [57, 255, 136];
+    const INK = [150, 255, 215];
+    const MAGENTA = [255, 43, 214];
+    const CYAN = [34, 230, 255];
+    const isCyber = () => document.documentElement.getAttribute('data-theme') === 'cyber';
+
+    const scale = (c, k) => c.map((v) => Math.round(Math.min(255, v * k)));
+
+    // Every colour is written in the editorial palette and remapped by family
+    // for the cyber theme: warm/gold -> acid, purple -> magenta, teal -> cyan,
+    // neutral greys -> ink, keeping each colour's brightness and alpha.
+    function col(r, g, b, a = 1) {
+        if (isCyber()) {
+            const hi = Math.max(r, g, b) / 255;
+            if (r - b > 40 && r > 100) [r, g, b] = scale(ACID, hi);
+            else if (b > g && r > g + 20) [r, g, b] = scale(MAGENTA, hi);
+            else if (g > r + 30) [r, g, b] = scale(CYAN, hi);
+            else [r, g, b] = scale(INK, (r + g + b) / 3 / 255 * 0.85);
+        }
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+
+    const rgba = (c, a) => col(c[0], c[1], c[2], a);
+    const substrate = () => (isCyber() ? '#05090b' : SUBSTRATE);
+    // signal pulses and the picked wafer die stand out from the routing
+    const accent = (a) => (isCyber() ? `rgba(${MAGENTA.join(', ')}, ${a})` : rgba(GOLD, a));
+    const accentCore = (a) => (isCyber() ? `rgba(255, 200, 244, ${a})` : `rgba(255, 236, 196, ${a})`);
 
     function mulberry32(seed) {
         let a = seed >>> 0;
@@ -105,26 +133,26 @@
             g.save();
             g.translate(fx, fy);
             g.rotate(ang);
-            g.fillStyle = 'rgba(160, 168, 180, 0.12)';
+            g.fillStyle = col(160, 168, 180, 0.12);
             g.fillRect(-2 * px, -2.2 * px, S * 0.06, 4.4 * px);
             g.restore();
         });
 
         // --- die body ---
-        g.fillStyle = SUBSTRATE;
+        g.fillStyle = substrate();
         g.fillRect(die.x, die.y, die.s, die.s);
         const sheen = g.createLinearGradient(die.x, die.y, die.x + die.s, die.y + die.s);
-        sheen.addColorStop(0, 'rgba(120, 150, 190, 0.07)');
-        sheen.addColorStop(0.5, 'rgba(255, 255, 255, 0.0)');
-        sheen.addColorStop(1, 'rgba(190, 140, 90, 0.06)');
+        sheen.addColorStop(0, col(120, 150, 190, 0.07));
+        sheen.addColorStop(0.5, col(255, 255, 255, 0.0));
+        sheen.addColorStop(1, col(190, 140, 90, 0.06));
         g.fillStyle = sheen;
         g.fillRect(die.x, die.y, die.s, die.s);
 
         // seal ring (double)
-        g.strokeStyle = 'rgba(200, 205, 215, 0.22)';
+        g.strokeStyle = col(200, 205, 215, 0.22);
         g.lineWidth = px;
         g.strokeRect(die.x + 3 * px, die.y + 3 * px, die.s - 6 * px, die.s - 6 * px);
-        g.strokeStyle = 'rgba(200, 205, 215, 0.12)';
+        g.strokeStyle = col(200, 205, 215, 0.12);
         g.strokeRect(die.x + 6 * px, die.y + 6 * px, die.s - 12 * px, die.s - 12 * px);
 
         // alignment marks in the corners
@@ -196,7 +224,7 @@
             for (let k = 0; k < lines; k++) {
                 const off = (k - (lines - 1) / 2) * 2.2 * px;
                 const gold = rnd() < 0.35;
-                g.strokeStyle = gold ? rgba(GOLD, 0.28) : 'rgba(170, 180, 195, 0.14)';
+                g.strokeStyle = gold ? rgba(GOLD, 0.28) : col(170, 180, 195, 0.14);
                 g.lineWidth = px * (gold ? 1 : 0.8);
                 g.beginPath();
                 if (vertical) { g.moveTo(b.x1 + off, b.y1); g.lineTo(b.x2 + off, b.y2); }
@@ -211,7 +239,7 @@
             // trace into the core
             const tx = p.side === 1 ? core.x + core.w : p.side === 3 ? core.x : p.x;
             const ty = p.side === 0 ? core.y : p.side === 2 ? core.y + core.h : p.y;
-            g.strokeStyle = 'rgba(170, 180, 195, 0.16)';
+            g.strokeStyle = col(170, 180, 195, 0.16);
             g.lineWidth = px;
             g.beginPath();
             g.moveTo(p.x, p.y);
@@ -220,15 +248,15 @@
             // ESD clamp
             const ex = (p.x + tx) / 2;
             const ey = (p.y + ty) / 2;
-            g.fillStyle = 'rgba(150, 160, 175, 0.16)';
+            g.fillStyle = col(150, 160, 175, 0.16);
             g.fillRect(ex - h * 0.6, ey - h * 0.6, h * 1.2, h * 1.2);
             // pad
             const pg = g.createLinearGradient(p.x - h, p.y - h, p.x + h, p.y + h);
-            pg.addColorStop(0, '#f0cd8a');
-            pg.addColorStop(1, '#a8772f');
+            pg.addColorStop(0, col(240, 205, 138));
+            pg.addColorStop(1, col(168, 119, 47));
             g.fillStyle = pg;
             g.fillRect(p.x - h, p.y - h, padSize, padSize);
-            g.fillStyle = 'rgba(20, 16, 10, 0.35)';
+            g.fillStyle = col(20, 16, 10, 0.35);
             g.fillRect(p.x - h * 0.62, p.y - h * 0.62, h * 1.24, h * 1.24);
         });
 
@@ -244,7 +272,7 @@
             const qx = mx + (nx / nl) * bow;
             const qy = my + (ny / nl) * bow;
             g.lineWidth = 1.4 * px;
-            g.strokeStyle = 'rgba(120, 85, 35, 0.55)';
+            g.strokeStyle = col(120, 85, 35, 0.55);
             g.beginPath();
             g.moveTo(p.x, p.y + 0.8 * px);
             g.quadraticCurveTo(qx, qy + 0.8 * px, p.fx, p.fy + 0.8 * px);
@@ -256,7 +284,7 @@
             g.quadraticCurveTo(qx, qy, p.fx, p.fy);
             g.stroke();
             // ball bond
-            g.fillStyle = '#f3d79c';
+            g.fillStyle = col(243, 215, 156);
             g.beginPath();
             g.arc(p.x, p.y, padSize * 0.22, 0, Math.PI * 2);
             g.fill();
@@ -269,7 +297,7 @@
         g.fillStyle = rgba(GOLD, 0.55);
         g.textBaseline = 'top';
         g.fillText('GM-RTC1', markRect.x + fs * 0.6, markRect.y + fs * 0.6);
-        g.fillStyle = 'rgba(200, 205, 215, 0.3)';
+        g.fillStyle = col(200, 205, 215, 0.3);
         g.fillText(hex(seed).slice(2), markRect.x + fs * 0.6, markRect.y + fs * 1.85);
 
         return { layer, buses, ro, die };
@@ -280,7 +308,7 @@
             const hue = pick([200, 215, 260, 35, 160]);
             g.fillStyle = `hsla(${hue}, 30%, 55%, ${range(0.03, 0.08)})`;
             g.fillRect(r.x, r.y, r.w, r.h);
-            g.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+            g.strokeStyle = col(255, 255, 255, 0.07);
             g.lineWidth = px;
             g.strokeRect(r.x + 0.5 * px, r.y + 0.5 * px, r.w - px, r.h - px);
 
@@ -310,7 +338,7 @@
                 }
             }
             // M2 straps
-            g.strokeStyle = 'rgba(190, 200, 215, 0.08)';
+            g.strokeStyle = col(190, 200, 215, 0.08);
             g.lineWidth = px;
             const step = Math.max(8 * px, b.w / Math.floor(range(5, 11)));
             for (let x = b.x + step / 2; x < b.x + b.w; x += step) {
@@ -337,21 +365,21 @@
                 for (let j = 0; j < banksY; j++) {
                     const x0 = a.x + i * (bw + bg);
                     const y0 = a.y + j * (bh + bg);
-                    g.fillStyle = 'rgba(70, 76, 88, 0.55)';
+                    g.fillStyle = col(70, 76, 88, 0.55);
                     g.fillRect(x0, y0, bw, bh);
                     const cw = Math.max(1.6 * px, core.w * 0.0065);
-                    g.fillStyle = 'rgba(15, 17, 21, 0.5)';
+                    g.fillStyle = col(15, 17, 21, 0.5);
                     for (let y = y0; y < y0 + bh; y += cw * 1.4) g.fillRect(x0, y, bw, 0.6 * px);
-                    g.fillStyle = 'rgba(200, 205, 215, 0.06)';
+                    g.fillStyle = col(200, 205, 215, 0.06);
                     for (let x = x0; x < x0 + bw; x += cw) g.fillRect(x, y0, 0.5 * px, bh);
                 }
             }
         }
 
         function drawStdCellsStrip(b) {
-            g.fillStyle = 'rgba(48, 52, 60, 0.9)';
+            g.fillStyle = col(48, 52, 60, 0.9);
             g.fillRect(b.x, b.y, b.w, b.h);
-            g.fillStyle = 'rgba(200, 205, 215, 0.07)';
+            g.fillStyle = col(200, 205, 215, 0.07);
             const step = 1.6 * px;
             if (b.w > b.h) for (let x = b.x; x < b.x + b.w; x += step * range(1, 3)) g.fillRect(x, b.y, 0.6 * px, b.h);
             else for (let y = b.y; y < b.y + b.h; y += step * range(1, 3)) g.fillRect(b.x, y, b.w, 0.6 * px);
@@ -368,12 +396,12 @@
             g.fillRect(half.x, half.y + half.h - fw, half.w, fw);
             let k = 0;
             for (let x = half.x + fw; x < half.x + half.w - fw; x += fw * 2, k++) {
-                g.fillStyle = k % 2 ? rgba(GOLD, 0.26) : 'rgba(180, 190, 205, 0.2)';
+                g.fillStyle = k % 2 ? rgba(GOLD, 0.26) : col(180, 190, 205, 0.2);
                 if (k % 2) g.fillRect(x, half.y + fw, fw, half.h - fw * 3);
                 else g.fillRect(x, half.y + fw * 2, fw, half.h - fw * 3);
             }
 
-            g.strokeStyle = 'rgba(180, 190, 205, 0.22)';
+            g.strokeStyle = col(180, 190, 205, 0.22);
             g.lineWidth = Math.max(px, rest.w / 40);
             g.beginPath();
             const turns = Math.max(3, Math.floor(rest.w / (6 * px)));
@@ -389,7 +417,7 @@
 
         function drawFill(b) {
             const step = Math.max(4 * px, core.w * 0.016);
-            g.fillStyle = 'rgba(200, 205, 215, 0.06)';
+            g.fillStyle = col(200, 205, 215, 0.06);
             for (let y = b.y; y < b.y + b.h; y += step) {
                 for (let x = b.x + ((y - b.y) / step % 2 ? step / 2 : 0); x < b.x + b.w; x += step) {
                     g.fillRect(x, y, step * 0.35, step * 0.35);
@@ -410,9 +438,9 @@
                 const x = b.x + i * cellW + cellW * 0.12;
                 const w = cellW * 0.76;
                 // pmos (top) / nmos (bottom) diffusion
-                g.fillStyle = 'rgba(160, 120, 170, 0.22)';
+                g.fillStyle = col(160, 120, 170, 0.22);
                 g.fillRect(x, top, w, cellH * 0.38);
-                g.fillStyle = 'rgba(110, 160, 150, 0.22)';
+                g.fillStyle = col(110, 160, 150, 0.22);
                 g.fillRect(x, top + cellH * 0.62, w, cellH * 0.38);
                 // poly gate
                 g.fillStyle = rgba(GOLD, 0.45);
@@ -420,7 +448,7 @@
                 cells.push({ x, y: top, w, h: cellH });
                 // stage-to-stage link
                 if (i < n - 1) {
-                    g.strokeStyle = 'rgba(200, 205, 215, 0.3)';
+                    g.strokeStyle = col(200, 205, 215, 0.3);
                     g.lineWidth = px;
                     g.beginPath();
                     g.moveTo(x + w, top + cellH / 2);
@@ -513,10 +541,10 @@
                 const hy = p.y1 + (p.y2 - p.y1) * head;
                 const tx = p.x1 + (p.x2 - p.x1) * tail;
                 const ty = p.y1 + (p.y2 - p.y1) * tail;
-                ctx.strokeStyle = rgba(GOLD, 0.18);
+                ctx.strokeStyle = accent(0.18);
                 ctx.lineWidth = 4 * dpr;
                 ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
-                ctx.strokeStyle = 'rgba(255, 236, 196, 0.9)';
+                ctx.strokeStyle = accentCore(0.9);
                 ctx.lineWidth = 1.2 * dpr;
                 ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
                 return true;
@@ -553,6 +581,7 @@
 
         document.addEventListener('visibilitychange', () => { last = 0; schedule(); });
         reduceMotion.addEventListener?.('change', () => { render(); schedule(); });
+        document.addEventListener('themechange', () => { if (chip) { render(); schedule(); } });
 
         let resizeTimer = 0;
         new ResizeObserver(() => {
@@ -590,7 +619,7 @@
         const defect = { x: cx + Math.cos(da) * dr, y: cy + Math.sin(da) * dr, r: R * (0.15 + rnd() * 0.15) };
 
         g.clearRect(0, 0, w, h);
-        g.strokeStyle = 'rgba(200, 205, 215, 0.25)';
+        g.strokeStyle = col(200, 205, 215, 0.25);
         g.lineWidth = dpr;
         g.beginPath();
         // flat notch at the bottom
@@ -620,19 +649,22 @@
         // the die in Fig. 1, picked off the wafer
         if (passing.length) {
             const [x, y] = passing[Math.floor(passing.length * 0.45)];
-            g.strokeStyle = 'rgba(255, 236, 196, 0.95)';
+            g.strokeStyle = accentCore(0.95);
             g.lineWidth = dpr;
             g.strokeRect(x + gap / 2 - dpr, y + gap / 2 - dpr, pitch - gap + 2 * dpr, pitch - gap + 2 * dpr);
         }
     }
 
     function initWafer(canvas) {
+        let drawn = false;
         new IntersectionObserver((entries, obs) => {
             if (entries[0].isIntersecting) {
                 drawWafer(canvas);
+                drawn = true;
                 obs.disconnect();
             }
         }, { rootMargin: '200px' }).observe(canvas);
+        document.addEventListener('themechange', () => { if (drawn) drawWafer(canvas); });
     }
 
     function init() {
