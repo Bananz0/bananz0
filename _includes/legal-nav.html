@@ -1,0 +1,6 @@
+<div class="legal-nav" role="navigation" aria-label="Hydrate legal documents">
+    {% assign legal_links = "/privacy/hydrate/|Privacy Policy,/privacy/hydrate/terms/|Terms of Use,/privacy/hydrate/delete/|Your data,/hydrate/|About Hydrate" | split: "," %}
+    {% for item in legal_links %}{% assign parts = item | split: "|" %}
+    <a href="{{ parts[0] | relative_url }}"{% if page.url == parts[0] %} aria-current="page"{% endif %}>{{ parts[1] }}</a>
+    {% endfor %}
+</div>

@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    {% unless page.no_tracking %}
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
                 'gtm.start':
@@ -10,6 +11,7 @@
                 j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-M2LBGWGZ');</script>
+    {% endunless %}
 
     <meta charset="UTF-8">
     <!-- Theme before first paint: ?mode=cyber|editorial, else the visitor's last choice -->
@@ -49,8 +51,10 @@
 </head>
 
 <body>
+    {% unless page.no_tracking %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M2LBGWGZ" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
+    {% endunless %}
     {% include navbar.html contact_href="#contact" %}
 
     <!-- Page content -->
